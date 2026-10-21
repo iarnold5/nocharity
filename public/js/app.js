@@ -7,8 +7,8 @@ import { INITIAL_BILLIONAIRES } from './data.js';
 
 // Application State with LocalStorage Persistence
 const state = {
-  monthlyIncome: parseFloat(localStorage.getItem('nocharity_income')) || 4000,
-  currency: localStorage.getItem('nocharity_currency') || '$',
+  monthlyIncome: parseFloat(localStorage.getItem('nocharity_income')) || 35000,
+  currency: localStorage.getItem('nocharity_currency') || '₹',
   calcMode: localStorage.getItem('nocharity_mode') || 'networth', // 'networth' or 'income'
   activeTimeframe: 'all', // 'all', 'past_month', 'past_year', 'custom'
   customStartDate: '2023-01-01',
@@ -41,11 +41,7 @@ const welcomeIncomeInput = document.getElementById('welcomeIncomeInput');
 const btnStartWelcome = document.getElementById('btnStartWelcome');
 
 // Me Card Elements
-const myBudgetValueDisplay = document.getElementById('myBudgetValueDisplay');
-const budgetModeBadge = document.getElementById('budgetModeBadge');
-const btnQuickEditBudget = document.getElementById('btnQuickEditBudget');
 const matchTargetQuote = document.getElementById('matchTargetQuote');
-const highlightMatchPercentage = document.getElementById('highlightMatchPercentage');
 const matchHeroAmount = document.getElementById('matchHeroAmount');
 const matchSubText = document.getElementById('matchSubText');
 const tangibleIcon = document.getElementById('tangibleIcon');
@@ -74,7 +70,7 @@ const closeMcpModal = document.getElementById('closeMcpModal');
 /**
  * Format currency amounts in human-readable millions/billions
  */
-function formatDollars(amount, currency = '$') {
+function formatDollars(amount, currency = '₹') {
   if (amount >= 1_000_000_000_000) {
     return `${currency}${(amount / 1_000_000_000_000).toFixed(2)} Trillion`;
   }
@@ -93,11 +89,11 @@ function formatDollars(amount, currency = '$') {
 /**
  * Tangible Everyday Micro-Comparisons
  */
-function getTangibleMatch(userAmount, currency = '$') {
+function getTangibleMatch(userAmount, currency = '₹') {
   if (userAmount <= 0.25) {
     return {
       icon: "🪙",
-      text: `A single coin found in your sofa (${currency}${userAmount.toFixed(2)})`,
+      text: `A loose coin found in your sofa (${currency}${userAmount.toFixed(2)})`,
       tip: "You can match this billionaire's entire wealth-giving sacrifice with literal pocket change! 🛋️✨"
     };
   }
@@ -112,7 +108,7 @@ function getTangibleMatch(userAmount, currency = '$') {
     return {
       icon: "☕",
       text: `One cup of filter coffee (${currency}${userAmount.toFixed(2)})`,
-      tip: "One modest coffee this month equals their exact proportional net worth sacrifice! ☕🎉"
+      tip: "One modest coffee this month equals their exact proportional sacrifice! ☕🎉"
     };
   }
   if (userAmount < 7.00) {
@@ -159,7 +155,6 @@ function getTangibleMatch(userAmount, currency = '$') {
 
 /**
  * Filter donations by timeframe
- * Handles 'all', 'past_month', 'past_year', and 'custom'
  */
 function filterDonations(donations, timeframe, start, end) {
   if (!timeframe || timeframe === 'all') return donations;
@@ -225,9 +220,6 @@ function renderActiveBillionaire() {
   const tangible = getTangibleMatch(userEquivalentMonthly, state.currency);
 
   // Update Left "ME" Panel
-  myBudgetValueDisplay.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
-  budgetModeBadge.textContent = state.calcMode === 'income' ? 'Earnings Mode' : 'Net Worth Mode';
-
   matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s generosity of <span class="highlight-percentage" id="highlightMatchPercentage">${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</span> of their ${baseMetricName} (${getTimeframeLabel(state.activeTimeframe)}):`;
   
   // Hero number in GREEN matching right side Donated in Period color
@@ -244,7 +236,30 @@ function renderActiveBillionaire() {
   // Update header settings button text
   headerSettingsLabel.textContent = `Settings (${state.currency}${state.monthlyIncome.toLocaleString()}/mo)`;
 
-  // Render Right Billionaire Card
+  // Flag and Country formatting
+  const countryStr = b.country || '';
+  const flagMatch = countryStr.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+  const flag = flagMatch ? flagMatch[0] : '🌐';
+  const countryName = countryStr.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u, '').trim();
+
+  // Financial badge: Net Worth vs Monthly Income mode with clean hover tooltip
+  let financialBadge = '';
+  if (state.calcMode === 'income') {
+    const monthlyEst = (b.estimatedAnnualIncome || (b.netWorth * 0.08)) / 12;
+    financialBadge = `
+      <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'} (Estimated based on annual returns)">
+        💼 Est. Monthly Income: ${formatDollars(monthlyEst, state.currency)} / mo ↗
+      </a>
+    `;
+  } else {
+    financialBadge = `
+      <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
+        💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗
+      </a>
+    `;
+  }
+
+  // Pledge badge
   const pledgeBadge = b.givingPledge 
     ? `<span class="pledge-icon-badge" title="Giving Pledge Signatory">✓</span>` 
     : `<span class="pledge-icon-badge" style="border-color:#94a3b8; color:#94a3b8;" title="Not a Giving Pledge Signatory">✕</span>`;
@@ -268,7 +283,7 @@ function renderActiveBillionaire() {
           </div>
         </div>
       `).join('')
-    : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; background: #fff; border-radius: 8px;">
+    : `<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.86rem; background: #fff; border-radius: 8px;">
         No major public donations reported in news during this specific timeframe.
        </div>`;
 
@@ -281,12 +296,13 @@ function renderActiveBillionaire() {
       </div>
       <div class="profile-meta">
         <h3>${b.name}</h3>
-        <p class="profile-company">${b.company} • ${b.country || ''}</p>
+        <p class="profile-company">${b.company}</p>
+        <p class="profile-origin">
+          <span class="country-flag-icon">${flag}</span>
+          <span>${countryName}</span>
+        </p>
         <div class="profile-tags-row">
-          <!-- Traceable Net Worth Link with Source -->
-          <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="View live source on ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
-            💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗ (${b.netWorthSourceName || 'Live Source'})
-          </a>
+          ${financialBadge}
           <span class="tag-badge tag-score" title="Forbes Philanthropy Score">⭐ Score: ${starRating}</span>
         </div>
       </div>
@@ -304,25 +320,23 @@ function renderActiveBillionaire() {
       </div>
     </div>
 
-    <!-- Verified Donations Section with Direct Clickable Links -->
+    <!-- Verified Donations Section with Header Run Live MCP Scan Button -->
     <div class="donations-section">
       <div class="donations-section-title">
-        <span>📰 Verified Public Reports (${activeDonations.length})</span>
-        <span style="font-size: 0.74rem; font-weight: 600; text-transform: none; color: #0284c7;">Click any headline to read source ↗</span>
+        <span>📰 Verified Reports (${activeDonations.length})</span>
+        <button id="btnHeaderLiveMcpScan" class="btn-refresh-scan" title="Run live news scan via MCP">
+          <span>Run Live MCP Scan</span>
+          <span class="refresh-icon">🔄</span>
+        </button>
       </div>
       <div class="donations-news-list">
         ${donationsHtml}
       </div>
     </div>
-
-    <!-- Live MCP Scan Button -->
-    <button class="btn-scan-mcp" id="btnLiveMcpScan">
-      <span>📡 Run Live MCP News Scan for ${b.name.split(' ')[0]}</span>
-    </button>
   `;
 
-  // Attach live MCP scan listener
-  document.getElementById('btnLiveMcpScan').addEventListener('click', () => {
+  // Attach live MCP scan listener on header button
+  document.getElementById('btnHeaderLiveMcpScan').addEventListener('click', () => {
     runLiveMcpNewsScan(b.name);
   });
 
@@ -425,7 +439,7 @@ function openSettings() {
  */
 function saveSettings() {
   state.currency = settingsCurrencySelect.value;
-  state.monthlyIncome = parseFloat(settingsIncomeInput.value) || 4000;
+  state.monthlyIncome = parseFloat(settingsIncomeInput.value) || 35000;
   
   const selectedMode = document.querySelector('input[name="calcMode"]:checked');
   if (selectedMode) state.calcMode = selectedMode.value;
@@ -468,7 +482,6 @@ function setupEvents() {
 
   // Settings Modal triggers
   openSettingsBtn.addEventListener('click', openSettings);
-  btnQuickEditBudget.addEventListener('click', openSettings);
   closeSettingsModal.addEventListener('click', () => settingsModal.classList.remove('active'));
   settingsModal.addEventListener('click', (e) => {
     if (e.target === settingsModal) settingsModal.classList.remove('active');
@@ -493,7 +506,7 @@ function setupEvents() {
 
   btnStartWelcome.addEventListener('click', () => {
     state.currency = welcomeCurrencySelect.value;
-    state.monthlyIncome = parseFloat(welcomeIncomeInput.value) || 4000;
+    state.monthlyIncome = parseFloat(welcomeIncomeInput.value) || 35000;
     localStorage.setItem('nocharity_income', state.monthlyIncome);
     localStorage.setItem('nocharity_currency', state.currency);
     welcomeModal.classList.remove('active');

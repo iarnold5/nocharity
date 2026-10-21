@@ -29,7 +29,7 @@
 
       <!-- Header Controls: Timeframe, Custom Dates, Settings & MCP Guide -->
       <div class="header-controls">
-        <!-- Timeframe Selector (Only All Time, Past Month, Past Year, Custom) -->
+        <!-- Timeframe Selector -->
         <div class="timeframe-header-group" id="timeframeHeaderGroup">
           <button class="time-btn active" data-timeframe="all">All Time</button>
           <button class="time-btn" data-timeframe="past_month">Past Month</button>
@@ -37,7 +37,7 @@
           <button class="time-btn" data-timeframe="custom">Custom</button>
         </div>
 
-        <!-- Custom Date Range Picker Row (Expands when Custom is active) -->
+        <!-- Custom Date Range Picker Row -->
         <div class="custom-date-row" id="customDateRow">
           <span>From:</span>
           <input type="date" id="customStartDate" class="date-input" value="2023-01-01">
@@ -60,24 +60,9 @@
       </div>
     </header>
 
-    <!-- Gianmarco Soresi Credit Banner -->
-    <aside class="soresi-credit-banner">
-      <div class="credit-content">
-        <span class="credit-icon">🎙️</span>
-        <p class="credit-quote">
-          “There should be some kind of calculator where whenever a billionaire donates some amount of money, you can quickly see what percentage that is of their net worth, apply it to your own net worth and see how much of a sacrifice it actually is”
-          <span class="credit-author">— Gianmarco Soresi</span>
-        </p>
-      </div>
-      <a href="https://www.youtube.com/@GianmarcoSoresi" target="_blank" rel="noopener noreferrer" class="btn-soresi-link">
-        <span>▶ Gianmarco Soresi</span>
-        <span>↗</span>
-      </a>
-    </aside>
-
-    <!-- Main Two-Sided Calculator Stage -->
+    <!-- Main Two-Sided Calculator Stage (Equal 50/50 Sizing) -->
     <main class="calculator-stage">
-      <!-- LEFT SIDE: "ME" Panel (Uncluttered) -->
+      <!-- LEFT SIDE: "ME" Panel (Exact same size as Right Side, uncluttered) -->
       <section class="panel-me">
         <div class="panel-me-top">
           <div class="me-badge-header">
@@ -88,18 +73,6 @@
                 <p class="panel-subtitle">Your personal reality check</p>
               </div>
             </div>
-          </div>
-
-          <!-- Current User Budget Pill with Quick Edit -->
-          <div class="user-budget-card">
-            <div>
-              <div class="budget-lbl" id="budgetTypeLabel">My Monthly Take-Home Pay</div>
-              <div class="budget-val-row">
-                <span class="budget-val" id="myBudgetValueDisplay">₹35,000 / mo</span>
-                <span id="budgetModeBadge" style="font-size: 0.72rem; font-weight: 700; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 9999px;">Net Worth Mode</span>
-              </div>
-            </div>
-            <button id="btnQuickEditBudget" class="btn-edit-budget">✏️ Edit in Settings</button>
           </div>
         </div>
 
@@ -132,7 +105,7 @@
         <div class="vs-line"></div>
       </div>
 
-      <!-- RIGHT SIDE: "CHOOSE BILLIONAIRE" Giant Vertical Carousel -->
+      <!-- RIGHT SIDE: "CHOOSE BILLIONAIRE" Giant Vertical Carousel (Exact same size) -->
       <section class="panel-billionaire">
         <!-- Carousel Nav Controls -->
         <div class="carousel-top-bar">
@@ -148,16 +121,31 @@
           <!-- Dynamically populated billionaire profile -->
         </div>
 
-        <!-- Quick Thumbnail Bar (All 17 global & historic billionaires) -->
+        <!-- Quick Thumbnail Bar -->
         <div class="billionaires-thumb-bar" id="thumbBar">
           <!-- Injected thumbnail buttons -->
         </div>
       </section>
     </main>
 
+    <!-- Gianmarco Soresi Credit Banner (Moved to the bottom of the VS section) -->
+    <aside class="soresi-credit-banner">
+      <div class="credit-content">
+        <span class="credit-icon">🎙️</span>
+        <p class="credit-quote">
+          “There should be some kind of calculator where whenever a billionaire donates some amount of money, you can quickly see what percentage that is of their net worth, apply it to your own net worth and see how much of a sacrifice it actually is”
+          <span class="credit-author">— Gianmarco Soresi</span>
+        </p>
+      </div>
+      <a href="https://www.youtube.com/@GianmarcoSoresi" target="_blank" rel="noopener noreferrer" class="btn-soresi-link">
+        <span>▶ Gianmarco Soresi</span>
+        <span>↗</span>
+      </a>
+    </aside>
+
     <!-- Footer -->
     <footer class="app-footer-bar">
-      <p>NoCharity • Inspired by <a href="https://www.youtube.com/@GianmarcoSoresi" target="_blank" style="color: #0284c7; font-weight: 700;">Gianmarco Soresi</a>. Grounded in public disclosures, Forbes Real-Time rankings, Bloomberg Index, and the Giving Pledge registry.</p>
+      <p>NoCharity • Grounded in public disclosures, Forbes Real-Time rankings, Bloomberg Index, and the Giving Pledge registry.</p>
       <p style="margin-top: 4px;">Powered by Model Context Protocol (MCP) • 100% Free deployment architecture</p>
     </footer>
   </div>
@@ -186,7 +174,7 @@
           </select>
           <input type="number" id="settingsIncomeInput" class="settings-number-input" value="4000" min="50" step="100">
         </div>
-        <input type="range" id="settingsIncomeSlider" class="income-range-slider" min="500" max="25000" step="250" value="4000" style="margin-top: 12px; width: 100%;">
+        <input type="range" id="settingsIncomeSlider" class="income-range-slider" min="500" max="25000" step="250" value="4000">
       </div>
 
       <div class="settings-group">
