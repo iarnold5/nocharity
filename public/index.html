@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoCharity — Billionaire Philanthropy & Income Parity Calculator</title>
+  <meta name="description" content="Track billionaire charity donations reported in the news across selected timeframes, calculate donations as a percentage of net worth, and compare directly against your personal monthly income.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="app-container">
+    <!-- Navigation Bar -->
+    <header class="app-nav">
+      <div class="nav-brand">
+        <div class="brand-icon">⚖️</div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="brand-title">NoCharity</span>
+            <span class="brand-tag">Reality Check</span>
+          </div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button id="openMcpModalBtn" class="btn-mcp-info">
+          <span class="mcp-indicator-pulse"></span>
+          <span>Free MCP Architecture</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <div class="hero-pill">
+        <span>📰 Verified News & Philanthropy Tracking</span>
+        <span>•</span>
+        <span style="color: #38bdf8;">100% Free Live MCP Integration</span>
+      </div>
+      <h1 class="hero-title">
+        Billionaire Donations, <br><span class="gradient-text">Translated to Your Reality</span>
+      </h1>
+      <p class="hero-subtitle">
+        When an ultra-wealthy mogul donates $100 Million, it dominates global headlines. But what percentage of their wealth did they actually sacrifice — and what would that look like out of your paycheck?
+      </p>
+    </section>
+
+    <!-- Interactive Calculator & Timeframe Deck -->
+    <section class="calculator-deck" id="calculatorDeck">
+      <div class="deck-header">
+        <div class="deck-title-group">
+          <span class="deck-icon">⚡</span>
+          <div>
+            <h2 class="deck-title">Parity Calculator & Timeframe Control</h2>
+            <p class="deck-subtitle">Adjust your monthly earnings to see what their generosity equals on your budget</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="deck-inputs-grid">
+        <!-- Input 1: Personal Monthly Income -->
+        <div class="input-block">
+          <div class="input-label-row">
+            <span class="input-label">
+              <span>💳</span> Your Monthly Take-Home Income
+            </span>
+            <span class="input-val-preview" id="incomePreviewDisplay">$4,000 / mo</span>
+          </div>
+          <div class="income-controls-row">
+            <select id="currencySelect" class="currency-select" title="Currency">
+              <option value="$" selected>USD ($)</option>
+              <option value="€">EUR (€)</option>
+              <option value="£">GBP (£)</option>
+              <option value="₹">INR (₹)</option>
+              <option value="C$">CAD (C$)</option>
+              <option value="A$">AUD (A$)</option>
+            </select>
+            <input type="number" id="incomeInput" class="income-number-input" value="4000" min="100" max="1000000" step="100" placeholder="Monthly income">
+          </div>
+          <input type="range" id="incomeSlider" class="income-slider" min="500" max="25000" step="250" value="4000" title="Slide to adjust income">
+        </div>
+
+        <!-- Input 2: Timeframe Filter Selector -->
+        <div class="input-block">
+          <div class="input-label-row">
+            <span class="input-label">
+              <span>📅</span> News & Donation Timeframe
+            </span>
+            <span id="activeTimeframeLabel" style="font-size: 0.85rem; font-weight: 700; color: #a5b4fc;">All Tracked Records</span>
+          </div>
+          <div class="timeframe-options" id="timeframeOptions">
+            <button class="time-btn active" data-timeframe="all">All Time</button>
+            <button class="time-btn" data-timeframe="2026">2026 Recent</button>
+            <button class="time-btn" data-timeframe="2025">2025 Calendar</button>
+            <button class="time-btn" data-timeframe="past_2_years">Past 2 Years</button>
+            <button class="time-btn" data-timeframe="past_5_years">Past 5 Years</button>
+            <button class="time-btn" data-timeframe="2020-2023">2020 - 2023</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Macro Stats Ribbon -->
+    <section class="stats-ribbon" id="statsRibbon">
+      <div class="stat-card">
+        <div class="stat-label">Total Tracked Wealth</div>
+        <div class="stat-value" id="statTotalWealth">$1.57 Trillion</div>
+        <div class="stat-foot">Combined net worth of tracked cohort</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Donated in Period</div>
+        <div class="stat-value" style="color: #38bdf8;" id="statTotalDonated">$62.4 Billion</div>
+        <div class="stat-foot" id="statDonationsCount">From verified news & tax filings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Average % of Net Worth Donated</div>
+        <div class="stat-value" style="color: #a855f7;" id="statAvgPercent">3.98%</div>
+        <div class="stat-foot">Aggregate generosity ratio</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Your Group Parity Average</div>
+        <div class="stat-value" style="color: #34d399;" id="statAvgParity">$159.20</div>
+        <div class="stat-foot">Monthly equivalent on your income</div>
+      </div>
+    </section>
+
+    <!-- Toolbar: Search, Sort, View Modes -->
+    <div class="toolbar-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, company, or cause...">
+      </div>
+
+      <div class="toolbar-controls">
+        <select id="sortSelect" class="sort-select" title="Sort by">
+          <option value="generosity-desc">Most Generous (% of Net Worth)</option>
+          <option value="amount-desc">Highest Total Amount ($)</option>
+          <option value="generosity-asc">Stingiest (% of Net Worth)</option>
+          <option value="wealth-desc">Highest Net Worth</option>
+          <option value="name-asc">Alphabetical (A - Z)</option>
+        </select>
+
+        <div class="view-toggle">
+          <button id="viewGridBtn" class="view-btn active" title="Cards View">
+            <span>🗂️ Cards</span>
+          </button>
+          <button id="viewChartBtn" class="view-btn" title="Comparative Chart">
+            <span>📊 Chart</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 1: Billionaire Cards Grid -->
+    <div class="cards-grid" id="cardsGrid">
+      <!-- Dynamically generated cards -->
+    </div>
+
+    <!-- View 2: Comparative Bar Chart View -->
+    <div class="chart-view-container" id="chartViewContainer">
+      <h3 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 20px;">
+        Visual Comparison: Percentage of Net Worth Donated vs. Equivalent From Your Paycheck
+      </h3>
+      <div id="chartRowsList">
+        <!-- Dynamically injected chart rows -->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>NoCharity • Grounded in public news reports, Forbes Philanthropy Rankings, SEC Form 990 tax disclosures, and the Giving Pledge registry.</p>
+      <p style="margin-top: 6px;">Powered by Model Context Protocol (MCP) • 100% Free deployment architecture</p>
+    </footer>
+  </div>
+
+  <!-- News & Articles Drawer Modal -->
+  <div class="modal-overlay" id="newsModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="modalBillionaireName">Billionaire News</h3>
+          <p id="modalTimeframeSub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Timeframe: All Time</p>
+        </div>
+        <button id="closeNewsModalBtn" class="btn-close-modal" aria-label="Close modal">✕</button>
+      </div>
+      <div id="modalLoadingSpinner" style="display: none; text-align: center; padding: 30px;">
+        <div class="mcp-indicator-pulse" style="width: 16px; height: 16px; margin: 0 auto 12px;"></div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Fetching live news via MCP Google News RSS stream...</p>
+      </div>
+      <div class="article-list" id="modalArticleList">
+        <!-- Injected articles -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MCP Architecture & Free Hosting Explainer Modal -->
+  <div class="modal-overlay" id="mcpArchitectureModalOverlay">
+    <div class="modal-card" style="max-width: 800px;">
+      <div class="modal-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 24px;">🌐</span>
+            <h3 class="modal-title">Free MCP Internet Deployment Guide</h3>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 4px;">
+            How this application runs on the internet for $0 using Model Context Protocol (MCP)
+          </p>
+        </div>
+        <button id="closeMcpModalBtn" class="btn-close-modal" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="mcp-grid">
+        <div class="mcp-box">
+          <h4>1. What MCP Servers Are Used?</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+            To achieve real-time news search and donation extraction on the internet with <strong>zero cost and zero paid API keys</strong>, this application implements a standard MCP Server architecture:
+          </p>
+          <ul style="padding-left: 20px; font-size: 0.86rem; color: var(--text-main); line-height: 1.7;">
+            <li><strong>News Search MCP Tool (<code>search_billionaire_news</code>)</strong>: Queries Google News RSS and open news endpoints with custom timeframe syntax (<code>when:1y</code>, <code>when:30d</code>). It requires $0, needs no subscription, and parses donation figures automatically with regex.</li>
+            <li><strong>Parity Math MCP Tool (<code>calculate_donation_parity</code>)</strong>: Computes percentage of net worth and maps it to tangible real-world equivalents for personal incomes.</li>
+            <li><strong>Philanthropy Index MCP Tool (<code>get_billionaires_list</code>)</strong>: Provides Forbes scores, verified tax filing records, and Giving Pledge status.</li>
+          </ul>
+        </div>
+
+        <div class="mcp-box">
+          <h4>2. Running This MCP Server In AI Clients</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            You can register this MCP server in Claude Desktop or Antigravity by adding the included <code>mcp_config.json</code> to your config:
+          </p>
+          <pre class="code-snippet"><code>{
+  "mcpServers": {
+    "billionaire-philanthropy": {
+      "command": "node",
+      "args": ["${path_to_repo}/mcp-server.js"]
+    }
+  }
+}</code></pre>
+        </div>
+
+        <div class="mcp-box">
+          <h4>3. How To Host It On The Internet For Free</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+            You can deploy this full-stack app online completely free on several cloud platforms:
+          </p>
+          <div style="font-size: 0.86rem; line-height: 1.7;">
+            <p><strong>A. Render.com (Recommended Free Tier)</strong></p>
+            <p style="color: var(--text-muted); margin-bottom: 8px;">Push this folder to GitHub, create a free "Web Service" on Render, choose Node.js, and set build command to <code>npm install</code> and start command to <code>node server.js</code>. You get a free HTTPS domain.</p>
+
+            <p><strong>B. Hugging Face Spaces (Free Docker/Node)</strong></p>
+            <p style="color: var(--text-muted); margin-bottom: 8px;">Create a free Space with Node.js / Docker. Free 24/7 web hosting without cold start restrictions.</p>
+
+            <p><strong>C. GitHub Pages (Static Client-Side Mode)</strong></p>
+            <p style="color: var(--text-muted);">The <code>public/</code> folder contains an autonomous client-side fallback with the full dataset and live parity engine, so it can be hosted directly on GitHub Pages with zero servers!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Logic -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

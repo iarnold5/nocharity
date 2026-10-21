@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "billionaire-philanthropy": {
+      "command": "node",
+      "args": [
+        "e:/PersonalProjects/ProjectFiles/AI Slop/nocharity/mcp-server.js"
+      ],
+      "env": {}
+    }
+  }
+}

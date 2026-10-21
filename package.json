@@ -1,0 +1,28 @@
+{
+  "name": "nocharity",
+  "version": "1.0.0",
+  "description": "Billionaire Philanthropy Reality Check - Track billionaire donations from news, calculate net-worth percentages, and compare against everyday personal income with free MCP integration.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "mcp": "node mcp-server.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "billionaires",
+    "philanthropy",
+    "charity",
+    "calculator",
+    "news-scraping"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
