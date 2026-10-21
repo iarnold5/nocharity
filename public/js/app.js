@@ -1,27 +1,51 @@
 /**
- * NoCharity — Cheerful "Me vs. Billionaire" Interactive Parity Calculator Logic
+ * NoCharity — Interactive Parity Calculator Logic
+ * Inspired by Gianmarco Soresi (@GianmarcoSoresi)
  */
 
 import { INITIAL_BILLIONAIRES } from './data.js';
 
-// Application State
+// Application State with LocalStorage Persistence
 const state = {
-  monthlyIncome: 4000,
-  currency: '$',
-  activeTimeframe: 'all',
+  monthlyIncome: parseFloat(localStorage.getItem('nocharity_income')) || 4000,
+  currency: localStorage.getItem('nocharity_currency') || '$',
+  calcMode: localStorage.getItem('nocharity_mode') || 'networth', // 'networth' or 'income'
+  activeTimeframe: 'all', // 'all', 'past_month', 'past_year', 'custom'
+  customStartDate: '2023-01-01',
+  customEndDate: '2026-12-31',
   currentIndex: 0,
   billionaires: JSON.parse(JSON.stringify(INITIAL_BILLIONAIRES)),
 };
 
 // DOM References
-const incomeInput = document.getElementById('incomeInput');
-const incomeSlider = document.getElementById('incomeSlider');
-const incomeDisplayTag = document.getElementById('incomeDisplayTag');
-const currencySelect = document.getElementById('currencySelect');
-const timeframePills = document.getElementById('timeframePills');
+const timeframeHeaderGroup = document.getElementById('timeframeHeaderGroup');
+const customDateRow = document.getElementById('customDateRow');
+const customStartDate = document.getElementById('customStartDate');
+const customEndDate = document.getElementById('customEndDate');
+const btnApplyCustomDates = document.getElementById('btnApplyCustomDates');
 
-// Me Match Result Elements
+// Header Settings
+const openSettingsBtn = document.getElementById('openSettingsBtn');
+const headerSettingsLabel = document.getElementById('headerSettingsLabel');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsModal = document.getElementById('closeSettingsModal');
+const settingsCurrencySelect = document.getElementById('settingsCurrencySelect');
+const settingsIncomeInput = document.getElementById('settingsIncomeInput');
+const settingsIncomeSlider = document.getElementById('settingsIncomeSlider');
+const btnSaveSettings = document.getElementById('btnSaveSettings');
+
+// Welcome Modal
+const welcomeModal = document.getElementById('welcomeModal');
+const welcomeCurrencySelect = document.getElementById('welcomeCurrencySelect');
+const welcomeIncomeInput = document.getElementById('welcomeIncomeInput');
+const btnStartWelcome = document.getElementById('btnStartWelcome');
+
+// Me Card Elements
+const myBudgetValueDisplay = document.getElementById('myBudgetValueDisplay');
+const budgetModeBadge = document.getElementById('budgetModeBadge');
+const btnQuickEditBudget = document.getElementById('btnQuickEditBudget');
 const matchTargetQuote = document.getElementById('matchTargetQuote');
+const highlightMatchPercentage = document.getElementById('highlightMatchPercentage');
 const matchHeroAmount = document.getElementById('matchHeroAmount');
 const matchSubText = document.getElementById('matchSubText');
 const tangibleIcon = document.getElementById('tangibleIcon');
@@ -35,7 +59,7 @@ const nextBillionaireBtn = document.getElementById('nextBillionaireBtn');
 const carouselCardBody = document.getElementById('carouselCardBody');
 const thumbBar = document.getElementById('thumbBar');
 
-// Modals
+// News & MCP Modals
 const newsModal = document.getElementById('newsModal');
 const closeNewsModal = document.getElementById('closeNewsModal');
 const modalBillionaireTitle = document.getElementById('modalBillionaireTitle');
@@ -48,7 +72,7 @@ const openMcpModalBtn = document.getElementById('openMcpModalBtn');
 const closeMcpModal = document.getElementById('closeMcpModal');
 
 /**
- * Currency & Number Formatting Helpers
+ * Format currency amounts in human-readable millions/billions
  */
 function formatDollars(amount, currency = '$') {
   if (amount >= 1_000_000_000_000) {
@@ -67,34 +91,34 @@ function formatDollars(amount, currency = '$') {
 }
 
 /**
- * Everyday Tangible Comparison Items & Cheerful Messaging
+ * Tangible Everyday Micro-Comparisons
  */
 function getTangibleMatch(userAmount, currency = '$') {
   if (userAmount <= 0.25) {
     return {
       icon: "🪙",
-      text: `A loose coin from under the sofa (${currency}${userAmount.toFixed(2)})`,
-      tip: "You can match this billionaire's entire generosity ratio with literal pocket lint! 🛋️✨"
+      text: `A single coin found in your sofa (${currency}${userAmount.toFixed(2)})`,
+      tip: "You can match this billionaire's entire wealth-giving sacrifice with literal pocket change! 🛋️✨"
     };
   }
   if (userAmount < 1.00) {
     return {
       icon: "🍬",
       text: `A single pack of chewing gum (${currency}${userAmount.toFixed(2)})`,
-      tip: "Skip one piece of gum and you're officially as philanthropic as a titan of industry. 🍬🌟"
+      tip: "Skip one piece of chewing gum and you're officially as generous as a global tycoon. 🍬🌟"
     };
   }
   if (userAmount < 3.50) {
     return {
       icon: "☕",
       text: `One cup of filter coffee (${currency}${userAmount.toFixed(2)})`,
-      tip: "One modest coffee this month equals their exact net worth sacrifice! ☕🎉"
+      tip: "One modest coffee this month equals their exact proportional net worth sacrifice! ☕🎉"
     };
   }
   if (userAmount < 7.00) {
     return {
       icon: "🚌",
-      text: `A single bus or subway fare (${currency}${userAmount.toFixed(2)})`,
+      text: `A single bus or metro ticket (${currency}${userAmount.toFixed(2)})`,
       tip: "Walk one bus stop and you've matched their philanthropic track record! 🚶✨"
     };
   }
@@ -108,7 +132,7 @@ function getTangibleMatch(userAmount, currency = '$') {
   if (userAmount < 35.00) {
     return {
       icon: "📺",
-      text: `A basic Netflix streaming subscription (${currency}${userAmount.toFixed(2)})`,
+      text: `A standard Netflix streaming subscription (${currency}${userAmount.toFixed(2)})`,
       tip: "One monthly subscription makes you match their lifetime generosity ratio! 📺🍿"
     };
   }
@@ -129,59 +153,96 @@ function getTangibleMatch(userAmount, currency = '$') {
   return {
     icon: "🏡",
     text: `A major rent / mortgage contribution (${currency}${userAmount.toFixed(2)})`,
-    tip: "Top-tier philanthropy! This billionaire gave away a huge portion of their fortune. 🏆👏"
+    tip: "Historic philanthropy! This billionaire gave away a huge portion of their fortune. 🏆👏"
   };
 }
 
 /**
  * Filter donations by timeframe
+ * Handles 'all', 'past_month', 'past_year', and 'custom'
  */
-function filterDonations(donations, timeframe) {
+function filterDonations(donations, timeframe, start, end) {
   if (!timeframe || timeframe === 'all') return donations;
+  const now = new Date();
+
   return donations.filter(d => {
-    if (timeframe === '2026') return d.year === 2026;
-    if (timeframe === '2025') return d.year === 2025;
-    if (timeframe === 'past_2_years') return d.year >= 2024;
-    if (timeframe === '2020-2023') return d.year >= 2020 && d.year <= 2023;
+    if (!d.date) return timeframe === 'all';
+    const donationDate = new Date(d.date);
+
+    if (timeframe === 'past_month') {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(now.getDate() - 30);
+      return donationDate >= thirtyDaysAgo;
+    }
+    if (timeframe === 'past_year') {
+      const oneYearAgo = new Date();
+      oneYearAgo.setDate(now.getDate() - 365);
+      return donationDate >= oneYearAgo;
+    }
+    if (timeframe === 'custom' && start && end) {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      return donationDate >= startDate && donationDate <= endDate;
+    }
     return true;
   });
 }
 
 function getTimeframeLabel(timeframe) {
   switch (timeframe) {
-    case '2026': return '2026 Recent';
-    case '2025': return '2025 Calendar';
-    case 'past_2_years': return 'Past 2 Years';
-    case '2020-2023': return '2020 - 2023';
+    case 'past_month': return 'Past Month';
+    case 'past_year': return 'Past Year';
+    case 'custom': return `Custom (${state.customStartDate} to ${state.customEndDate})`;
     default: return 'All Time';
   }
 }
 
 /**
- * Render the Active Billionaire Profile Card
+ * Render the Active Billionaire Profile Card & Match Box
  */
 function renderActiveBillionaire() {
   const b = state.billionaires[state.currentIndex];
   if (!b) return;
 
   // Filter donations for active timeframe
-  const activeDonations = filterDonations(b.historicalDonations, state.activeTimeframe);
+  const activeDonations = filterDonations(b.historicalDonations, state.activeTimeframe, state.customStartDate, state.customEndDate);
   const totalDonatedInPeriod = activeDonations.reduce((sum, d) => sum + d.amount, 0);
-  const percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
+
+  // Parity percentage calculation based on selected mode
+  let percentage = 0;
+  let baseMetricName = "net worth";
+
+  if (state.calcMode === 'income') {
+    const annualEarnings = b.estimatedAnnualIncome || (b.netWorth * 0.08);
+    percentage = (totalDonatedInPeriod / annualEarnings) * 100;
+    baseMetricName = "estimated annual earnings";
+  } else {
+    percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
+    baseMetricName = "net worth";
+  }
+
   const userEquivalentMonthly = state.monthlyIncome * (percentage / 100);
   const tangible = getTangibleMatch(userEquivalentMonthly, state.currency);
 
-  // Update carousel counter
-  carouselCounter.textContent = `Billionaire ${state.currentIndex + 1} of ${state.billionaires.length}`;
+  // Update Left "ME" Panel
+  myBudgetValueDisplay.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
+  budgetModeBadge.textContent = state.calcMode === 'income' ? 'Earnings Mode' : 'Net Worth Mode';
 
-  // Update Left "ME" Result Box
-  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s generosity of <strong>${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</strong> of their net worth (${getTimeframeLabel(state.activeTimeframe)}):`;
+  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s generosity of <span class="highlight-percentage" id="highlightMatchPercentage">${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</span> of their ${baseMetricName} (${getTimeframeLabel(state.activeTimeframe)}):`;
+  
+  // Hero number in GREEN matching right side Donated in Period color
   matchHeroAmount.textContent = `${state.currency}${userEquivalentMonthly.toFixed(2)}`;
   matchSubText.textContent = `out of your ${state.currency}${state.monthlyIncome.toLocaleString()} monthly paycheck`;
   
   tangibleIcon.textContent = tangible.icon;
   tangibleText.textContent = tangible.text;
   cheeringTip.textContent = tangible.tip;
+
+  // Update carousel counter
+  carouselCounter.textContent = `Billionaire ${state.currentIndex + 1} of ${state.billionaires.length}`;
+
+  // Update header settings button text
+  headerSettingsLabel.textContent = `Settings (${state.currency}${state.monthlyIncome.toLocaleString()}/mo)`;
 
   // Render Right Billionaire Card
   const pledgeBadge = b.givingPledge 
@@ -208,7 +269,7 @@ function renderActiveBillionaire() {
         </div>
       `).join('')
     : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; background: #fff; border-radius: 8px;">
-        No major public donations verified in news during this timeframe.
+        No major public donations reported in news during this specific timeframe.
        </div>`;
 
   carouselCardBody.innerHTML = `
@@ -220,22 +281,25 @@ function renderActiveBillionaire() {
       </div>
       <div class="profile-meta">
         <h3>${b.name}</h3>
-        <p class="profile-company">${b.company} • ${b.industry}</p>
+        <p class="profile-company">${b.company} • ${b.country || ''}</p>
         <div class="profile-tags-row">
-          <span class="tag-badge tag-networth">💰 Net Worth: ${formatDollars(b.netWorth, state.currency)}</span>
-          <span class="tag-badge tag-score" title="Forbes Philanthropy Score">⭐ Forbes Score: ${starRating}</span>
+          <!-- Traceable Net Worth Link with Source -->
+          <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="View live source on ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
+            💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗ (${b.netWorthSourceName || 'Live Source'})
+          </a>
+          <span class="tag-badge tag-score" title="Forbes Philanthropy Score">⭐ Score: ${starRating}</span>
         </div>
       </div>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Stats Grid: Color Matched (Green & Purple) -->
     <div class="b-stats-grid">
       <div class="b-stat-box">
         <div class="lbl">Donated in Period</div>
         <div class="val val-green">${formatDollars(totalDonatedInPeriod, state.currency)}</div>
       </div>
       <div class="b-stat-box">
-        <div class="lbl">Wealth % Donated</div>
+        <div class="lbl">${state.calcMode === 'income' ? 'Income % Donated' : 'Wealth % Donated'}</div>
         <div class="val val-purple">${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</div>
       </div>
     </div>
@@ -252,11 +316,9 @@ function renderActiveBillionaire() {
     </div>
 
     <!-- Live MCP Scan Button -->
-    <div class="b-card-footer">
-      <button class="btn-scan-mcp" id="btnLiveMcpScan">
-        <span>📡 Run Live MCP News Scan for ${b.name.split(' ')[0]}</span>
-      </button>
-    </div>
+    <button class="btn-scan-mcp" id="btnLiveMcpScan">
+      <span>📡 Run Live MCP News Scan for ${b.name.split(' ')[0]}</span>
+    </button>
   `;
 
   // Attach live MCP scan listener
@@ -273,16 +335,13 @@ function renderActiveBillionaire() {
  */
 function renderThumbBar() {
   thumbBar.innerHTML = state.billionaires.map((b, i) => `
-    <button class="thumb-item ${i === state.currentIndex ? 'active' : ''}" data-index="${i}" title="${b.name}">
+    <button class="thumb-item ${i === state.currentIndex ? 'active' : ''}" data-index="${i}" title="${b.name} (${b.country || ''})">
       <img class="thumb-img" src="${b.image}" alt="${b.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=f59e0b&color=fff&size=80'">
       <span class="thumb-name">${b.name.split(' ')[1] || b.name}</span>
     </button>
   `).join('');
 }
 
-/**
- * Navigate to next/prev billionaire
- */
 function nextBillionaire() {
   state.currentIndex = (state.currentIndex + 1) % state.billionaires.length;
   renderActiveBillionaire();
@@ -298,15 +357,17 @@ function prevBillionaire() {
  */
 async function runLiveMcpNewsScan(billionaireName) {
   modalBillionaireTitle.textContent = `Live MCP News Scan: ${billionaireName}`;
-  modalSubTitle.textContent = `Streaming Google News RSS via Model Context Protocol tool...`;
+  modalSubTitle.textContent = `Streaming Google News RSS via Model Context Protocol...`;
   modalArticlesContainer.innerHTML = '';
   modalLoadingIndicator.style.display = 'block';
   newsModal.classList.add('active');
 
   try {
-    const timeframeParam = state.activeTimeframe === 'all' ? '1y' : state.activeTimeframe;
-    const response = await fetch(`/api/news?billionaire=${encodeURIComponent(billionaireName)}&timeframe=${encodeURIComponent(timeframeParam)}`);
-    
+    let url = `/api/news?billionaire=${encodeURIComponent(billionaireName)}&timeframe=${encodeURIComponent(state.activeTimeframe)}`;
+    if (state.activeTimeframe === 'custom') {
+      url += `&startDate=${state.customStartDate}&endDate=${state.customEndDate}`;
+    }
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     
@@ -339,47 +400,103 @@ async function runLiveMcpNewsScan(billionaireName) {
     modalLoadingIndicator.style.display = 'none';
     modalArticlesContainer.innerHTML = `
       <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; color: #991b1b; font-size: 0.88rem;">
-        <p><strong>Note:</strong> Live news scan connects to the Node backend server (<code>server.js</code>). In static mode, verified historical reports with direct links are loaded automatically.</p>
+        <p><strong>Notice:</strong> Live RSS news scanning connects to the server backend. In static mode, verified historical reports with direct links are loaded automatically.</p>
       </div>
     `;
   }
 }
 
 /**
+ * Open Settings Modal & Pre-fill values
+ */
+function openSettings() {
+  settingsCurrencySelect.value = state.currency;
+  settingsIncomeInput.value = state.monthlyIncome;
+  settingsIncomeSlider.value = Math.min(state.monthlyIncome, 25000);
+  
+  const radio = document.querySelector(`input[name="calcMode"][value="${state.calcMode}"]`);
+  if (radio) radio.checked = true;
+
+  settingsModal.classList.add('active');
+}
+
+/**
+ * Save Settings & Persist to LocalStorage
+ */
+function saveSettings() {
+  state.currency = settingsCurrencySelect.value;
+  state.monthlyIncome = parseFloat(settingsIncomeInput.value) || 4000;
+  
+  const selectedMode = document.querySelector('input[name="calcMode"]:checked');
+  if (selectedMode) state.calcMode = selectedMode.value;
+
+  localStorage.setItem('nocharity_income', state.monthlyIncome);
+  localStorage.setItem('nocharity_currency', state.currency);
+  localStorage.setItem('nocharity_mode', state.calcMode);
+
+  settingsModal.classList.remove('active');
+  renderActiveBillionaire();
+}
+
+/**
  * Event Listeners Setup
  */
 function setupEvents() {
-  // Income numerical input
-  incomeInput.addEventListener('input', (e) => {
+  // Header Timeframe buttons (All Time, Past Month, Past Year, Custom)
+  timeframeHeaderGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('.time-btn');
+    if (!btn) return;
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    state.activeTimeframe = btn.dataset.timeframe;
+
+    if (state.activeTimeframe === 'custom') {
+      customDateRow.classList.add('visible');
+    } else {
+      customDateRow.classList.remove('visible');
+    }
+    renderActiveBillionaire();
+  });
+
+  // Apply custom dates
+  btnApplyCustomDates.addEventListener('click', () => {
+    state.customStartDate = customStartDate.value;
+    state.customEndDate = customEndDate.value;
+    renderActiveBillionaire();
+  });
+
+  // Settings Modal triggers
+  openSettingsBtn.addEventListener('click', openSettings);
+  btnQuickEditBudget.addEventListener('click', openSettings);
+  closeSettingsModal.addEventListener('click', () => settingsModal.classList.remove('active'));
+  settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) settingsModal.classList.remove('active');
+  });
+
+  // Settings income input/slider sync
+  settingsIncomeInput.addEventListener('input', (e) => {
     const val = parseFloat(e.target.value) || 0;
-    state.monthlyIncome = Math.max(val, 0);
-    incomeSlider.value = Math.min(state.monthlyIncome, 20000);
-    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
-    renderActiveBillionaire();
+    settingsIncomeSlider.value = Math.min(val, 25000);
+  });
+  settingsIncomeSlider.addEventListener('input', (e) => {
+    settingsIncomeInput.value = e.target.value;
   });
 
-  // Income slider
-  incomeSlider.addEventListener('input', (e) => {
-    state.monthlyIncome = parseFloat(e.target.value);
-    incomeInput.value = state.monthlyIncome;
-    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
-    renderActiveBillionaire();
-  });
+  // Save Settings
+  btnSaveSettings.addEventListener('click', saveSettings);
 
-  // Currency select
-  currencySelect.addEventListener('change', (e) => {
-    state.currency = e.target.value;
-    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
-    renderActiveBillionaire();
-  });
+  // First-time Welcome modal trigger & handler
+  if (!localStorage.getItem('nocharity_income')) {
+    welcomeModal.classList.add('active');
+  }
 
-  // Timeframe pills
-  timeframePills.addEventListener('click', (e) => {
-    const pill = e.target.closest('.time-pill');
-    if (!pill) return;
-    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    state.activeTimeframe = pill.dataset.timeframe;
+  btnStartWelcome.addEventListener('click', () => {
+    state.currency = welcomeCurrencySelect.value;
+    state.monthlyIncome = parseFloat(welcomeIncomeInput.value) || 4000;
+    localStorage.setItem('nocharity_income', state.monthlyIncome);
+    localStorage.setItem('nocharity_currency', state.currency);
+    welcomeModal.classList.remove('active');
     renderActiveBillionaire();
   });
 
@@ -405,10 +522,11 @@ function setupEvents() {
     } else if (e.key === 'Escape') {
       newsModal.classList.remove('active');
       mcpModal.classList.remove('active');
+      settingsModal.classList.remove('active');
     }
   });
 
-  // Modals
+  // Modals close
   closeNewsModal.addEventListener('click', () => newsModal.classList.remove('active'));
   newsModal.addEventListener('click', (e) => {
     if (e.target === newsModal) newsModal.classList.remove('active');

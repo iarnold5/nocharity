@@ -31,39 +31,48 @@ app.use(express.static(path.join(__dirname, 'public')));
  */
 app.get('/api/billionaires', (req, res) => {
   const timeframe = req.query.timeframe || 'all';
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
   const monthlyIncome = parseFloat(req.query.monthlyIncome) || 4000;
   const currency = req.query.currency || '$';
+  const mode = req.query.mode || 'networth';
 
   const processed = BILLIONAIRES_DATA.map(b => {
-    const filteredDonations = filterDonationsByTimeframe(b.historicalDonations, timeframe);
+    const filteredDonations = filterDonationsByTimeframe(b.historicalDonations, timeframe, startDate, endDate);
     const totalDonatedInPeriod = filteredDonations.reduce((acc, curr) => acc + curr.amount, 0);
-    const parity = calculateDonationParity(b.netWorth, totalDonatedInPeriod, monthlyIncome, currency);
+    const parity = calculateDonationParity(b, totalDonatedInPeriod, monthlyIncome, currency, mode);
 
     return {
       id: b.id,
       name: b.name,
       company: b.company,
+      country: b.country,
       industry: b.industry,
       netWorth: b.netWorth,
+      netWorthSourceUrl: b.netWorthSourceUrl,
+      netWorthSourceName: b.netWorthSourceName,
+      image: b.image,
       givingPledge: b.givingPledge,
       forbesPhilanthropyScore: b.forbesPhilanthropyScore,
+      tagline: b.tagline,
       summary: b.summary,
       totalDonatedInPeriod,
-      percentageOfNetWorth: parity.percentageOfNetWorth,
+      percentage: parity.percentage,
       percentageFormatted: parity.percentageFormatted,
       userEquivalentMonthly: parity.userEquivalentMonthly,
       userEquivalentAnnual: parity.userEquivalentAnnual,
-      tangibleComparison: parity.tangibleComparison,
-      comparisonIcon: parity.comparisonIcon,
-      articlesCount: filteredDonations.length,
+      baseMetricLabel: parity.baseMetricLabel,
       donations: filteredDonations
     };
   });
 
   res.json({
     timeframe,
+    startDate,
+    endDate,
     monthlyIncome,
     currency,
+    mode,
     billionaires: processed,
     totalTrackedWealth: BILLIONAIRES_DATA.reduce((acc, b) => acc + b.netWorth, 0),
     totalDonatedAcrossAll: processed.reduce((acc, b) => acc + b.totalDonatedInPeriod, 0)
@@ -75,14 +84,14 @@ app.get('/api/billionaires', (req, res) => {
  * Live news search for a specific billionaire and timeframe via Google News RSS scraper
  */
 app.get('/api/news', async (req, res) => {
-  const { billionaire, timeframe } = req.query;
+  const { billionaire, timeframe, startDate, endDate } = req.query;
 
   if (!billionaire) {
     return res.status(400).json({ error: 'Missing billionaire parameter' });
   }
 
   try {
-    const articles = await searchGoogleNews(billionaire, timeframe || 'all');
+    const articles = await searchGoogleNews(billionaire, timeframe || 'all', startDate, endDate);
     res.json({
       billionaire,
       timeframe: timeframe || 'all',
@@ -92,77 +101,6 @@ app.get('/api/news', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
-
-/**
- * POST /api/calculate
- * Calculate parity dynamically for any custom input
- */
-app.post('/api/calculate', (req, res) => {
-  const { netWorth, donationAmount, monthlyIncome, currency } = req.body;
-  if (!netWorth || donationAmount === undefined || !monthlyIncome) {
-    return res.status(400).json({ error: 'netWorth, donationAmount, and monthlyIncome are required' });
-  }
-
-  const result = calculateDonationParity(
-    parseFloat(netWorth),
-    parseFloat(donationAmount),
-    parseFloat(monthlyIncome),
-    currency || '$'
-  );
-
-  res.json(result);
-});
-
-/**
- * GET /api/mcp-info
- * Returns specification of MCP tools and how they can be used locally or deployed to the web
- */
-app.get('/api/mcp-info', (req, res) => {
-  res.json({
-    serverName: "billionaire-philanthropy-mcp",
-    version: "1.0.0",
-    protocol: "Model Context Protocol (v2024-11-05)",
-    tools: [
-      {
-        name: "search_billionaire_news",
-        description: "Scrapes real-time news headlines, publication dates, and extracted donation figures using free Google News RSS.",
-        cost: "100% Free (Zero API key required)"
-      },
-      {
-        name: "calculate_donation_parity",
-        description: "Translates billionaire donation percentages into exact monthly and annual equivalents for an everyday user's income.",
-        cost: "100% Free"
-      },
-      {
-        name: "get_billionaires_list",
-        description: "Curated registry of top billionaires, net worth, philanthropy track records, and Giving Pledge status.",
-        cost: "100% Free"
-      }
-    ],
-    freeDeploymentOptions: [
-      {
-        platform: "Render.com (Web Service Free Tier)",
-        url: "https://render.com",
-        how: "Connect your GitHub repository; Render detects Node.js and runs 'npm start'. Gives a free public https:// URL."
-      },
-      {
-        platform: "Railway.app / Fly.io",
-        url: "https://railway.app",
-        how: "Deploy Dockerfile or Node.js container with free monthly credits."
-      },
-      {
-        platform: "GitHub Pages (Static Mode)",
-        url: "https://pages.github.com",
-        how: "Host the public/ folder directly for 100% free with client-side fallback data."
-      },
-      {
-        platform: "Hugging Face Spaces (Free Node/Docker Space)",
-        url: "https://huggingface.co/spaces",
-        how: "Create a free Docker space; runs 24/7 with a public web endpoint."
-      }
-    ]
-  });
 });
 
 // Fallback to index.html for SPA routing

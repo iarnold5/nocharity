@@ -1,41 +1,35 @@
 /* ==========================================================================
-   NoCharity - Cheerful "Me vs. Billionaire" Interactive Parity Calculator
-   Clean, Warm, Uncluttered & Delightful Design System
+   NoCharity - Cheerful "Me vs. Billionaire" Parity Calculator
+   Inspired by Gianmarco Soresi (@GianmarcoSoresi)
    ========================================================================== */
 
 :root {
-  /* Cheerful & Approachable Color Palette */
+  /* Cheerful Warm Color Palette */
   --bg-page: #faf8f5;
   --bg-surface: #ffffff;
-  --bg-surface-soft: #f4efe6;
+  --bg-surface-soft: #f5efe6;
   --bg-surface-tint: #fff9f0;
   
-  --border-subtle: #e8e2d7;
+  --border-subtle: #e8e2d8;
   --border-focus: #f59e0b;
   
-  --text-main: #1e293b;
+  --text-main: #0f172a;
   --text-muted: #64748b;
   --text-light: #94a3b8;
 
-  /* Cheerful Vibrant Accents */
-  --coral-main: #ff5a5f;
-  --coral-soft: #ffe4e6;
-  --amber-main: #f59e0b;
-  --amber-soft: #fef3c7;
-  --emerald-main: #10b981;
-  --emerald-soft: #d1fae5;
-  --sky-main: #0284c7;
-  --sky-soft: #e0f2fe;
-  --purple-main: #8b5cf6;
-  --purple-soft: #ede9fe;
+  /* Harmonized Match Colors */
+  --color-donated: #15803d;      /* Vibrant Green for Donated Amounts */
+  --color-percentage: #7e22ce;   /* Vibrant Purple for Generosity Percentages */
+  --color-coral: #ff5a5f;
+  --color-amber: #f59e0b;
+  --color-sky: #0284c7;
 
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 10px 25px -5px rgba(30, 41, 59, 0.06), 0 8px 10px -6px rgba(30, 41, 59, 0.04);
   --shadow-hover: 0 20px 35px -10px rgba(30, 41, 59, 0.12);
-  --shadow-pop: 0 12px 28px rgba(245, 158, 11, 0.2);
 
-  /* Fonts & Geometry */
+  /* Typography */
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   
@@ -44,11 +38,9 @@
   --radius-lg: 24px;
   --radius-full: 9999px;
 
-  --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 0.15s ease-out;
+  --transition-fast: 0.18s ease-out;
 }
 
-/* Reset */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -63,25 +55,29 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(254, 243, 199, 0.6) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(224, 242, 254, 0.5) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(254, 243, 199, 0.55) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(224, 242, 254, 0.45) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
 .app-wrapper {
-  max-width: 1300px;
+  max-width: 1340px;
   margin: 0 auto;
-  padding: 24px 24px 60px;
+  padding: 20px 24px 60px;
 }
 
-/* Navigation / Header */
+/* ==========================================================================
+   Header & Top Control Bar
+   ========================================================================== */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-subtle);
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1.5px solid var(--border-subtle);
+  flex-wrap: wrap;
 }
 
 .brand-wrapper {
@@ -99,7 +95,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  box-shadow: 0 4px 12px rgba(255, 90, 95, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 90, 95, 0.25);
 }
 
 .brand-title {
@@ -111,49 +107,186 @@ body {
 }
 
 .brand-subtitle-tag {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: var(--amber-soft);
+  background: #fef3c7;
   color: #b45309;
-  padding: 2px 10px;
+  padding: 2px 8px;
   border-radius: var(--radius-full);
 }
 
-.btn-mcp-guide {
+/* Header Controls: Timeframe, Settings & MCP Guide */
+.header-controls {
   display: flex;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Timeframe Bar in Header */
+.timeframe-header-group {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.time-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.time-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-surface-soft);
+}
+
+.time-btn.active {
+  background: var(--color-coral);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 90, 95, 0.3);
+}
+
+/* Custom Date Inputs Dropdown Row */
+.custom-date-row {
+  display: none;
+  align-items: center;
   gap: 8px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.custom-date-row.visible {
+  display: flex;
+}
+
+.date-input {
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+/* Action Buttons in Header */
+.btn-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
-  padding: 8px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: var(--transition-fast);
 }
 
-.btn-mcp-guide:hover {
-  border-color: var(--amber-main);
-  box-shadow: var(--shadow-card);
+.btn-header:hover {
+  border-color: var(--color-amber);
   transform: translateY(-1px);
 }
 
-/* Two-Sided Versus Calculator Grid */
+.btn-settings {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+/* ==========================================================================
+   Gianmarco Soresi Credit Callout Banner
+   ========================================================================== */
+.soresi-credit-banner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.credit-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.credit-icon {
+  font-size: 24px;
+}
+
+.credit-quote {
+  font-size: 0.88rem;
+  color: #7c2d12;
+  font-style: italic;
+}
+
+.credit-author {
+  font-style: normal;
+  font-weight: 800;
+  color: #9a3412;
+}
+
+.btn-soresi-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ff0000;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(255, 0, 0, 0.3);
+  transition: var(--transition-fast);
+}
+
+.btn-soresi-link:hover {
+  transform: translateY(-1px);
+  background: #cc0000;
+}
+
+/* ==========================================================================
+   Two-Sided Interactive Stage
+   ========================================================================== */
 .calculator-stage {
   display: grid;
-  grid-template-columns: 1fr 60px 1.25fr;
+  grid-template-columns: 1fr 50px 1.25fr;
   align-items: stretch;
-  gap: 20px;
+  gap: 18px;
 }
 
 @media (max-width: 960px) {
   .calculator-stage {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
   .versus-divider {
     transform: rotate(90deg);
@@ -173,202 +306,135 @@ body {
   justify-content: space-between;
 }
 
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.panel-me-top {
   margin-bottom: 24px;
 }
 
-.panel-role-title {
+.me-badge-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 18px;
 }
 
-.role-avatar-circle {
+.me-role-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.me-avatar-circle {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--sky-soft);
+  background: #e0f2fe;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .panel-title {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: 1.6rem;
+  font-weight: 900;
   color: var(--text-main);
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
-.panel-desc {
+.panel-subtitle {
   font-size: 0.86rem;
   color: var(--text-muted);
 }
 
-/* Timeframe Filter Tabs */
-.timeframe-strip {
-  margin-bottom: 24px;
-}
-
-.timeframe-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  display: block;
-}
-
-.timeframe-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.time-pill {
-  background: var(--bg-surface-soft);
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.time-pill:hover {
-  background: #eae3d7;
-  color: var(--text-main);
-}
-
-.time-pill.active {
-  background: #ff5a5f;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(255, 90, 95, 0.3);
-}
-
-/* Income Input Block */
-.income-group {
+/* Current User Budget Display Pill */
+.user-budget-card {
   background: var(--bg-surface-tint);
   border: 1.5px solid #fed7aa;
   border-radius: var(--radius-md);
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
-.income-group-top {
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
-.income-label {
-  font-size: 0.88rem;
-  font-weight: 800;
+.budget-lbl {
+  font-size: 0.84rem;
+  font-weight: 700;
   color: #9a3412;
 }
 
-.income-controls-wrapper {
+.budget-val-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.currency-dropdown {
-  background: #ffffff;
-  border: 1.5px solid #fdba74;
-  color: var(--text-main);
+.budget-val {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 1.35rem;
   font-weight: 800;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
+  color: #c2410c;
+}
+
+.btn-edit-budget {
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  color: #ea580c;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 800;
   cursor: pointer;
-  outline: none;
-}
-
-.income-field {
-  flex: 1;
-  background: #ffffff;
-  border: 1.5px solid #fdba74;
-  color: var(--text-main);
-  font-family: var(--font-heading);
-  font-size: 1.4rem;
-  font-weight: 800;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  outline: none;
   transition: var(--transition-fast);
 }
 
-.income-field:focus {
-  border-color: #ea580c;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
-}
-
-.income-range-slider {
-  width: 100%;
-  margin-top: 14px;
-  -webkit-appearance: none;
-  height: 8px;
-  border-radius: 4px;
-  background: #fed7aa;
-  outline: none;
-  cursor: pointer;
-}
-
-.income-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+.btn-edit-budget:hover {
   background: #ea580c;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.4);
-  transition: transform 0.15s;
+  color: #ffffff;
 }
 
-.income-range-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-/* Matching Result Showcase Box */
+/* The Matching Challenge Card (Centerpiece of Left Side) */
 .match-card {
-  background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+  background: linear-gradient(135deg, #fbf7ee 0%, #fffdf8 100%);
   border: 2px dashed #f59e0b;
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 28px 24px;
   text-align: center;
-  position: relative;
 }
 
 .match-subheading {
-  font-size: 0.86rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 800;
   color: #b45309;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
 }
 
 .match-target-quote {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-bottom: 14px;
+  font-size: 1.05rem;
+  color: var(--text-main);
+  line-height: 1.45;
+  margin-bottom: 16px;
 }
 
+/* Percentage color matches the right side (% purple) */
+.highlight-percentage {
+  color: var(--color-percentage);
+  font-weight: 900;
+  background: #f3e8ff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid #e9d5ff;
+}
+
+/* Matched dollar amount matches the right side (Donated green) */
 .match-hero-number {
   font-family: var(--font-heading);
-  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
   font-weight: 900;
-  color: #ea580c;
+  color: var(--color-donated);
   line-height: 1;
   margin-bottom: 6px;
 }
@@ -377,25 +443,25 @@ body {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .tangible-banner {
   background: #ffffff;
-  border: 1px solid #fed7aa;
+  border: 1.5px solid #fed7aa;
   border-radius: var(--radius-full);
   padding: 10px 18px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 800;
   color: #7c2d12;
   box-shadow: var(--shadow-sm);
 }
 
 .cheering-tip {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   margin-top: 14px;
 }
@@ -410,8 +476,8 @@ body {
 }
 
 .vs-badge {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: #ffffff;
   border: 2px solid var(--border-subtle);
@@ -420,8 +486,8 @@ body {
   justify-content: center;
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--coral-main);
+  font-size: 1rem;
+  color: var(--color-coral);
   box-shadow: var(--shadow-card);
 }
 
@@ -431,7 +497,9 @@ body {
   background: dashed 2px var(--border-subtle);
 }
 
-/* Side 2: "CHOOSE BILLIONAIRE" Giant Vertical Carousel */
+/* ==========================================================================
+   Side 2: "CHOOSE BILLIONAIRE" Giant Vertical Carousel
+   ========================================================================== */
 .panel-billionaire {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
@@ -455,7 +523,7 @@ body {
   font-size: 0.82rem;
   font-weight: 800;
   color: #0369a1;
-  background: var(--sky-soft);
+  background: #e0f2fe;
   padding: 4px 12px;
   border-radius: var(--radius-full);
 }
@@ -481,22 +549,16 @@ body {
 }
 
 .carousel-btn:hover {
-  background: var(--amber-main);
+  background: var(--color-amber);
   color: #ffffff;
-  border-color: var(--amber-main);
+  border-color: var(--color-amber);
 }
 
-/* The Active Billionaire Card Deck */
+/* Active Billionaire Profile Card */
 .carousel-card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  animation: fadeInCard 0.35s ease-out;
-}
-
-@keyframes fadeInCard {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .billionaire-profile-header {
@@ -549,7 +611,7 @@ body {
 }
 
 .profile-company {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
   margin-bottom: 8px;
 }
@@ -561,16 +623,27 @@ body {
 }
 
 .tag-badge {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .tag-networth {
   background: #f1f5f9;
-  color: #334155;
-  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
+  transition: var(--transition-fast);
+}
+
+.tag-networth:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
 .tag-score {
@@ -579,7 +652,7 @@ body {
   border: 1px solid #fde68a;
 }
 
-/* Billionaire Stats Row */
+/* Billionaire Stats Grid (Green & Purple) */
 .b-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -592,26 +665,26 @@ body {
 
 .b-stat-box .lbl {
   font-size: 0.76rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .b-stat-box .val {
   font-family: var(--font-heading);
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: 1.45rem;
+  font-weight: 900;
 }
 
 .val-green {
-  color: #15803d;
+  color: var(--color-donated); /* GREEN */
 }
 
 .val-purple {
-  color: #7e22ce;
+  color: var(--color-percentage); /* PURPLE */
 }
 
-/* Verified Donations News Links List */
+/* Verified Donations News List */
 .donations-section {
   flex: 1;
   display: flex;
@@ -619,7 +692,7 @@ body {
 }
 
 .donations-section-title {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -672,7 +745,7 @@ body {
 }
 
 .donation-news-headline:hover {
-  color: var(--coral-main);
+  color: var(--color-coral);
 }
 
 .donation-news-meta {
@@ -685,19 +758,19 @@ body {
 
 .news-source-tag {
   font-weight: 700;
-  color: #0369a1;
+  color: var(--color-sky);
 }
 
 .donation-amount-badge {
-  background: var(--emerald-soft);
-  color: #166534;
+  background: #dcfce7;
+  color: #15803d;
   font-weight: 800;
   font-size: 0.74rem;
   padding: 1px 8px;
   border-radius: var(--radius-full);
 }
 
-/* Quick Billionaire Selector Carousel Bar */
+/* Quick Thumbnails Selector Bar */
 .billionaires-thumb-bar {
   display: flex;
   gap: 8px;
@@ -748,16 +821,9 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Card Action: Live Scan Button */
-.b-card-footer {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
-
 .btn-scan-mcp {
-  flex: 1;
-  background: var(--sky-soft);
+  width: 100%;
+  background: #e0f2fe;
   border: 1px solid #bae6fd;
   color: #0369a1;
   font-weight: 700;
@@ -769,6 +835,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  margin-top: 14px;
   transition: var(--transition-fast);
 }
 
@@ -776,7 +843,9 @@ body {
   background: #bae6fd;
 }
 
-/* Modal */
+/* ==========================================================================
+   Modals
+   ========================================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -801,7 +870,7 @@ body {
   background: #ffffff;
   border-radius: var(--radius-lg);
   width: 100%;
-  max-width: 680px;
+  max-width: 600px;
   max-height: 85vh;
   overflow-y: auto;
   padding: 32px;
@@ -830,7 +899,90 @@ body {
   color: var(--text-main);
 }
 
-/* Footer */
+/* Settings Form Controls */
+.settings-group {
+  margin-bottom: 20px;
+}
+
+.settings-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.settings-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.settings-select {
+  background: #ffffff;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  outline: none;
+}
+
+.settings-number-input {
+  flex: 1;
+  background: #ffffff;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  outline: none;
+}
+
+.settings-number-input:focus {
+  border-color: var(--color-amber);
+}
+
+.mode-radio-box {
+  background: var(--bg-surface-soft);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.mode-option input {
+  margin-top: 4px;
+}
+
+.btn-save-settings {
+  width: 100%;
+  background: var(--color-coral);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 90, 95, 0.3);
+  transition: var(--transition-fast);
+}
+
+.btn-save-settings:hover {
+  background: #e0484d;
+}
+
 .app-footer-bar {
   text-align: center;
   margin-top: 48px;
