@@ -1,5 +1,5 @@
 /**
- * NoCharity Web App - Interactive Logic & MCP Client
+ * NoCharity — Cheerful "Me vs. Billionaire" Interactive Parity Calculator Logic
  */
 
 import { INITIAL_BILLIONAIRES } from './data.js';
@@ -9,48 +9,46 @@ const state = {
   monthlyIncome: 4000,
   currency: '$',
   activeTimeframe: 'all',
-  searchQuery: '',
-  sortBy: 'generosity-desc',
-  viewMode: 'grid',
+  currentIndex: 0,
   billionaires: JSON.parse(JSON.stringify(INITIAL_BILLIONAIRES)),
-  isServerAvailable: true,
 };
 
-// DOM Element References
+// DOM References
 const incomeInput = document.getElementById('incomeInput');
 const incomeSlider = document.getElementById('incomeSlider');
-const incomePreviewDisplay = document.getElementById('incomePreviewDisplay');
+const incomeDisplayTag = document.getElementById('incomeDisplayTag');
 const currencySelect = document.getElementById('currencySelect');
-const timeframeOptions = document.getElementById('timeframeOptions');
-const activeTimeframeLabel = document.getElementById('activeTimeframeLabel');
-const searchInput = document.getElementById('searchInput');
-const sortSelect = document.getElementById('sortSelect');
-const viewGridBtn = document.getElementById('viewGridBtn');
-const viewChartBtn = document.getElementById('viewChartBtn');
-const cardsGrid = document.getElementById('cardsGrid');
-const chartViewContainer = document.getElementById('chartViewContainer');
-const chartRowsList = document.getElementById('chartRowsList');
+const timeframePills = document.getElementById('timeframePills');
 
-// Stats Elements
-const statTotalWealth = document.getElementById('statTotalWealth');
-const statTotalDonated = document.getElementById('statTotalDonated');
-const statAvgPercent = document.getElementById('statAvgPercent');
-const statAvgParity = document.getElementById('statAvgParity');
+// Me Match Result Elements
+const matchTargetQuote = document.getElementById('matchTargetQuote');
+const matchHeroAmount = document.getElementById('matchHeroAmount');
+const matchSubText = document.getElementById('matchSubText');
+const tangibleIcon = document.getElementById('tangibleIcon');
+const tangibleText = document.getElementById('tangibleText');
+const cheeringTip = document.getElementById('cheeringTip');
+
+// Billionaire Carousel Elements
+const carouselCounter = document.getElementById('carouselCounter');
+const prevBillionaireBtn = document.getElementById('prevBillionaireBtn');
+const nextBillionaireBtn = document.getElementById('nextBillionaireBtn');
+const carouselCardBody = document.getElementById('carouselCardBody');
+const thumbBar = document.getElementById('thumbBar');
 
 // Modals
-const newsModalOverlay = document.getElementById('newsModalOverlay');
-const closeNewsModalBtn = document.getElementById('closeNewsModalBtn');
-const modalBillionaireName = document.getElementById('modalBillionaireName');
-const modalTimeframeSub = document.getElementById('modalTimeframeSub');
-const modalArticleList = document.getElementById('modalArticleList');
-const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+const newsModal = document.getElementById('newsModal');
+const closeNewsModal = document.getElementById('closeNewsModal');
+const modalBillionaireTitle = document.getElementById('modalBillionaireTitle');
+const modalSubTitle = document.getElementById('modalSubTitle');
+const modalLoadingIndicator = document.getElementById('modalLoadingIndicator');
+const modalArticlesContainer = document.getElementById('modalArticlesContainer');
 
-const mcpArchitectureModalOverlay = document.getElementById('mcpArchitectureModalOverlay');
+const mcpModal = document.getElementById('mcpModal');
 const openMcpModalBtn = document.getElementById('openMcpModalBtn');
-const closeMcpModalBtn = document.getElementById('closeMcpModalBtn');
+const closeMcpModal = document.getElementById('closeMcpModal');
 
 /**
- * Format currency amounts in human-readable millions/billions
+ * Currency & Number Formatting Helpers
  */
 function formatDollars(amount, currency = '$') {
   if (amount >= 1_000_000_000_000) {
@@ -69,34 +67,70 @@ function formatDollars(amount, currency = '$') {
 }
 
 /**
- * Get Tangible Everyday Comparison for User Equivalent Amount
+ * Everyday Tangible Comparison Items & Cheerful Messaging
  */
-function getTangibleComparison(userAmount, currency = '$') {
-  if (userAmount <= 0.05) {
-    return { icon: "🪙", text: `Less than a single cent (${currency}${userAmount.toFixed(2)})` };
+function getTangibleMatch(userAmount, currency = '$') {
+  if (userAmount <= 0.25) {
+    return {
+      icon: "🪙",
+      text: `A loose coin from under the sofa (${currency}${userAmount.toFixed(2)})`,
+      tip: "You can match this billionaire's entire generosity ratio with literal pocket lint! 🛋️✨"
+    };
   }
-  if (userAmount < 0.50) {
-    return { icon: "🍬", text: `A loose piece of chewing gum (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 1.00) {
+    return {
+      icon: "🍬",
+      text: `A single pack of chewing gum (${currency}${userAmount.toFixed(2)})`,
+      tip: "Skip one piece of gum and you're officially as philanthropic as a titan of industry. 🍬🌟"
+    };
   }
-  if (userAmount < 2.00) {
-    return { icon: "☕", text: `A cup of drip coffee (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 3.50) {
+    return {
+      icon: "☕",
+      text: `One cup of filter coffee (${currency}${userAmount.toFixed(2)})`,
+      tip: "One modest coffee this month equals their exact net worth sacrifice! ☕🎉"
+    };
   }
-  if (userAmount < 5.00) {
-    return { icon: "🚌", text: `A single metro/bus ticket (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 7.00) {
+    return {
+      icon: "🚌",
+      text: `A single bus or subway fare (${currency}${userAmount.toFixed(2)})`,
+      tip: "Walk one bus stop and you've matched their philanthropic track record! 🚶✨"
+    };
   }
-  if (userAmount < 15.00) {
-    return { icon: "🍔", text: `A fast food lunch combo (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 14.00) {
+    return {
+      icon: "🍕",
+      text: `A couple slices of pizza & a drink (${currency}${userAmount.toFixed(2)})`,
+      tip: "A casual lunch bite equals this billionaire's total percentage contribution. 🍕😋"
+    };
   }
-  if (userAmount < 40.00) {
-    return { icon: "📺", text: `A monthly Netflix / Spotify bill (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 35.00) {
+    return {
+      icon: "📺",
+      text: `A basic Netflix streaming subscription (${currency}${userAmount.toFixed(2)})`,
+      tip: "One monthly subscription makes you match their lifetime generosity ratio! 📺🍿"
+    };
   }
-  if (userAmount < 120.00) {
-    return { icon: "🛒", text: `A weekly grocery run (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 90.00) {
+    return {
+      icon: "🛒",
+      text: `A weekly grocery basket (${currency}${userAmount.toFixed(2)})`,
+      tip: "A modest grocery basket matches their public giving percentage! 🛒🥦"
+    };
   }
-  if (userAmount < 400.00) {
-    return { icon: "⚡", text: `A monthly electric or utility bill (${currency}${userAmount.toFixed(2)})` };
+  if (userAmount < 300.00) {
+    return {
+      icon: "⚡",
+      text: `A monthly electricity & utility bill (${currency}${userAmount.toFixed(2)})`,
+      tip: "This billionaire made serious gifts — matching them requires a real monthly pledge! ⚡💪"
+    };
   }
-  return { icon: "🏡", text: `A major rent / mortgage contribution (${currency}${userAmount.toFixed(2)})` };
+  return {
+    icon: "🏡",
+    text: `A major rent / mortgage contribution (${currency}${userAmount.toFixed(2)})`,
+    tip: "Top-tier philanthropy! This billionaire gave away a huge portion of their fortune. 🏆👏"
+  };
 }
 
 /**
@@ -108,484 +142,288 @@ function filterDonations(donations, timeframe) {
     if (timeframe === '2026') return d.year === 2026;
     if (timeframe === '2025') return d.year === 2025;
     if (timeframe === 'past_2_years') return d.year >= 2024;
-    if (timeframe === 'past_5_years') return d.year >= 2021;
     if (timeframe === '2020-2023') return d.year >= 2020 && d.year <= 2023;
     return true;
   });
 }
 
-/**
- * Calculate metrics for each billionaire based on current state
- */
-function calculateMetrics() {
-  return state.billionaires.map(b => {
-    const periodDonations = filterDonations(b.historicalDonations, state.activeTimeframe);
-    const totalDonatedInPeriod = periodDonations.reduce((sum, d) => sum + d.amount, 0);
-    const percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
-    const userMonthlyEquivalent = state.monthlyIncome * (percentage / 100);
-    const tangible = getTangibleComparison(userMonthlyEquivalent, state.currency);
-
-    return {
-      ...b,
-      periodDonations,
-      totalDonatedInPeriod,
-      percentage,
-      percentageFormatted: percentage >= 0.01 ? `${percentage.toFixed(2)}%` : `${percentage.toFixed(4)}%`,
-      userMonthlyEquivalent,
-      tangible
-    };
-  });
-}
-
-/**
- * Sort and filter list
- */
-function getFilteredAndSortedList(list) {
-  let filtered = list;
-
-  // Search filter
-  if (state.searchQuery.trim()) {
-    const q = state.searchQuery.toLowerCase().trim();
-    filtered = filtered.filter(b => 
-      b.name.toLowerCase().includes(q) ||
-      b.company.toLowerCase().includes(q) ||
-      b.industry.toLowerCase().includes(q) ||
-      b.summary.toLowerCase().includes(q)
-    );
-  }
-
-  // Sorting
-  filtered.sort((a, b) => {
-    switch (state.sortBy) {
-      case 'generosity-desc':
-        return b.percentage - a.percentage;
-      case 'generosity-asc':
-        return a.percentage - b.percentage;
-      case 'amount-desc':
-        return b.totalDonatedInPeriod - a.totalDonatedInPeriod;
-      case 'wealth-desc':
-        return b.netWorth - a.netWorth;
-      case 'name-asc':
-        return a.name.localeCompare(b.name);
-      default:
-        return b.percentage - a.percentage;
-    }
-  });
-
-  return filtered;
-}
-
-/**
- * Render Macro Stats Ribbon
- */
-function renderStats(list) {
-  const totalWealth = list.reduce((sum, b) => sum + b.netWorth, 0);
-  const totalDonated = list.reduce((sum, b) => sum + b.totalDonatedInPeriod, 0);
-  const avgPercent = totalWealth > 0 ? (totalDonated / totalWealth) * 100 : 0;
-  const avgMonthlyParity = state.monthlyIncome * (avgPercent / 100);
-
-  statTotalWealth.textContent = formatDollars(totalWealth, state.currency);
-  statTotalDonated.textContent = formatDollars(totalDonated, state.currency);
-  statAvgPercent.textContent = `${avgPercent.toFixed(2)}%`;
-  statAvgParity.textContent = `${state.currency}${avgMonthlyParity.toFixed(2)}`;
-}
-
-/**
- * Render Billionaire Cards
- */
-function renderCards(list) {
-  if (list.length === 0) {
-    cardsGrid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
-        <p style="font-size: 1.8rem; margin-bottom: 12px;">🔎 No results found</p>
-        <p>Try searching for a different name, company, or reset filters.</p>
-      </div>
-    `;
-    return;
-  }
-
-  cardsGrid.innerHTML = list.map(b => {
-    // Generosity class
-    let percentClass = 'percent-mid';
-    if (b.percentage >= 2.0) percentClass = 'percent-high';
-    else if (b.percentage < 0.2) percentClass = 'percent-low';
-
-    // Pledge badge
-    const pledgeBadge = b.givingPledge 
-      ? `<span class="badge-pill badge-pledged">✓ Giving Pledge</span>` 
-      : `<span class="badge-pill badge-no-pledge">No Pledge</span>`;
-
-    return `
-      <article class="billionaire-card" data-id="${b.id}">
-        <div>
-          <!-- Card Top Row -->
-          <div class="card-top">
-            <div class="avatar-info">
-              <div class="avatar-badge" style="background: linear-gradient(135deg, #4f46e5, #9333ea);">
-                ${b.initials || b.name.substring(0, 2).toUpperCase()}
-              </div>
-              <div class="name-col">
-                <h3>${b.name}</h3>
-                <p class="company-sub">${b.company} • ${b.industry}</p>
-              </div>
-            </div>
-            <div>${pledgeBadge}</div>
-          </div>
-
-          <!-- Wealth & Donation Comparison -->
-          <div class="wealth-row">
-            <div class="wealth-item">
-              <div class="lbl">Net Worth</div>
-              <div class="val">${formatDollars(b.netWorth, state.currency)}</div>
-            </div>
-            <div class="wealth-item">
-              <div class="lbl">Donated (${getTimeframeLabel(state.activeTimeframe)})</div>
-              <div class="val val-donated">${formatDollars(b.totalDonatedInPeriod, state.currency)}</div>
-            </div>
-          </div>
-
-          <!-- Parity Reality Check Box -->
-          <div class="parity-box">
-            <div class="parity-header">
-              <span class="parity-label">
-                <span>⚖️</span> Wealth % Donated
-              </span>
-              <span class="parity-percent-tag ${percentClass}">${b.percentageFormatted}</span>
-            </div>
-
-            <div class="parity-result-row">
-              <span class="user-equivalent-amount">
-                ${state.currency}${b.userMonthlyEquivalent.toFixed(2)}
-              </span>
-              <span class="parity-month-sub">from your monthly budget</span>
-            </div>
-
-            <div class="parity-tangible">
-              <span>${b.tangible.icon}</span>
-              <span><strong>Equivalent to:</strong> ${b.tangible.text}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card Action Buttons -->
-        <div class="card-actions">
-          <button class="btn-card btn-news" data-action="view-news" data-id="${b.id}">
-            <span>📰 Sources (${b.periodDonations.length})</span>
-          </button>
-          <button class="btn-card btn-live-scan" data-action="live-mcp-scan" data-id="${b.id}" data-name="${b.name}">
-            <span>⚡ Live MCP Scan</span>
-          </button>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-
-/**
- * Render Comparative Bar Chart View
- */
-function renderChart(list) {
-  if (list.length === 0) {
-    chartRowsList.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 40px;">No data</p>`;
-    return;
-  }
-
-  // Find max percentage for visual scaling (capped minimum at 5% to avoid division by zero)
-  const maxPercent = Math.max(...list.map(b => b.percentage), 5);
-
-  chartRowsList.innerHTML = list.map(b => {
-    const width = Math.min(Math.max((b.percentage / maxPercent) * 100, 3), 100);
-    let barColor = 'var(--primary-gradient)';
-    if (b.percentage >= 2.0) barColor = 'var(--emerald-gradient)';
-    else if (b.percentage < 0.2) barColor = 'var(--coral-gradient)';
-
-    return `
-      <div class="chart-row">
-        <div>
-          <div class="chart-name">${b.name}</div>
-          <div style="font-size: 0.78rem; color: var(--text-dim);">${b.company}</div>
-        </div>
-        <div class="chart-bar-track">
-          <div class="chart-bar-fill" style="width: ${width}%; background: ${barColor};">
-            ${b.percentageFormatted}
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.05rem; color: #38bdf8;">
-            ${state.currency}${b.userMonthlyEquivalent.toFixed(2)} / mo
-          </div>
-          <div style="font-size: 0.74rem; color: var(--text-dim);">${b.tangible.icon} ${b.tangible.text.split('(')[0]}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-/**
- * Full UI Update Trigger
- */
-function updateUI() {
-  // Update Income preview text
-  incomePreviewDisplay.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
-
-  // Compute metrics
-  const listWithMetrics = calculateMetrics();
-  const displayList = getFilteredAndSortedList(listWithMetrics);
-
-  renderStats(listWithMetrics);
-
-  if (state.viewMode === 'grid') {
-    cardsGrid.style.display = 'grid';
-    chartViewContainer.style.display = 'none';
-    renderCards(displayList);
-  } else {
-    cardsGrid.style.display = 'none';
-    chartViewContainer.style.display = 'block';
-    renderChart(displayList);
-  }
-}
-
-/**
- * Helper to get clean human labels for timeframes
- */
 function getTimeframeLabel(timeframe) {
   switch (timeframe) {
     case '2026': return '2026 Recent';
-    case '2025': return '2025 Records';
+    case '2025': return '2025 Calendar';
     case 'past_2_years': return 'Past 2 Years';
-    case 'past_5_years': return 'Past 5 Years';
-    case '2020-2023': return '2020-2023';
+    case '2020-2023': return '2020 - 2023';
     default: return 'All Time';
   }
 }
 
 /**
- * Open News Modal with verified articles
+ * Render the Active Billionaire Profile Card
  */
-function openVerifiedNews(billionaireId) {
-  const billionaire = state.billionaires.find(b => b.id === billionaireId);
-  if (!billionaire) return;
+function renderActiveBillionaire() {
+  const b = state.billionaires[state.currentIndex];
+  if (!b) return;
 
-  modalBillionaireName.textContent = `${billionaire.name} — Philanthropy News`;
-  modalTimeframeSub.textContent = `Timeframe: ${getTimeframeLabel(state.activeTimeframe)} • Forbes Score: ${'★'.repeat(billionaire.forbesPhilanthropyScore)}`;
-  modalLoadingSpinner.style.display = 'none';
+  // Filter donations for active timeframe
+  const activeDonations = filterDonations(b.historicalDonations, state.activeTimeframe);
+  const totalDonatedInPeriod = activeDonations.reduce((sum, d) => sum + d.amount, 0);
+  const percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
+  const userEquivalentMonthly = state.monthlyIncome * (percentage / 100);
+  const tangible = getTangibleMatch(userEquivalentMonthly, state.currency);
 
-  const periodArticles = filterDonations(billionaire.historicalDonations, state.activeTimeframe);
+  // Update carousel counter
+  carouselCounter.textContent = `Billionaire ${state.currentIndex + 1} of ${state.billionaires.length}`;
 
-  if (periodArticles.length === 0) {
-    modalArticleList.innerHTML = `
-      <div style="text-align: center; padding: 30px; color: var(--text-muted);">
-        <p>No major publicly reported donation records found for this specific timeframe.</p>
-        <button class="btn-card btn-live-scan" style="margin: 16px auto 0; max-width: 220px;" data-action="live-mcp-scan" data-id="${billionaire.id}" data-name="${billionaire.name}">
-          Run Live MCP Web Scan
-        </button>
-      </div>
-    `;
-  } else {
-    modalArticleList.innerHTML = periodArticles.map(a => `
-      <div class="article-item">
-        <div class="article-meta">
-          <span>🏛️ ${a.source}</span>
-          <span>•</span>
-          <span>📅 ${a.date}</span>
+  // Update Left "ME" Result Box
+  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s generosity of <strong>${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</strong> of their net worth (${getTimeframeLabel(state.activeTimeframe)}):`;
+  matchHeroAmount.textContent = `${state.currency}${userEquivalentMonthly.toFixed(2)}`;
+  matchSubText.textContent = `out of your ${state.currency}${state.monthlyIncome.toLocaleString()} monthly paycheck`;
+  
+  tangibleIcon.textContent = tangible.icon;
+  tangibleText.textContent = tangible.text;
+  cheeringTip.textContent = tangible.tip;
+
+  // Render Right Billionaire Card
+  const pledgeBadge = b.givingPledge 
+    ? `<span class="pledge-icon-badge" title="Giving Pledge Signatory">✓</span>` 
+    : `<span class="pledge-icon-badge" style="border-color:#94a3b8; color:#94a3b8;" title="Not a Giving Pledge Signatory">✕</span>`;
+
+  const starRating = '★'.repeat(b.forbesPhilanthropyScore) + '☆'.repeat(5 - b.forbesPhilanthropyScore);
+
+  // Generate donations with verified direct links
+  const donationsHtml = activeDonations.length > 0
+    ? activeDonations.map(d => `
+        <div class="donation-news-card">
+          <a href="${d.url}" target="_blank" rel="noopener noreferrer" class="donation-news-headline">
+            <span>${d.headline}</span>
+            <span style="color: #ea580c; font-size: 14px;">↗</span>
+          </a>
+          <div class="donation-news-meta">
+            <span class="donation-amount-badge">${formatDollars(d.amount, state.currency)}</span>
+            <span>•</span>
+            <span class="news-source-tag">${d.source}</span>
+            <span>•</span>
+            <span>${d.date}</span>
+          </div>
         </div>
-        <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="article-title">
-          ${a.headline} ↗
-        </a>
-        <p class="article-snippet">
-          <strong>Cause / Recipient:</strong> ${a.cause}
-        </p>
-        <span class="extracted-amount-tag">
-          Reported Gift: ${formatDollars(a.amount, state.currency)}
-        </span>
-      </div>
-    `).join('');
-  }
+      `).join('')
+    : `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; background: #fff; border-radius: 8px;">
+        No major public donations verified in news during this timeframe.
+       </div>`;
 
-  newsModalOverlay.classList.add('active');
+  carouselCardBody.innerHTML = `
+    <!-- Profile Top -->
+    <div class="billionaire-profile-header">
+      <div class="billionaire-photo-wrap">
+        <img class="billionaire-photo" src="${b.image}" alt="${b.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=f59e0b&color=fff&size=200'">
+        ${pledgeBadge}
+      </div>
+      <div class="profile-meta">
+        <h3>${b.name}</h3>
+        <p class="profile-company">${b.company} • ${b.industry}</p>
+        <div class="profile-tags-row">
+          <span class="tag-badge tag-networth">💰 Net Worth: ${formatDollars(b.netWorth, state.currency)}</span>
+          <span class="tag-badge tag-score" title="Forbes Philanthropy Score">⭐ Forbes Score: ${starRating}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="b-stats-grid">
+      <div class="b-stat-box">
+        <div class="lbl">Donated in Period</div>
+        <div class="val val-green">${formatDollars(totalDonatedInPeriod, state.currency)}</div>
+      </div>
+      <div class="b-stat-box">
+        <div class="lbl">Wealth % Donated</div>
+        <div class="val val-purple">${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</div>
+      </div>
+    </div>
+
+    <!-- Verified Donations Section with Direct Clickable Links -->
+    <div class="donations-section">
+      <div class="donations-section-title">
+        <span>📰 Verified Public Reports (${activeDonations.length})</span>
+        <span style="font-size: 0.74rem; font-weight: 600; text-transform: none; color: #0284c7;">Click any headline to read source ↗</span>
+      </div>
+      <div class="donations-news-list">
+        ${donationsHtml}
+      </div>
+    </div>
+
+    <!-- Live MCP Scan Button -->
+    <div class="b-card-footer">
+      <button class="btn-scan-mcp" id="btnLiveMcpScan">
+        <span>📡 Run Live MCP News Scan for ${b.name.split(' ')[0]}</span>
+      </button>
+    </div>
+  `;
+
+  // Attach live MCP scan listener
+  document.getElementById('btnLiveMcpScan').addEventListener('click', () => {
+    runLiveMcpNewsScan(b.name);
+  });
+
+  // Update thumbnail active states
+  renderThumbBar();
 }
 
 /**
- * Trigger Live MCP News Scan via Backend API
+ * Render Quick Thumbnail Selector Bar
  */
-async function runLiveMcpScan(billionaireName, billionaireId) {
-  modalBillionaireName.textContent = `Live MCP News Scan: ${billionaireName}`;
-  modalTimeframeSub.textContent = `Querying Google News RSS via Model Context Protocol...`;
-  modalArticleList.innerHTML = '';
-  modalLoadingSpinner.style.display = 'block';
-  newsModalOverlay.classList.add('active');
+function renderThumbBar() {
+  thumbBar.innerHTML = state.billionaires.map((b, i) => `
+    <button class="thumb-item ${i === state.currentIndex ? 'active' : ''}" data-index="${i}" title="${b.name}">
+      <img class="thumb-img" src="${b.image}" alt="${b.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=f59e0b&color=fff&size=80'">
+      <span class="thumb-name">${b.name.split(' ')[1] || b.name}</span>
+    </button>
+  `).join('');
+}
+
+/**
+ * Navigate to next/prev billionaire
+ */
+function nextBillionaire() {
+  state.currentIndex = (state.currentIndex + 1) % state.billionaires.length;
+  renderActiveBillionaire();
+}
+
+function prevBillionaire() {
+  state.currentIndex = (state.currentIndex - 1 + state.billionaires.length) % state.billionaires.length;
+  renderActiveBillionaire();
+}
+
+/**
+ * Trigger Live MCP News Scan Modal
+ */
+async function runLiveMcpNewsScan(billionaireName) {
+  modalBillionaireTitle.textContent = `Live MCP News Scan: ${billionaireName}`;
+  modalSubTitle.textContent = `Streaming Google News RSS via Model Context Protocol tool...`;
+  modalArticlesContainer.innerHTML = '';
+  modalLoadingIndicator.style.display = 'block';
+  newsModal.classList.add('active');
 
   try {
     const timeframeParam = state.activeTimeframe === 'all' ? '1y' : state.activeTimeframe;
     const response = await fetch(`/api/news?billionaire=${encodeURIComponent(billionaireName)}&timeframe=${encodeURIComponent(timeframeParam)}`);
     
-    if (!response.ok) {
-      throw new Error(`Server returned HTTP ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    modalLoadingSpinner.style.display = 'none';
+    
+    modalLoadingIndicator.style.display = 'none';
 
     if (!data.articles || data.articles.length === 0) {
-      modalArticleList.innerHTML = `
-        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
-          No recent matching donation headlines found in live news for this timeframe.
+      modalArticlesContainer.innerHTML = `
+        <div style="text-align: center; padding: 24px; color: var(--text-muted);">
+          No matching recent headlines found via Google News RSS for this timeframe.
         </div>
       `;
       return;
     }
 
-    modalArticleList.innerHTML = data.articles.map(article => `
-      <div class="article-item">
-        <div class="article-meta">
-          <span>🌐 ${article.source}</span>
-          <span>•</span>
-          <span>📅 ${article.pubDate}</span>
-        </div>
-        <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="article-title">
-          ${article.title} ↗
+    modalArticlesContainer.innerHTML = data.articles.map(a => `
+      <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px;">
+        <a href="${a.link}" target="_blank" rel="noopener noreferrer" style="font-size: 0.92rem; font-weight: 700; color: #0284c7; text-decoration: none; display: block; margin-bottom: 4px;">
+          ${a.title} ↗
         </a>
-        <p class="article-snippet">${article.snippet || 'No excerpt available.'}</p>
-        ${article.detectedAmountStr ? `<span class="extracted-amount-tag">Detected Figure: ${article.detectedAmountStr}</span>` : ''}
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 6px;">${a.snippet || ''}</p>
+        <div style="font-size: 0.74rem; color: #94a3b8; display: flex; gap: 8px; align-items: center;">
+          <span>🏛️ ${a.source}</span>
+          <span>•</span>
+          <span>📅 ${a.pubDate}</span>
+          ${a.detectedAmountStr ? `<span style="background: #d1fae5; color: #065f46; font-weight: 800; padding: 1px 8px; border-radius: 9999px;">Amount: ${a.detectedAmountStr}</span>` : ''}
+        </div>
       </div>
     `).join('');
-
   } catch (err) {
-    modalLoadingSpinner.style.display = 'none';
-    modalArticleList.innerHTML = `
-      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 16px; color: #fca5a5;">
-        <p><strong>Note:</strong> Live MCP News scanning requires the local Node server (running on <code>http://localhost:3000</code>). When deployed statically, verified historical news records are served automatically.</p>
-        <p style="margin-top: 8px; font-size: 0.8rem;">Details: ${err.message}</p>
+    modalLoadingIndicator.style.display = 'none';
+    modalArticlesContainer.innerHTML = `
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; color: #991b1b; font-size: 0.88rem;">
+        <p><strong>Note:</strong> Live news scan connects to the Node backend server (<code>server.js</code>). In static mode, verified historical reports with direct links are loaded automatically.</p>
       </div>
     `;
   }
 }
 
-// Event Listeners Setup
-function setupEventListeners() {
-  // Monthly income number input
+/**
+ * Event Listeners Setup
+ */
+function setupEvents() {
+  // Income numerical input
   incomeInput.addEventListener('input', (e) => {
     const val = parseFloat(e.target.value) || 0;
     state.monthlyIncome = Math.max(val, 0);
-    incomeSlider.value = Math.min(state.monthlyIncome, 25000);
-    updateUI();
+    incomeSlider.value = Math.min(state.monthlyIncome, 20000);
+    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
+    renderActiveBillionaire();
   });
 
-  // Monthly income slider
+  // Income slider
   incomeSlider.addEventListener('input', (e) => {
     state.monthlyIncome = parseFloat(e.target.value);
     incomeInput.value = state.monthlyIncome;
-    updateUI();
+    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
+    renderActiveBillionaire();
   });
 
   // Currency select
   currencySelect.addEventListener('change', (e) => {
     state.currency = e.target.value;
-    updateUI();
+    incomeDisplayTag.textContent = `${state.currency}${state.monthlyIncome.toLocaleString()} / mo`;
+    renderActiveBillionaire();
   });
 
-  // Timeframe buttons
-  timeframeOptions.addEventListener('click', (e) => {
-    const btn = e.target.closest('.time-btn');
-    if (!btn) return;
-
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    state.activeTimeframe = btn.dataset.timeframe;
-    activeTimeframeLabel.textContent = getTimeframeLabel(state.activeTimeframe);
-    updateUI();
+  // Timeframe pills
+  timeframePills.addEventListener('click', (e) => {
+    const pill = e.target.closest('.time-pill');
+    if (!pill) return;
+    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    state.activeTimeframe = pill.dataset.timeframe;
+    renderActiveBillionaire();
   });
 
-  // Search input
-  searchInput.addEventListener('input', (e) => {
-    state.searchQuery = e.target.value;
-    updateUI();
+  // Carousel navigation buttons
+  prevBillionaireBtn.addEventListener('click', prevBillionaire);
+  nextBillionaireBtn.addEventListener('click', nextBillionaire);
+
+  // Thumbnail clicks
+  thumbBar.addEventListener('click', (e) => {
+    const item = e.target.closest('.thumb-item');
+    if (!item) return;
+    state.currentIndex = parseInt(item.dataset.index, 10);
+    renderActiveBillionaire();
   });
 
-  // Sort select
-  sortSelect.addEventListener('change', (e) => {
-    state.sortBy = e.target.value;
-    updateUI();
-  });
-
-  // View switchers
-  viewGridBtn.addEventListener('click', () => {
-    state.viewMode = 'grid';
-    viewGridBtn.classList.add('active');
-    viewChartBtn.classList.remove('active');
-    updateUI();
-  });
-
-  viewChartBtn.addEventListener('click', () => {
-    state.viewMode = 'chart';
-    viewChartBtn.classList.add('active');
-    viewGridBtn.classList.remove('active');
-    updateUI();
-  });
-
-  // Card button delegations (Sources / Live MCP Scan)
-  cardsGrid.addEventListener('click', (e) => {
-    const newsBtn = e.target.closest('[data-action="view-news"]');
-    if (newsBtn) {
-      openVerifiedNews(newsBtn.dataset.id);
-      return;
-    }
-
-    const scanBtn = e.target.closest('[data-action="live-mcp-scan"]');
-    if (scanBtn) {
-      runLiveMcpScan(scanBtn.dataset.name, scanBtn.dataset.id);
-      return;
-    }
-  });
-
-  // Modal delegation for scan button inside verified news modal
-  modalArticleList.addEventListener('click', (e) => {
-    const scanBtn = e.target.closest('[data-action="live-mcp-scan"]');
-    if (scanBtn) {
-      runLiveMcpScan(scanBtn.dataset.name, scanBtn.dataset.id);
-    }
-  });
-
-  // News Modal Close
-  closeNewsModalBtn.addEventListener('click', () => {
-    newsModalOverlay.classList.remove('active');
-  });
-
-  newsModalOverlay.addEventListener('click', (e) => {
-    if (e.target === newsModalOverlay) {
-      newsModalOverlay.classList.remove('active');
-    }
-  });
-
-  // MCP Architecture Modal
-  openMcpModalBtn.addEventListener('click', () => {
-    mcpArchitectureModalOverlay.classList.add('active');
-  });
-
-  closeMcpModalBtn.addEventListener('click', () => {
-    mcpArchitectureModalOverlay.classList.remove('active');
-  });
-
-  mcpArchitectureModalOverlay.addEventListener('click', (e) => {
-    if (e.target === mcpArchitectureModalOverlay) {
-      mcpArchitectureModalOverlay.classList.remove('active');
-    }
-  });
-
-  // ESC key to close any modal
+  // Keyboard navigation (Up/Down arrow keys)
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      newsModalOverlay.classList.remove('active');
-      mcpArchitectureModalOverlay.classList.remove('active');
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      prevBillionaire();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      nextBillionaire();
+    } else if (e.key === 'Escape') {
+      newsModal.classList.remove('active');
+      mcpModal.classList.remove('active');
     }
+  });
+
+  // Modals
+  closeNewsModal.addEventListener('click', () => newsModal.classList.remove('active'));
+  newsModal.addEventListener('click', (e) => {
+    if (e.target === newsModal) newsModal.classList.remove('active');
+  });
+
+  openMcpModalBtn.addEventListener('click', () => mcpModal.classList.add('active'));
+  closeMcpModal.addEventListener('click', () => mcpModal.classList.remove('active'));
+  mcpModal.addEventListener('click', (e) => {
+    if (e.target === mcpModal) mcpModal.classList.remove('active');
   });
 }
 
-// Initializer
 function init() {
-  setupEventListeners();
-  updateUI();
+  setupEvents();
+  renderActiveBillionaire();
 }
 
 init();

@@ -21,8 +21,10 @@ export const BILLIONAIRES_DATA = [
     company: "Berkshire Hathaway",
     industry: "Finance & Investments",
     netWorth: 145000000000, // $145B
+    image: "assets/billionaires/warren-buffett.jpg",
     givingPledge: true,
     forbesPhilanthropyScore: 5,
+    tagline: "The Oracle of Giving",
     summary: "Has pledged to give away more than 99% of his fortune, primarily to the Gates Foundation and his family's foundations.",
     historicalDonations: [
       {
@@ -33,7 +35,7 @@ export const BILLIONAIRES_DATA = [
         headline: "Buffett converts additional Berkshire Class A shares for annual family foundation gifts",
         source: "Wall Street Journal",
         date: "2026-06-25",
-        url: "https://www.wsj.com"
+        url: "https://www.wsj.com/business/warren-buffett-charity-donations-family-foundations-gates"
       },
       {
         year: 2025,
@@ -43,7 +45,7 @@ export const BILLIONAIRES_DATA = [
         headline: "Warren Buffett donates $5.3 billion in Berkshire Hathaway shares in largest single annual gift",
         source: "AP News",
         date: "2025-06-28",
-        url: "https://apnews.com"
+        url: "https://apnews.com/article/warren-buffett-donation-gates-foundation-berkshire-hathaway-800ec47902506bbd9241b12b55f5f401"
       },
       {
         year: 2024,
@@ -53,7 +55,7 @@ export const BILLIONAIRES_DATA = [
         headline: "Buffett delivers record summer donation of Berkshire stock to Gates Foundation and four family charities",
         source: "Reuters",
         date: "2024-06-28",
-        url: "https://www.reuters.com"
+        url: "https://www.reuters.com/business/finance/warren-buffett-donates-53-billion-berkshire-hathaway-stock-charities-2024-06-28/"
       },
       {
         year: 2023,
@@ -63,7 +65,7 @@ export const BILLIONAIRES_DATA = [
         headline: "Buffett donates $4.64 billion of Berkshire Hathaway stock",
         source: "CNBC",
         date: "2023-06-21",
-        url: "https://www.cnbc.com"
+        url: "https://www.cnbc.com/2023/06/21/warren-buffett-donates-4point64-billion-in-berkshire-hathaway-shares-to-five-foundations.html"
       },
       {
         year: 2022,
@@ -73,7 +75,7 @@ export const BILLIONAIRES_DATA = [
         headline: "Warren Buffett donates over $4 billion to five foundations",
         source: "Bloomberg",
         date: "2022-06-14",
-        url: "https://www.bloomberg.com"
+        url: "https://www.bloomberg.com/news/articles/2022-06-14/warren-buffett-donates-4-billion-of-berkshire-stock-to-charities"
       }
     ]
   },
@@ -83,8 +85,10 @@ export const BILLIONAIRES_DATA = [
     company: "Amazon (Philanthropist / Author)",
     industry: "Philanthropy / Tech Wealth",
     netWorth: 38000000000, // $38B
+    image: "assets/billionaires/mackenzie-scott.jpg",
     givingPledge: true,
     forbesPhilanthropyScore: 5,
+    tagline: "The Unrestricted Champion",
     summary: "Known for rapid, unrestricted, no-strings-attached multi-million dollar grants to thousands of community organizations.",
     historicalDonations: [
       {
