@@ -32,6 +32,7 @@ const closeSettingsModal = document.getElementById('closeSettingsModal');
 const settingsCurrencySelect = document.getElementById('settingsCurrencySelect');
 const settingsIncomeInput = document.getElementById('settingsIncomeInput');
 const settingsIncomeSlider = document.getElementById('settingsIncomeSlider');
+const settingsAdvancedModeToggle = document.getElementById('settingsAdvancedModeToggle');
 const btnSaveSettings = document.getElementById('btnSaveSettings');
 
 // Welcome Modal
@@ -431,7 +432,35 @@ function openSettings() {
   const radio = document.querySelector(`input[name="calcMode"][value="${state.calcMode}"]`);
   if (radio) radio.checked = true;
 
+  if (settingsAdvancedModeToggle) {
+    const isAdv = localStorage.getItem('nocharity_advanced_mode') === 'true';
+    settingsAdvancedModeToggle.checked = isAdv;
+    updateModeDisplay(isAdv);
+  }
+
   settingsModal.classList.add('active');
+}
+
+function updateModeDisplay(isAdv) {
+  const title = document.getElementById('modeTitleText');
+  const badge = document.getElementById('modeBadgeText');
+  const sub = document.getElementById('modeSubText');
+  if (!title) return;
+  if (isAdv) {
+    title.textContent = 'Advanced Mode';
+    title.style.color = '#38bdf8';
+    badge.textContent = 'Selected';
+    badge.style.background = 'rgba(56, 189, 248, 0.15)';
+    badge.style.color = '#38bdf8';
+    sub.textContent = 'Navigating to historical wealth parity & verified attribution explorer...';
+  } else {
+    title.textContent = 'Basic Mode';
+    title.style.color = 'inherit';
+    badge.textContent = 'Current';
+    badge.style.background = 'rgba(245, 158, 11, 0.15)';
+    badge.style.color = '#f59e0b';
+    sub.textContent = 'Fast meme-inspired Soresi calculator with client-side comparisons.';
+  }
 }
 
 /**
@@ -447,6 +476,14 @@ function saveSettings() {
   localStorage.setItem('nocharity_income', state.monthlyIncome);
   localStorage.setItem('nocharity_currency', state.currency);
   localStorage.setItem('nocharity_mode', state.calcMode);
+
+  if (settingsAdvancedModeToggle && settingsAdvancedModeToggle.checked) {
+    localStorage.setItem('nocharity_advanced_mode', 'true');
+    window.location.href = '/advanced';
+    return;
+  } else {
+    localStorage.setItem('nocharity_advanced_mode', 'false');
+  }
 
   settingsModal.classList.remove('active');
   renderActiveBillionaire();
@@ -498,6 +535,21 @@ function setupEvents() {
 
   // Save Settings
   btnSaveSettings.addEventListener('click', saveSettings);
+
+  // Settings Advanced Mode toggle immediate redirect
+  if (settingsAdvancedModeToggle) {
+    settingsAdvancedModeToggle.addEventListener('change', (e) => {
+      updateModeDisplay(e.target.checked);
+      if (e.target.checked) {
+        localStorage.setItem('nocharity_advanced_mode', 'true');
+        setTimeout(() => {
+          window.location.href = '/advanced';
+        }, 180);
+      } else {
+        localStorage.setItem('nocharity_advanced_mode', 'false');
+      }
+    });
+  }
 
   // First-time Welcome modal trigger & handler
   if (!localStorage.getItem('nocharity_income')) {

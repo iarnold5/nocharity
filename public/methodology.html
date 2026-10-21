@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Methodology & Data Quality — NoCharity Advanced Mode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: #131d35;
+      --bg-subcard: #182442;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-gold: #f59e0b;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #c084fc;
+      --accent-red: #f87171;
+      --border-subtle: rgba(148, 163, 184, 0.15);
+      --border-light: rgba(148, 163, 184, 0.3);
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .meth-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+
+    /* Top App Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-size: 1.8rem;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-md);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-advanced {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      padding: 7px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-main);
+      border-color: var(--border-light);
+    }
+
+    .nav-btn.primary {
+      background: var(--accent-gold);
+      color: var(--bg-dark);
+      border-color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    /* Hero Banner */
+    .meth-hero {
+      background: radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.95) 70%), var(--bg-card);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meth-hero h2 {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      color: #f8fafc;
+      margin: 0 0 10px 0;
+      letter-spacing: 0.5px;
+    }
+
+    .meth-hero p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+    }
+
+    .meth-mantra-banner {
+      background: rgba(15, 23, 42, 0.9);
+      border-left: 4px solid var(--accent-gold);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 14px 20px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #fde68a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Table of Contents */
+    .toc-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .toc-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin: 0 0 16px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.2s;
+    }
+
+    .toc-link:hover {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-gold);
+      transform: translateX(4px);
+    }
+
+    /* Content Sections */
+    .meth-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .meth-section h3 {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      color: var(--accent-gold);
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      line-height: 1.3;
+    }
+
+    .meth-section p {
+      font-size: 0.94rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .meth-callout {
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    .meth-callout.warning {
+      border-left-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .meth-callout.gold {
+      border-left-color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .meth-callout.purple {
+      border-left-color: var(--accent-purple);
+      background: rgba(192, 132, 252, 0.08);
+    }
+
+    /* Dense Comparison Tables */
+    .dense-table-wrapper {
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .dense-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      text-align: left;
+    }
+
+    .dense-table th {
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--accent-gold);
+      font-family: var(--font-heading);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .dense-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      color: #e2e8f0;
+      vertical-align: top;
+    }
+
+    .dense-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .dense-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .badge-green { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-blue  { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-red   { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+    .badge-purple{ background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
+
+    /* The 8 Questions Grid */
+    .eight-questions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .question-tile {
+      background: var(--bg-subcard);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .question-tile:hover {
+      border-color: rgba(245, 158, 11, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .question-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .question-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Footer */
+    .meth-footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="meth-container">
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo">⚖️</div>
+        <div class="brand-text">
+          <h1>
+            <span>NoCharity</span>
+            <span class="badge-advanced">Advanced Mode</span>
+          </h1>
+        </div>
+      </div>
+
+      <nav class="header-nav">
+        <a href="/" class="nav-btn">
+          <span>🎭 Basic Mode</span>
+        </a>
+        <a href="/advanced" class="nav-btn primary">
+          <span>🔬 Open Advanced Mode</span>
+        </a>
+      </nav>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="meth-hero">
+      <h2>Methodology & Data Quality Architecture</h2>
+      <p>
+        A rigorous accounting of how NoCharity tracks historical net worth, isolates personal sacrifice from corporate/foundation funds, audits regulatory filings, and scores data quality.
+      </p>
+
+      <div class="meth-mantra-banner">
+        <span>🛡️</span>
+        <div>
+          <strong>CENTRAL GUIDING PRINCIPLE:</strong>
+          "The goal is not academic perfection. The goal is preventing NoCharity from confidently displaying nonsense."
+        </div>
+      </div>
+    </section>
+
+    <!-- Table of Contents -->
+    <nav class="toc-card" aria-label="Table of Contents">
+      <div class="toc-title">Methodology Roadmap</div>
+      <div class="toc-grid">
+        <a href="#historical-wealth" class="toc-link"><span>⏳</span> 1. Historical Wealth & Denominators</a>
+        <a href="#personal-vs-org" class="toc-link"><span>🏛️</span> 2. Personal vs. Organization Giving</a>
+        <a href="#verification-tiers" class="toc-link"><span>✅</span> 3. Verification & Evidence Ladder</a>
+        <a href="#source-limitations" class="toc-link"><span>📑</span> 4. Source Limitations & Filing Lags</a>
+        <a href="#incomplete-records" class="toc-link"><span>🔍</span> 5. Incomplete Public Records</a>
+        <a href="#documented-vs-real" class="toc-link"><span>⚖️</span> 6. Documented vs. Real-World Giving</a>
+        <a href="#eight-questions" class="toc-link"><span>🎯</span> 7. The 8 Questions & Quality Layer</a>
+      </div>
+    </nav>
+
+    <!-- ===================================================================== -->
+    <!-- 1. HISTORICAL WEALTH                                                  -->
+    <!-- ===================================================================== -->
+    <article id="historical-wealth" class="meth-section">
+      <h3><span>⏳</span> 1. Historical Wealth & The Denominator Problem</h3>
+      <p>
+        The single most common flaw in philanthropic analysis is dividing historical donations by a billionaire's <em>current</em> net worth.
+      </p>
+
+      <div class="meth-callout gold">
+        <strong>The Denominator Fallacy:</strong><br>
+        Suppose an investor donated $1,000,000,000 in 2006 when their net worth was $25,000,000,000. That represented <strong>4.00%</strong> of their entire fortune at that moment. If that individual's fortune subsequently expands to $150,000,000,000 due to market appreciation by 2026, comparing the 2006 donation to their 2026 wealth produces <strong>0.67%</strong>, artificially minimizing their relative sacrifice. Conversely, evaluating an older donation against a collapsed current fortune creates false inflation.
+      </div>
+
+      <p>
+        NoCharity enforces <strong>Historical Wealth-Aware Parity</strong>. Every qualifying donation is evaluated against the donor's documented net worth at or immediately preceding the donation date:
+      </p>
+      
+      <div class="dense-table-wrapper">
+        <table class="dense-table">
+          <thead>
+            <tr>
+              <th>Proximity Tier</th>
+              <th>Calendar Distance</th>
+              <th>Quality Classification</th>
+              <th>Methodological Handling</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">EXACT_DATE</span></td>
+              <td>0 Days (Same Date)</td>
+              <td>Highest Benchmark</td>
+              <td>Direct valuation snapshot recorded on the date of transaction.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">NEAR_DATE</span></td>
+              <td>1 to 90 Days Prior</td>
+              <td>Audited High Quality</td>
+              <td>Snapshot within 1 quarter prior; market fluctuations are minimal.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">SAME_YEAR</span></td>
+              <td>91 to 365 Days Prior</td>
+              <td>Documented Estimate</td>
+              <td>Snapshot recorded earlier in the same calendar year.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">APPROXIMATE</span></td>
+              <td>366 to 1,095 Days Prior</td>
+              <td>Approximate Estimate</td>
+              <td>Multi-year baseline (≤ 3 years). Explicitly labeled approximate.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">UNAVAILABLE</span></td>
+              <td>&gt; 3 Years or Future</td>
+              <td>Rejected (No Parity)</td>
+              <td>Calculations suppressed. Future snapshots are strictly disallowed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meth-callout warning">
+        <strong>Anti-Nonsense Rule: Temporal Consistency</strong><br>
+        If a donation took place in 2018, NoCharity will <strong>never</strong> silently use a 2026 wealth snapshot. Using a valuation date far into the future relative to the donation date without explicit disclaimer produces misleading results. Any such temporal gap is flagged, suppressed, or marked approximate.
+      </div>
+
+      <p>
+        <strong>No Fabricated Interpolation:</strong> Financial benchmarks (Bloomberg Billionaires Index, Forbes) provide discrete point-in-time valuation snapshots. Generating smooth polynomial or spline curves between distant snapshot years introduces false precision. NoCharity uses discrete documented snapshots only.
+      </p>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 2. PERSONAL VS ORGANIZATION GIVING                                    -->
+    <!-- ===================================================================== -->
+    <article id="personal-vs-org" class="meth-section">
+      <h3><span>🏛️</span> 2. Personal vs. Organization Giving</h3>
+      <p>
+        Public relations releases routinely conflate three entirely distinct categories of philanthropic capital:
+      </p>
+
+      <div class="dense-table-wrapper">
+        <table class="dense-table">
+          <thead>
+            <tr>
+              <th>Attribution Category</th>
+              <th>Funding Source</th>
+              <th>Tax & Economic Reality</th>
+              <th>NoCharity Treatment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">PERSONAL_DIRECT</span></td>
+              <td>Individual Personal Accounts</td>
+              <td>Direct outlay of private assets (cash, personal stock shares).</td>
+              <td><strong>Qualifies for Personal Parity.</strong> Tracked as true personal sacrifice.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-purple">FOUNDATION</span></td>
+              <td>Private Charitable Foundation</td>
+              <td>Assets already legally irrevocably gifted; donor took tax deduction years earlier.</td>
+              <td><strong>Excluded from Personal Parity.</strong> Displayed exclusively in Associated Organization section.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">CORPORATE</span></td>
+              <td>Company Corporate Treasury</td>
+              <td>Company funds owned by all shareholders, not billionaire's personal checkbook.</td>
+              <td><strong>Excluded from Personal Parity.</strong> Displayed as corporate philanthropy context.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">DAF</span></td>
+              <td>Donor-Advised Fund</td>
+              <td>Intermediary sponsor (Fidelity/Schwab); irrevocable tax write-off already captured.</td>
+              <td><strong>Excluded from Personal Parity.</strong> Disclosed as intermediary transfer.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">PLEDGE</span></td>
+              <td>Future Commitment</td>
+              <td>Non-binding public pledge (e.g. Giving Pledge); no asset transfer completed.</td>
+              <td><strong>Excluded from All Giving Totals.</strong> Pledges do not count as completed giving.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meth-callout purple">
+        <strong>The Foundation Double-Dipping Defense:</strong><br>
+        When a billionaire transfers $1,000,000,000 of stock to their private family foundation, they receive an immediate personal income tax deduction of up to 30% of their adjusted gross income. When that foundation subsequently writes a $10,000,000 check to a food bank five years later, that $10,000,000 comes from foundation endowment money—not the billionaire's personal checking account. Counting both the original contribution and every subsequent foundation grant as "personal billionaire giving" double-counts the same dollar.
+      </div>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 3. VERIFICATION & EVIDENCE LADDER                                     -->
+    <!-- ===================================================================== -->
+    <article id="verification-tiers" class="meth-section">
+      <h3><span>✅</span> 3. Verification & The Evidence Ladder</h3>
+      <p>
+        No transaction enters NoCharity's confirmed database without passing an evidentiary audit:
+      </p>
+
+      <div class="dense-table-wrapper">
+        <table class="dense-table">
+          <thead>
+            <tr>
+              <th>Status Tier</th>
+              <th>Required Primary Evidence</th>
+              <th>Default Parity Eligibility</th>
+              <th>Ranking Eligibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">VERIFIED</span></td>
+              <td>SEC Form 4 beneficial ownership statement, IRS Form 990-PF schedule, or audited grant agreement.</td>
+              <td>Eligible</td>
+              <td>Eligible</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">PARTIALLY_VERIFIED</span></td>
+              <td>Institutional recipient official disclosure or dual independent investigative reports.</td>
+              <td>Eligible</td>
+              <td>Eligible</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">UNVERIFIED</span></td>
+              <td>Press release or single news article without regulatory corroboration.</td>
+              <td>Eligible (Badged)</td>
+              <td>Excluded from High-Confidence Filters</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">DISCOVERED</span></td>
+              <td>Candidate headline detected by Google News RSS. "Potential donation — verification required".</td>
+              <td>Ineligible</td>
+              <td>Excluded</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">DISPUTED</span></td>
+              <td>Contested attribution, unfulfilled commitment, or repudiated grant figure.</td>
+              <td>Ineligible</td>
+              <td>Excluded</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 4. SOURCE LIMITATIONS                                                 -->
+    <!-- ===================================================================== -->
+    <article id="source-limitations" class="meth-section">
+      <h3><span>📑</span> 4. Source Limitations & Filing Lags</h3>
+      <p>
+        Transparency requires acknowledging the structural constraints of open public data:
+      </p>
+      <ul>
+        <li>
+          <strong>IRS Form 990-PF Reporting Lags:</strong> Non-profit private foundations file annual tax returns up to 10.5 months after their fiscal year ends. With IRS processing delays, official government filings frequently lag actual grant disbursals by <strong>12 to 24 months</strong>.
+        </li>
+        <li>
+          <strong>SEC Form 4 Scope Limits:</strong> SEC Form 4 filings capture transfers of public company common equity by corporate insiders. They do not capture gifts of cash, privately held business equity, municipal bonds, artwork, or real estate holdings.
+        </li>
+        <li>
+          <strong>Donor-Advised Fund Redactions:</strong> Under federal law, commercial DAF sponsors (e.g. Fidelity Charitable, Schwab Charitable) are legally designated as 501(c)(3) public charities. Grants made from a donor's DAF account are filed on the sponsor's master Form 990 without identifying the underlying donor.
+        </li>
+      </ul>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 5. INCOMPLETE PUBLIC RECORDS                                          -->
+    <!-- ===================================================================== -->
+    <article id="incomplete-records" class="meth-section">
+      <h3><span>🔍</span> 5. Incomplete Public Records</h3>
+      <p>
+        The public record is inherently incomplete. Billionaires who value privacy, support contentious causes, or donate to religious institutions, local relief efforts, or medical funds without issuing press releases leave minimal regulatory paper trails.
+      </p>
+      <div class="meth-callout warning">
+        <strong>The PR Bias:</strong><br>
+        A public database naturally indexes what is public. A media-savvy billionaire who employs a public relations team to announce every gift will generate a more extensive documented trail than an introverted peer of equal or greater generosity. NoCharity documents disclosures; it does not measure moral virtue.
+      </div>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 6. DOCUMENTED VS REAL-WORLD GIVING                                    -->
+    <!-- ===================================================================== -->
+    <article id="documented-vs-real" class="meth-section">
+      <h3><span>⚖️</span> 6. Why "Documented Giving" is NOT Equivalent to Total Real-World Giving</h3>
+      <p>
+        Every figure in NoCharity Advanced Mode represents a <strong>documented minimum (floor)</strong>, not a definitive ceiling.
+      </p>
+      <div class="meth-callout gold">
+        <strong>The "Documented Only" Invariant:</strong><br>
+        If NoCharity reports that a billionaire has $15,000,000,000 in documented personal giving, this statement means exactly:
+        <br>
+        <em>"Public regulatory filings and audited disclosures confirm at least $15.0B in qualifying personal transactions."</em>
+        <br><br>
+        It does <strong>not</strong> mean the billionaire has given only $15.0B. Nor does a blank record prove that an unranked billionaire has given zero dollars.
+      </div>
+      <p>
+        When NoCharity calculates parity ratios, it explicitly qualifies:
+        <br>
+        <code style="font-family: var(--font-mono); color: var(--accent-gold);">"Proportional wealth comparison based on documented wealth at donation date. This is an illustration of relative proportional scale, not an assertion of identical subjective financial sacrifice."</code>
+      </p>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 7. THE 8 QUESTIONS & DATA QUALITY LAYER                               -->
+    <!-- ===================================================================== -->
+    <article id="eight-questions" class="meth-section">
+      <h3><span>🎯</span> 7. The 8 Essential Questions & Quality Scoring</h3>
+      <p>
+        To prevent NoCharity from confidently displaying nonsense, every donation in Advanced Mode is evaluated against the <strong>8 Essential Questions</strong>:
+      </p>
+
+      <div class="eight-questions-grid">
+        <div class="question-tile">
+          <span class="question-badge">1. WHO?</span>
+          <span class="question-desc">Donor identity: named person or verified organization entity.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">2. WHAT?</span>
+          <span class="question-desc">Nature of the gift (monetary, equity, real estate) and stated cause.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">3. WHEN?</span>
+          <span class="question-desc">Valid calendar date in parseable YYYY-MM-DD ISO format.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">4. HOW MUCH?</span>
+          <span class="question-desc">Finite, positive dollar amount with explicit ISO currency.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">5. FROM WHOM?</span>
+          <span class="question-desc">Funding vehicle: personal, foundation, company, DAF, or pledge.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">6. TO WHOM?</span>
+          <span class="question-desc">Recipient charity, institutional fund, university, or hospital.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">7. SOURCE?</span>
+          <span class="question-desc">Verifiable regulatory filing link or audited publisher citation.</span>
+        </div>
+        <div class="question-tile">
+          <span class="question-badge">8. HOW CERTAIN?</span>
+          <span class="question-desc">Evidentiary status tier: VERIFIED, PARTIALLY_VERIFIED, UNVERIFIED.</span>
+        </div>
+      </div>
+
+      <p>
+        <strong>Automated Quality Grades (0 to 100):</strong>
+      </p>
+      <div class="dense-table-wrapper">
+        <table class="dense-table">
+          <thead>
+            <tr>
+              <th>Quality Grade</th>
+              <th>Score Threshold</th>
+              <th>Status Label</th>
+              <th>Audit Standards Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">Grade A</span></td>
+              <td>85 – 100</td>
+              <td>Audited & Complete</td>
+              <td>Answers all 8 questions, verified primary regulatory source, zero discrepancies.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Grade B</span></td>
+              <td>70 – 84</td>
+              <td>Well-Documented</td>
+              <td>High completeness, confirmed recipient disclosure or reliable dual reporting.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">Grade C</span></td>
+              <td>50 – 69</td>
+              <td>Preliminary / Unverified</td>
+              <td>Preliminary public reporting or approximate temporal wealth benchmark.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">Grade D / Flagged</span></td>
+              <td>&lt; 50 or Flagged</td>
+              <td>Disputed / Incomplete</td>
+              <td>Active source amount disagreements, missing donor entity, or contested claim.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meth-callout gold">
+        <strong>Multi-Source Discrepancy Rule:</strong><br>
+        If two credible sources disagree on a donation amount (for example, a press release claiming $1.2B while an SEC Form 4 indicates $1.0B in shares transferred), NoCharity <strong>never silently picks one</strong>. The disagreement is preserved on the record, both figures are recorded, and the donation is flagged with a discrepancy notice.
+      </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="meth-footer">
+      <p>
+        NoCharity Advanced Mode &copy; 2026. Built with open-access public regulatory data.
+        <br>
+        <a href="/advanced" style="color: var(--accent-gold); text-decoration: none; font-weight: 600;">Return to Advanced Dashboard &rarr;</a>
+      </p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

@@ -197,6 +197,30 @@
         </div>
       </div>
 
+      <!-- App Mode Toggle Section (Basic vs Advanced) -->
+      <div class="settings-group" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-subtle);">
+        <label class="settings-label">Mode Selection</label>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(0,0,0,0.15); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <strong id="modeTitleText" style="font-size: 0.95rem;">Basic Mode</strong>
+              <span id="modeBadgeText" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 9999px;">Current</span>
+            </div>
+            <p id="modeSubText" style="font-size: 0.78rem; color: var(--text-muted); margin: 3px 0 0; line-height: 1.4;">
+              Fast meme-inspired Soresi calculator with client-side comparisons.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Basic</span>
+            <label class="switch-toggle" style="flex-shrink: 0;" title="Toggle between Basic Mode and Advanced Mode">
+              <input type="checkbox" id="settingsAdvancedModeToggle">
+              <span class="slider"></span>
+            </label>
+            <span style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Advanced</span>
+          </div>
+        </div>
+      </div>
+
       <button id="btnSaveSettings" class="btn-save-settings">Save & Apply Changes</button>
     </div>
   </div>

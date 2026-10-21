@@ -1,80 +1,83 @@
-# ⚖️ NoCharity — Billionaire Philanthropy & Income Parity Calculator
+# ⚖️ NoCharity — Billionaire Philanthropy & Reality Check Platform
 
-> An interactive web application and Model Context Protocol (MCP) server that tracks billionaire donations reported in the news across selected timeframes, calculates donations as a percentage of their net worth, and translates those percentages into everyday dollars based on your personal monthly income.
-
----
-
-## ✨ Features
-
-1. **Reality Check Parity Engine**:
-   - Converts multi-million and billion-dollar donations into exact **percentages of total net worth**:
-     $$\text{Generosity Ratio} = \left(\frac{\text{Donated Amount}}{\text{Net Worth}}\right) \times 100$$
-   - Multiplies that exact ratio by your **take-home monthly income** to show what their sacrifice equals on your budget:
-     $$\text{Your Equivalent} = \text{Monthly Income} \times \left(\frac{\text{Generosity Ratio}}{100}\right)$$
-   - Displays sobering, tangible everyday comparisons (e.g., *"Equivalent to a single pack of gum ($0.45)"*, *"A cup of filter coffee ($1.85)"*, *"A subway ticket ($2.75)"*).
-
-2. **Timeframe-Based News Tracking**:
-   - Filter by **All Time**, **2026 Recent**, **2025 Calendar**, **Past 2 Years**, **Past 5 Years**, or **2020–2023**.
-   - Verified records from Forbes Philanthropy rankings, Bloomberg, SEC Form 990 tax filings, Chronicle of Philanthropy, and the Giving Pledge directory.
-
-3. **100% Free Live MCP News Integration**:
-   - On-demand **Live MCP Web Scan** queries real-time Google News RSS feeds for any billionaire and timeframe.
-   - Automatically extracts donation figures, news headlines, publication dates, and source URLs.
-   - Requires **$0** and **zero paid API keys**.
-
-4. **Dual Visualizations**:
-   - **Cards Grid**: Rich cards with avatar monograms, giving pledge status, Forbes Philanthropy scores, and parity callouts.
-   - **Comparative Bar Chart**: Visual horizontal bar comparison ranking billionaires by generosity ratio.
+> A dual-mode open-source web application and Model Context Protocol (MCP) server that brings truthful perspective to billionaire philanthropy. Compare billionaire giving ratios against everyday household budgets using verified historical net worth and regulatory disclosures.
 
 ---
 
-## 🤖 MCP Servers Architecture (100% Free)
+## 🏛️ Dual-Mode Architecture
 
-This application includes a fully standard **Model Context Protocol (MCP)** server built with `@modelcontextprotocol/sdk` in [`mcp-server.js`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/mcp-server.js).
+NoCharity operates with a strict dual-mode model to preserve simplicity and prevent breaking changes:
 
-### The MCP Tools:
-
-| Tool Name | Parameters | Purpose | Cost |
-| :--- | :--- | :--- | :--- |
-| `search_billionaire_news` | `billionaireName`, `timeframe` | Scrapes real-time news headlines, dates, and amounts via Google News RSS | **$0 (Free, No API Key)** |
-| `calculate_donation_parity` | `netWorth`, `donationAmount`, `userMonthlyIncome`, `currency` | Computes percentage of net worth and converts it to personal income parity | **$0 (Free)** |
-| `get_billionaires_list` | `timeframe` | Returns verified billionaire roster, net worth, Giving Pledge status, and donation history | **$0 (Free)** |
-
----
-
-## 🚀 Quick Start (Local)
-
-### 1. Install dependencies:
-```bash
-npm install
+```
+                                  [ User Entry ]
+                                         │
+                   ┌─────────────────────┴─────────────────────┐
+                   ▼                                           ▼
+          [ Basic Meme Mode ]                         [ Advanced Mode ]
+             Route: `/`                              Route: `/advanced`
+                   │                                           │
+  ┌────────────────┴────────────────┐         ┌────────────────┴────────────────┐
+  │ • Fast, playful Soresi calculator│         │ • Truthful historical parity    │
+  │ • Hardcoded public/js/data.js   │         │ • Attribution taxonomy          │
+  │ • 100% Client-side state        │         │ • Primary regulatory sources    │
+  │ • Zero database required        │         │ • Supabase PostgreSQL store     │
+  │ • Live Google News RSS scan     │         │ • Donation & Person Explorers   │
+  │ • 100% backwards-compatible     │         │ • Verified leaderboards/rankings│
+  └─────────────────────────────────┘         └─────────────────────────────────┘
 ```
 
-### 2. Start the web application:
-```bash
-npm start
-```
-Open your browser to: **`http://localhost:3000`**
-
-### 3. Run the MCP Server directly (stdio):
-```bash
-npm run mcp
-```
+1. **Basic Meme Mode (`/`):** Instant, zero-friction Gianmarco Soresi-style calculator comparing billionaire net worth percentages to your monthly take-home pay. Runs anywhere with zero configuration.
+2. **Advanced Mode (`/advanced`):** Backed by Supabase PostgreSQL, separating personal gifts from foundation/corporate disbursements, pairing gifts with dated historical wealth snapshots, and enforcing a strict 8-question data quality audit.
+3. **Settings Toggle:** Switch between modes seamlessly via the Settings modal (⚙️) on the top bar or dedicated buttons. Users are never forced into Advanced Mode.
 
 ---
 
-## 🔌 Connecting to AI Clients (Claude Desktop / Antigravity)
+## 🔬 Core Principles of Advanced Mode
 
-Add this entry to your `mcp_config.json` (or Claude Desktop configuration file):
+1. **Attribution Taxonomy:** Only `PERSONAL_DIRECT` and `PERSONAL_FUNDS_CONFIRMED` count toward personal generosity calculations. Foundation grants (`FOUNDATION`), corporate philanthropy (`CORPORATE`), and donor-advised fund transfers (`DAF`) are categorized as separate contextual data.
+2. **Historical Wealth Parity:** Donation percentages must compare against the billionaire's estimated net worth **at the date of the donation**, never their present-day wealth:
+   $$\text{Historical Generosity Ratio} = \left(\frac{\text{Donation Amount at Date } T}{\text{Billionaire Net Worth at Date } T}\right) \times 100$$
+3. **Pledges Excluded:** Non-binding commitments (`PLEDGE`) do not count as completed giving.
+4. **Disputes Quarantined:** Contested or disputed records (`DISPUTED`) are excluded from default rankings and parity calculations.
+5. **Universal Provenance:** Every claim is linked to primary sources (SEC Form 4, IRS Form 990-PF, annual filings) or established investigative journalism.
+6. **Graceful Degradation:** If Supabase is offline or unconfigured, Advanced Mode falls back to a verified offline snapshot with clear notices.
 
+---
+
+## 🤖 Model Context Protocol (MCP) Server
+
+NoCharity includes a standard **Model Context Protocol (MCP)** server ([`mcp-server.js`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/mcp-server.js)) running over standard I/O (`stdio`).
+
+### MCP Tools Roster (16 Tools)
+
+| Tool Name | Type | Description |
+| :--- | :--- | :--- |
+| `get_person` | Database | Retrieve canonical profile, wealth, and giving summary by name or ID. |
+| `search_people` | Database | Search billionaires by query, country, industry, or giving pledge status. |
+| `get_wealth_history` | Database | Multi-year historical net worth snapshots with citations. |
+| `search_donations` | Database | Filter donations by donor, recipient, cause, funding source, or status. |
+| `get_donation` | Database | Fetch full metadata for a specific donation ID. |
+| `get_person_donations` | Database | Retrieve all documented donations for a specific individual. |
+| `get_person_giving_summary`| Database | Aggregated personal vs foundation vs corporate giving breakdown. |
+| `compare_people` | Database | Compare multiple billionaires side-by-side on verified metrics. |
+| `calculate_historical_parity` | Engine | Compute parity between a donation, historical wealth, and user income. |
+| `get_sources` | Database | Primary regulatory filings and media citations for a donation. |
+| `discover_news_donations` | Discovery | Scan Google News RSS for candidate donations (flags unverified). |
+| `validate_donation_quality` | Quality | Evaluate a donation against the 8 Questions and invariant rules. |
+| `search_billionaire_news` | Legacy | Query Google News RSS for headlines and extracted figures. |
+| `calculate_donation_parity` | Legacy | Basic mode parity calculator against current net worth. |
+| `get_billionaires_list` | Legacy | List tracked billionaires with legacy structure. |
+| `calculate_historical_donation_parity` | Legacy | Backwards-compatible historical parity calculation tool. |
+
+### Connecting to AI Clients (Claude Desktop / Antigravity)
+
+Add to your `mcp_config.json`:
 ```json
 {
   "mcpServers": {
-    "billionaire-philanthropy": {
+    "nocharity": {
       "command": "node",
-      "args": [
-        "e:/PersonalProjects/ProjectFiles/AI Slop/nocharity/mcp-server.js"
-      ],
-      "env": {}
+      "args": ["<PATH_TO_REPO>/mcp-server.js"]
     }
   }
 }
@@ -82,27 +85,71 @@ Add this entry to your `mcp_config.json` (or Claude Desktop configuration file):
 
 ---
 
-## 🌐 How to Host on the Internet For Free
+## 🚀 Quick Start (Local Development)
 
-You can deploy this application on the web completely for free using any of the following platforms:
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-### Option A: Render.com (Recommended Free Full-Stack Web Service)
-1. Push this project to a GitHub repository.
-2. Sign in to [Render.com](https://render.com) (free tier).
-3. Click **New +** → **Web Service** → Select your repository.
-4. Settings:
-   - **Runtime**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Plan**: `Free`
-5. Render deploys the app and provides a free HTTPS URL (e.g. `https://nocharity.onrender.com`).
+### 2. Configure Environment (Optional for Advanced Mode)
+Basic Mode runs without any configuration. To enable live Supabase data in Advanced Mode:
+```bash
+cp .env.example .env
+# Edit .env and set SUPABASE_URL and SUPABASE_ANON_KEY
+```
 
-### Option B: Hugging Face Spaces (Free Docker / Node Space)
-1. Go to [Hugging Face Spaces](https://huggingface.co/spaces) and click **Create new Space**.
-2. Select **Docker** or **Static** SDK, license: **MIT**.
-3. Upload files or link your GitHub repo.
-4. Hugging Face runs it 24/7 with zero cost and no subscription.
+### 3. Run Web Application
+```bash
+npm start
+# Server listens at http://localhost:3000
+```
+- Open `http://localhost:3000` for Basic Mode.
+- Open `http://localhost:3000/advanced` for Advanced Mode.
+- Open `http://localhost:3000/methodology` for the transparent research methodology.
 
-### Option C: GitHub Pages (100% Free Static Mode)
-- The [`public/`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/public) directory is built with a resilient client-side fallback using [`public/js/data.js`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/public/js/data.js).
-- You can enable GitHub Pages directly on the `public/` directory or root to host it statically at zero cost forever.
+### 4. Available NPM Scripts
+```bash
+npm start              # Start production server
+npm run dev            # Start development server with file watch
+npm run mcp            # Start MCP server via stdio
+npm test               # Run all automated test suites (220+ tests)
+npm run test:audit     # Run resource & performance audit tests
+npm run test:integration # Run full integration and regression test suite
+npm run seed           # Seed high-quality Phase 13 dataset (--dry-run or --commit)
+npm run review         # Run interactive CLI discovery review queue
+npm run ingest         # Run discovery ingestion pipeline
+```
+
+---
+
+## 🗄️ Database Architecture & Migrations
+
+All schema definitions, functions, and seed datasets are managed via idempotent SQL migrations in [`supabase/migrations/`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/supabase/migrations):
+
+1. `20261021000001_phase1_core_schema.sql` — Core tables (`people`, `organizations`, `sources`, `wealth_snapshots`, `donations`, etc.).
+2. `20261021000002_phase1_seed_data.sql` — Initial schema seed data.
+3. `20261021000003_phase2_views_and_functions.sql` — Views (`v_donations_with_parity`, `v_person_giving_summary`).
+4. `20261021000004_phase3_historical_parity.sql` — Historical snapshot matching procedures.
+5. `20261021000005_phase5_classification_verification.sql` — Attribution classification and verification statuses.
+6. `20261022000006_phase6_advanced_mode_views_and_seed.sql` — Advanced Mode dashboard views.
+7. `20261022000007_phase8_rankings_and_donation_explorer.sql` — Leaderboard and explorer composite views.
+8. `20261022000008_phase13_high_quality_seed.sql` — 25 verified billionaires, 46 organizations, 131 snapshots, 68 donations.
+9. `20261022000009_phase14_resource_and_performance_optimization.sql` — Performance B-Tree and partial indexes.
+
+---
+
+## 🌿 Free-Tier & Resource Considerations
+
+NoCharity is engineered to operate at **$0.00/month** on developer free tiers:
+- **Database Size:** ~2.8 MB total footprint (0.56% of Supabase 500 MB limit).
+- **Outbound Egress:** Bounded LRU in-memory caching (`server/cache.js`) reduces monthly bandwidth to < 100 MB at 10k visits.
+- **Connection Safety:** Max pooled connections ≤ 5 (Supavisor pool limit is 60).
+- **Zero Polling & Zero Visit Ingestion:** No continuous `setInterval` polling loops; user visits are 100% read-only.
+- **Detailed Audit Documentation:** [`docs/free-tier-audit.md`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/docs/free-tier-audit.md).
+
+---
+
+## 📄 License
+
+MIT Open Source License. Built for public transparency and civic education.
