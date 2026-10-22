@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — NoCharity</title>
+  <meta name="description" content="Privacy Policy for NoCharity. Transparent, factual documentation of our zero-cookie, zero-tracking, privacy-first architecture.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --legal-bg: #0b0f19;
+      --legal-surface: #111827;
+      --legal-card: #1f2937;
+      --legal-border: rgba(148, 163, 184, 0.15);
+      --legal-text: #f8fafc;
+      --legal-muted: #94a3b8;
+      --legal-accent: #34d399; /* Emerald green for privacy badge */
+      --legal-coral: #ff5a5f;
+      --legal-gold: #f59e0b;
+    }
+
+    body {
+      background-color: var(--legal-bg);
+      color: var(--legal-text);
+      font-family: 'Plus Jakarta Sans', var(--font-body);
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legal-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    /* Top Navigation Bar */
+    .legal-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .legal-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--legal-text);
+    }
+
+    .legal-brand-badge {
+      font-size: 1.4rem;
+    }
+
+    .legal-brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .legal-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.9rem;
+    }
+
+    .legal-nav-links a {
+      color: var(--legal-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+      font-weight: 500;
+    }
+
+    .legal-nav-links a:hover, .legal-nav-links a.active {
+      color: var(--legal-gold);
+    }
+
+    /* Page Header */
+    .legal-header {
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--legal-border);
+      padding-bottom: 24px;
+    }
+
+    .legal-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--legal-accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 12px;
+    }
+
+    .legal-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .legal-header p {
+      color: var(--legal-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Sections */
+    .legal-section {
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .legal-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .legal-section p, .legal-section ul {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .legal-section ul {
+      padding-left: 20px;
+    }
+
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+
+    .privacy-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .privacy-stat-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+
+    .privacy-stat-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--legal-accent);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .privacy-stat-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .privacy-stat-desc {
+      font-size: 0.8rem;
+      color: var(--legal-muted);
+      line-height: 1.4;
+    }
+
+    /* LocalStorage Table */
+    .storage-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .storage-table th {
+      background: rgba(15, 23, 42, 0.8);
+      color: #e2e8f0;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid var(--legal-border);
+      font-weight: 700;
+    }
+
+    .storage-table td {
+      padding: 10px 14px;
+      border: 1px solid var(--legal-border);
+      color: #cbd5e1;
+    }
+
+    .storage-table code {
+      background: rgba(0, 0, 0, 0.35);
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    /* Footer */
+    .site-footer-card {
+      margin-top: 48px;
+      padding: 28px 24px;
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .site-footer-brand {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .site-footer-desc {
+      font-size: 0.85rem;
+      color: var(--legal-muted);
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+
+    .site-footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    .site-footer-nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .site-footer-nav a:hover {
+      color: var(--legal-gold);
+    }
+
+    .site-footer-slopped {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      border-top: 1px solid var(--legal-border);
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .slopped-pill {
+      background: rgba(255, 90, 95, 0.15);
+      color: var(--legal-coral);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="legal-container">
+
+    <!-- Header Navigation -->
+    <header class="legal-nav-header">
+      <a href="/" class="legal-brand">
+        <span class="legal-brand-badge">🪙</span>
+        <span class="legal-brand-name">NoCharity</span>
+      </a>
+      <nav class="legal-nav-links" aria-label="Site Navigation">
+        <a href="/">Home</a>
+        <a href="/advanced">Advanced Mode</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy" class="active">Privacy</a>
+        <a href="/sitemap">Sitemap</a>
+        <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </nav>
+    </header>
+
+    <!-- Page Title & Header -->
+    <div class="legal-header">
+      <span class="legal-tag">Transparent Architecture</span>
+      <h1>Privacy Policy</h1>
+      <p>Effective Date: October 2026 • Grounded strictly in how the application actually operates</p>
+    </div>
+
+    <!-- Overview Highlights Grid -->
+    <div class="privacy-card-grid">
+      <div class="privacy-stat-card">
+        <div class="privacy-stat-title">Cookies</div>
+        <div class="privacy-stat-val">0 Set or Read</div>
+        <div class="privacy-stat-desc">No tracking cookies, marketing cookies, or third-party cookies of any kind.</div>
+      </div>
+      <div class="privacy-stat-card">
+        <div class="privacy-stat-title">User Accounts</div>
+        <div class="privacy-stat-val">None</div>
+        <div class="privacy-stat-desc">No sign-up, login, password, or email collection backend exists.</div>
+      </div>
+      <div class="privacy-stat-card">
+        <div class="privacy-stat-title">Analytics / Telemetry</div>
+        <div class="privacy-stat-val">Zero Scripts</div>
+        <div class="privacy-stat-desc">No Google Analytics, Meta Pixel, Hotjar, or telemetry beacons.</div>
+      </div>
+      <div class="privacy-stat-card">
+        <div class="privacy-stat-title">Calculation Data</div>
+        <div class="privacy-stat-val">Ephemeral Only</div>
+        <div class="privacy-stat-desc">Your financial inputs are processed in-memory or in-browser and never saved.</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Zero Account System -->
+    <section class="legal-section">
+      <h2>1. No Account System or Personal Data Backend</h2>
+      <p>
+        NoCharity has <strong>no user account system</strong>. We do not ask for your name, email address, phone number, location, or payment information. There is no user database, registration endpoint, or profiling mechanism on our servers.
+      </p>
+      <p>
+        You can use every feature of NoCharity anonymously without creating an identity.
+      </p>
+    </section>
+
+    <!-- Section 2: Browser Local Storage -->
+    <section class="legal-section">
+      <h2>2. Browser Local Storage (Client-Side Only)</h2>
+      <p>
+        To make the calculator convenient so you don't have to re-enter your preferences every time you refresh the page, NoCharity saves a few non-identifying preference keys to your browser's private <code>localStorage</code> sandbox.
+      </p>
+      <p>
+        <strong>These keys remain entirely on your personal device. They are never sent to our servers, sold, or shared with third parties:</strong>
+      </p>
+
+      <table class="storage-table">
+        <thead>
+          <tr>
+            <th>Key Name</th>
+            <th>Type</th>
+            <th>Purpose</th>
+            <th>Example Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>nocharity_income</code></td>
+            <td>Number</td>
+            <td>Stores your voluntary income or net worth figure for parity scaling</td>
+            <td><code>35000</code> or <code>4000</code></td>
+          </tr>
+          <tr>
+            <td><code>nocharity_currency</code></td>
+            <td>String</td>
+            <td>Stores your selected currency symbol</td>
+            <td><code>₹</code>, <code>$</code>, <code>€</code>, or <code>£</code></td>
+          </tr>
+          <tr>
+            <td><code>nocharity_income_frequency</code></td>
+            <td>String</td>
+            <td>Stores whether your entered income is monthly or annual</td>
+            <td><code>"monthly"</code> or <code>"annual"</code></td>
+          </tr>
+          <tr>
+            <td><code>nocharity_mode</code></td>
+            <td>String</td>
+            <td>Stores your preferred parity comparison mode</td>
+            <td><code>"networth"</code> or <code>"monthly"</code></td>
+          </tr>
+          <tr>
+            <td><code>nocharity_advanced_mode</code></td>
+            <td>Boolean String</td>
+            <td>Stores whether you toggled between Basic and Advanced Mode</td>
+            <td><code>"true"</code> or <code>"false"</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-size: 0.9rem; color: var(--legal-muted);">
+        <em>How to clear this data:</em> You can wipe this data at any time by opening your browser's Developer Tools (Application &rarr; Storage &rarr; Clear site data) or by clearing your browser cache.
+      </p>
+    </section>
+
+    <!-- Section 3: Ephemeral Processing -->
+    <section class="legal-section">
+      <h2>3. Ephemeral Financial Calculations</h2>
+      <p>
+        When you enter your personal financial numbers into the calculator:
+      </p>
+      <ul>
+        <li>In Basic Mode, calculations execute client-side inside your browser engine.</li>
+        <li>In Advanced Mode, historical parity calculations sent to <code>/api/advanced/parity</code> are computed in temporary server memory and immediately returned to your browser.</li>
+      </ul>
+      <p>
+        <strong>We never write your financial numbers to disk, to a database, or to any access log.</strong> Your personal financial figures vanish the moment your calculation response is sent.
+      </p>
+    </section>
+
+    <!-- Section 4: Cookies & Tracking -->
+    <section class="legal-section">
+      <h2>4. Zero Cookies & Zero Third-Party Analytics</h2>
+      <p>
+        NoCharity sets <strong>zero HTTP cookies</strong>. We do not use session cookies, persistent tracking cookies, or flash cookies.
+      </p>
+      <p>
+        Furthermore, we do not bundle any analytics trackers, behavioral profiling scripts, advertisement networks, or telemetry trackers (such as Google Analytics, Mixpanel, Segment, or Facebook Pixel). We do not track you across websites or monitor your browsing behavior.
+      </p>
+    </section>
+
+    <!-- Section 5: External Services -->
+    <section class="legal-section">
+      <h2>5. External Services & Requests</h2>
+      <p>
+        To render the website and display public philanthropic records, NoCharity interacts with a minimal set of external services:
+      </p>
+      <ul>
+        <li>
+          <strong>Google Fonts (fonts.googleapis.com / fonts.gstatic.com):</strong> Used to deliver typography (Outfit, Plus Jakarta Sans, Inter, Cinzel, JetBrains Mono). Your browser requests these font files directly from Google's content delivery network, subject to Google's standard privacy policies.
+        </li>
+        <li>
+          <strong>Supabase (supabase.co):</strong> Houses the public, read-only database of verified billionaire wealth snapshots, donation receipts, and source references. All queries to Supabase fetch public reference data. No user identity or user financial numbers are ever sent to or stored in Supabase.
+        </li>
+        <li>
+          <strong>Google News RSS:</strong> In Advanced Mode, if you choose to search recent news coverage for a billionaire or use the discovery engine, our server fetches public RSS news headlines from Google News on-demand. These requests carry only the public figure's name and query parameters, never any user information.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 6: Open-Source Code Auditing -->
+    <section class="legal-section">
+      <h2>6. Open-Source Verification</h2>
+      <p>
+        Because NoCharity is open source, every statement in this Privacy Policy is verifiable by anyone directly in our source code. You do not have to take our word for it—you can inspect our server routes, database queries, and client scripts directly on GitHub.
+      </p>
+      <p>
+        Repository: <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer" style="color: var(--legal-gold); text-decoration: underline; font-weight: 600;">github.com/iarnold5/nocharity ↗</a>
+      </p>
+    </section>
+
+    <!-- Section 7: Questions & Contact -->
+    <section class="legal-section">
+      <h2>7. Questions & Maintainer Contact</h2>
+      <p>
+        NoCharity is an independent project maintained by <strong>Arnold</strong>. If you have questions regarding our data architecture or privacy practices, you can open an issue or discussion on the project's public GitHub repository.
+      </p>
+    </section>
+
+    <!-- Site Footer -->
+    <footer class="site-footer-card">
+      <div class="site-footer-brand">NoCharity</div>
+      <p class="site-footer-desc">
+        A satirical, mathematical perspective on billionaire philanthropy and relative wealth sacrifice. Sourced from public SEC filings, Forbes, Bloomberg, and the Giving Pledge.
+      </p>
+      <nav class="site-footer-nav" aria-label="Footer Navigation">
+        <a href="/">Home</a>
+        <a href="/advanced">Advanced Mode</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms">Terms of Use</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/sitemap">Sitemap</a>
+        <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="site-footer-slopped">
+        <span class="slopped-pill">AI Slopped by Arnold</span>
+        <span>• Human maintainer responsible for published dataset & methodology</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

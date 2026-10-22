@@ -133,6 +133,64 @@ app.get('/advanced', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'advanced.html'));
 });
 
+// Methodology HTML entry point
+app.get('/methodology', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'methodology.html'));
+});
+
+// Terms of Use HTML entry point
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
+// Privacy Policy HTML entry point
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+});
+
+// Sitemap HTML entry point
+app.get('/sitemap', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sitemap.html'));
+});
+
+// XML Sitemap endpoint for crawlers
+app.get('/sitemap.xml', (req, res) => {
+  res.header('Content-Type', 'application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://nocharity.org/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/advanced</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/methodology</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/sitemap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>`);
+});
+
 // GET /api/advanced/status - Diagnostic health check for Supabase connection
 app.get('/api/advanced/status', async (req, res) => {
   try {
@@ -648,12 +706,18 @@ app.get('/api/advanced/resource-audit', (req, res) => {
   }
 });
 
-// Fallback to index.html for SPA routing (or advanced.html / methodology.html if prefixed)
+// Fallback to appropriate static pages for SPA / direct navigation
 app.get('*', (req, res) => {
   if (req.path.startsWith('/advanced')) {
     res.sendFile(path.join(__dirname, 'public', 'advanced.html'));
   } else if (req.path.startsWith('/methodology')) {
     res.sendFile(path.join(__dirname, 'public', 'methodology.html'));
+  } else if (req.path.startsWith('/terms')) {
+    res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+  } else if (req.path.startsWith('/privacy')) {
+    res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+  } else if (req.path.startsWith('/sitemap')) {
+    res.sendFile(path.join(__dirname, 'public', 'sitemap.html'));
   } else {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
   }

@@ -1132,9 +1132,131 @@ body {
   transform: translateX(22px);
 }
 
+/* ==========================================================================
+   Home Page Disclaimer & Unified Footer
+   ========================================================================== */
+.home-disclaimer-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-top: -12px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.home-disclaimer-card .disclaimer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.home-disclaimer-card .disclaimer-badge {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
+}
+
+.home-disclaimer-card .disclaimer-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9a3412;
+  background: #fef3c7;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.home-disclaimer-card .disclaimer-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.home-disclaimer-card .disclaimer-text strong {
+  color: var(--text-main);
+}
+
 .app-footer-bar {
+  margin-top: 32px;
+  padding: 24px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   text-align: center;
-  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.footer-top {
+  margin-bottom: 14px;
+}
+
+.footer-brand-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-main);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.footer-tagline {
   font-size: 0.84rem;
   color: var(--text-muted);
+  max-width: 580px;
+  margin: 0 auto;
+  line-height: 1.45;
 }
+
+.footer-nav-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.84rem;
+  margin-bottom: 16px;
+}
+
+.footer-nav-row a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.footer-nav-row a:hover {
+  color: var(--color-coral);
+}
+
+.footer-attribution-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.badge-slopped {
+  background: rgba(255, 90, 95, 0.12);
+  color: var(--color-coral);
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  letter-spacing: 0.2px;
+}
+
+.footer-maintainer-note {
+  color: var(--text-muted);
+}
+

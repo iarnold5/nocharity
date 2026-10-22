@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Use — NoCharity</title>
+  <meta name="description" content="Terms of Use for NoCharity. Plain-language terms detailing our satirical premise, informational calculations, data sources, and open-source license.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --legal-bg: #0b0f19;
+      --legal-surface: #111827;
+      --legal-card: #1f2937;
+      --legal-border: rgba(148, 163, 184, 0.15);
+      --legal-text: #f8fafc;
+      --legal-muted: #94a3b8;
+      --legal-accent: #f59e0b;
+      --legal-coral: #ff5a5f;
+    }
+
+    body {
+      background-color: var(--legal-bg);
+      color: var(--legal-text);
+      font-family: 'Plus Jakarta Sans', var(--font-body);
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legal-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    /* Top Navigation Bar */
+    .legal-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .legal-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--legal-text);
+    }
+
+    .legal-brand-badge {
+      font-size: 1.4rem;
+    }
+
+    .legal-brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .legal-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.9rem;
+    }
+
+    .legal-nav-links a {
+      color: var(--legal-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+      font-weight: 500;
+    }
+
+    .legal-nav-links a:hover, .legal-nav-links a.active {
+      color: var(--legal-accent);
+    }
+
+    /* Page Header */
+    .legal-header {
+      margin-bottom: 36px;
+      border-bottom: 1px solid var(--legal-border);
+      padding-bottom: 24px;
+    }
+
+    .legal-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--legal-accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 12px;
+    }
+
+    .legal-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .legal-header p {
+      color: var(--legal-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Sections */
+    .legal-section {
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .legal-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .legal-section p, .legal-section ul {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .legal-section ul {
+      padding-left: 20px;
+    }
+
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+
+    .legal-callout {
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 4px solid var(--legal-accent);
+      padding: 14px 18px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 16px 0;
+      font-size: 0.92rem;
+      color: #fde68a;
+    }
+
+    /* Footer */
+    .site-footer-card {
+      margin-top: 48px;
+      padding: 28px 24px;
+      background: var(--legal-surface);
+      border: 1px solid var(--legal-border);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .site-footer-brand {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .site-footer-desc {
+      font-size: 0.85rem;
+      color: var(--legal-muted);
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+
+    .site-footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    .site-footer-nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .site-footer-nav a:hover {
+      color: var(--legal-accent);
+    }
+
+    .site-footer-slopped {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      border-top: 1px solid var(--legal-border);
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .slopped-pill {
+      background: rgba(255, 90, 95, 0.15);
+      color: var(--legal-coral);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="legal-container">
+
+    <!-- Header Navigation -->
+    <header class="legal-nav-header">
+      <a href="/" class="legal-brand">
+        <span class="legal-brand-badge">🪙</span>
+        <span class="legal-brand-name">NoCharity</span>
+      </a>
+      <nav class="legal-nav-links" aria-label="Site Navigation">
+        <a href="/">Home</a>
+        <a href="/advanced">Advanced Mode</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms" class="active">Terms</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/sitemap">Sitemap</a>
+        <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </nav>
+    </header>
+
+    <!-- Page Title & Header -->
+    <div class="legal-header">
+      <span class="legal-tag">Legal Terms & Project Scope</span>
+      <h1>Terms of Use</h1>
+      <p>Effective Date: October 2026 • Plain-language overview for users, readers, and contributors</p>
+    </div>
+
+    <!-- Introduction & Intended Use -->
+    <section class="legal-section">
+      <h2>1. Intended Use & Premise</h2>
+      <p>
+        <strong>NoCharity</strong> is an independent, open-source project designed to explore relative wealth mathematics. Inspired by a comedic premise from stand-up comedian <strong>Gianmarco Soresi</strong>, the application computes what publicly reported billionaire philanthropic contributions look like when scaled proportionally to an everyday household's income or net worth.
+      </p>
+      <p>
+        The site is intended strictly for <strong>personal, educational, journalistic, and satirical reflection</strong>. It provides context on the sheer scale of extreme wealth through mathematical proportionality.
+      </p>
+    </section>
+
+    <!-- Informational & Satirical Purpose -->
+    <section class="legal-section">
+      <h2>2. Informational & Satirical Purpose</h2>
+      <p>
+        NoCharity operates at the intersection of public data math and comedic critique. The tool converts massive abstract sums (e.g., millions or billions of dollars) into intuitive personal equivalents (e.g., buying a cup of coffee or a lunch combo).
+      </p>
+      <p>
+        While the mathematical engine strives for precise calculation, the contextual framing is light-hearted and satirical. It is designed to foster critical thinking about wealth concentration and charitable pledges, not to serve as an authoritative financial balance sheet.
+      </p>
+    </section>
+
+    <!-- Limitations of Public-Source Data -->
+    <section class="legal-section">
+      <h2>3. Limitations of Public-Source Data</h2>
+      <p>
+        NoCharity relies entirely on <strong>publicly available data sources</strong>, including:
+      </p>
+      <ul>
+        <li>Regulatory filings with the U.S. Securities and Exchange Commission (SEC Form 4, 13D/G).</li>
+        <li>IRS Form 990-PF foundation disclosures and registered charity filings.</li>
+        <li>Real-time wealth indices published by financial outlets, such as the Forbes Real-Time Billionaires List and Bloomberg Billionaires Index.</li>
+        <li>Public registries, such as The Giving Pledge and official philanthropic press releases.</li>
+      </ul>
+      <p>
+        <strong>Important Realities of Wealth Reporting:</strong> Public wealth estimates are inherently volatile, subject to fluctuating stock prices, private equity valuations, currency shifts, and differences in valuation methodologies between indices. Furthermore, charitable gift disclosures are frequently incomplete, revised retrospectively, pledged over multi-year periods, or disputed among multiple parties.
+      </p>
+      <div class="legal-callout">
+        <strong>Discrepancy Policy:</strong> When credible public sources disagree on a donation amount or net worth figure, NoCharity flags the discrepancy transparently in Advanced Mode rather than inventing figures or picking favorites.
+      </div>
+    </section>
+
+    <!-- No Guarantee of Completeness or Accuracy -->
+    <section class="legal-section">
+      <h2>4. No Guarantee of Completeness or Accuracy</h2>
+      <p>
+        NoCharity is provided on an <strong>"as is"</strong> and <strong>"as available"</strong> basis without warranties of any kind, whether express, statutory, or implied. Although we maintain curated datasets with multi-point verification standards (detailed in our <a href="/methodology" style="color: var(--legal-accent); text-decoration: underline;">Methodology</a>), we cannot guarantee that all historical snapshots or public disclosures are entirely comprehensive, error-free, or up-to-the-minute.
+      </p>
+    </section>
+
+    <!-- No Financial, Tax, or Legal Advice -->
+    <section class="legal-section">
+      <h2>5. No Financial, Tax, Legal, or Charitable Advice</h2>
+      <p>
+        The calculations, figures, and comparisons provided on NoCharity are purely mathematical and illustrative. <strong>Nothing on this website constitutes financial planning, tax guidance, investment advice, legal counsel, or professional charitable giving consulting.</strong>
+      </p>
+      <p>
+        You should not make financial or philanthropic decisions based on the satirical outputs of this calculator. Consult a certified financial planner, tax professional, or legal counsel for personalized advisory needs.
+      </p>
+    </section>
+
+    <!-- No Affiliation or Endorsement -->
+    <section class="legal-section">
+      <h2>6. Independence & Non-Affiliation</h2>
+      <p>
+        NoCharity is an independent open-source web application. It is <strong>not affiliated with, sponsored by, authorized by, or endorsed by</strong>:
+      </p>
+      <ul>
+        <li>Gianmarco Soresi or his management.</li>
+        <li>Forbes Media LLC or Bloomberg L.P.</li>
+        <li>The Giving Pledge, the Bill & Melinda Gates Foundation, or any named charitable foundation.</li>
+        <li>Any of the individual billionaires, corporate executives, or enterprises indexed on this site.</li>
+      </ul>
+      <p>
+        All trademarks, company names, and trade names referenced herein remain the property of their respective owners and are used strictly under <strong>nominative fair use</strong> for factual identification, commentary, and comedic parody.
+      </p>
+    </section>
+
+    <!-- Acceptable Use -->
+    <section class="legal-section">
+      <h2>7. Acceptable Use</h2>
+      <p>
+        You are welcome to browse the site, experiment with personal income comparisons, cite calculations in journalistic pieces, share screenshots on social media, and inspect the open-source code.
+      </p>
+      <p>You agree not to:</p>
+      <ul>
+        <li>Attempt to disrupt, overload, or launch denial-of-service attacks against the application or its underlying free-tier infrastructure.</li>
+        <li>Abuse automated scraping scripts to scrape our backend in violation of resource guidelines.</li>
+        <li>Misrepresent NoCharity calculations as certified governmental tax audits, official court filings, or professional investment recommendations.</li>
+      </ul>
+    </section>
+
+    <!-- Open Source & Intellectual Property -->
+    <section class="legal-section">
+      <h2>8. Open-Source Nature & Intellectual Property</h2>
+      <p>
+        The NoCharity software architecture, user interface, calculation engine, and documentation are open-source software licensed under the <strong>MIT License</strong>. You are free to inspect, fork, modify, and contribute to the project repository on GitHub.
+      </p>
+      <p>
+        Under the MIT License, copyright and permission notices must be preserved in all copies or substantial portions of the software.
+      </p>
+    </section>
+
+    <!-- Limitation of Liability -->
+    <section class="legal-section">
+      <h2>9. Limitation of Liability</h2>
+      <p>
+        To the fullest extent permitted by applicable law, neither the project author, maintainers, nor open-source contributors shall be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your access to or use of this website, any calculations generated, or any reliance placed upon public data summaries presented herein.
+      </p>
+    </section>
+
+    <!-- Maintainer & Contact Information -->
+    <section class="legal-section">
+      <h2>10. Maintainer Information & Corrections</h2>
+      <p>
+        NoCharity is maintained openly by <strong>Arnold</strong>. If you discover a factual inaccuracy, an updated regulatory disclosure, a broken link, or a bug in our calculation formulas, we welcome community review and correction.
+      </p>
+      <p>
+        Please submit verifiable documentation or issue reports directly via our public GitHub repository: <br>
+        <a href="https://github.com/iarnold5/nocharity/issues" target="_blank" rel="noopener noreferrer" style="color: var(--legal-accent); text-decoration: underline; font-weight: 600;">github.com/iarnold5/nocharity/issues ↗</a>
+      </p>
+      <p style="font-size: 0.85rem; color: var(--legal-muted); margin-top: 14px;">
+        <em>Notice: These Terms of Use are provided for transparency and community clarity. They do not constitute formal legal counsel.</em>
+      </p>
+    </section>
+
+    <!-- Site Footer -->
+    <footer class="site-footer-card">
+      <div class="site-footer-brand">NoCharity</div>
+      <p class="site-footer-desc">
+        A satirical, mathematical perspective on billionaire philanthropy and relative wealth sacrifice. Sourced from public SEC filings, Forbes, Bloomberg, and the Giving Pledge.
+      </p>
+      <nav class="site-footer-nav" aria-label="Footer Navigation">
+        <a href="/">Home</a>
+        <a href="/advanced">Advanced Mode</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms">Terms of Use</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/sitemap">Sitemap</a>
+        <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="site-footer-slopped">
+        <span class="slopped-pill">AI Slopped by Arnold</span>
+        <span>• Human maintainer responsible for published dataset & methodology</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
