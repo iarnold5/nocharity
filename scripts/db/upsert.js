@@ -20,6 +20,24 @@ import { validateRecord } from '../validate/index.js';
 import { cleanUrl, ENTITY_TYPES } from '../normalize/schemas.js';
 
 /**
+ * Helper to fetch all rows across PostgREST 1,000 max-rows pagination
+ */
+async function fetchAllRows(supabase, table) {
+  const all = [];
+  let from = 0;
+  const step = 1000;
+  while (true) {
+    const { data, error } = await supabase.from(table).select('*').range(from, from + step - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < step) break;
+    from += step;
+  }
+  return all;
+}
+
+/**
  * Loads baseline dataset from Supabase if connected
  */
 export async function fetchExistingDataset(supabase) {
@@ -36,24 +54,24 @@ export async function fetchExistingDataset(supabase) {
   }
 
   try {
-    const [peopleRes, orgsRes, sourcesRes, snapshotsRes, donationsRes, donationSourcesRes, personOrgsRes] = await Promise.all([
-      supabase.from('people').select('*'),
-      supabase.from('organizations').select('*'),
-      supabase.from('sources').select('*'),
-      supabase.from('wealth_snapshots').select('*'),
-      supabase.from('donations').select('*'),
-      supabase.from('donation_sources').select('*'),
-      supabase.from('person_organizations').select('*')
+    const [people, organizations, sources, wealthSnapshots, donations, donationSources, personOrganizations] = await Promise.all([
+      fetchAllRows(supabase, 'people'),
+      fetchAllRows(supabase, 'organizations'),
+      fetchAllRows(supabase, 'sources'),
+      fetchAllRows(supabase, 'wealth_snapshots'),
+      fetchAllRows(supabase, 'donations'),
+      fetchAllRows(supabase, 'donation_sources'),
+      fetchAllRows(supabase, 'person_organizations')
     ]);
 
     return {
-      people: peopleRes.data || [],
-      organizations: orgsRes.data || [],
-      sources: sourcesRes.data || [],
-      wealthSnapshots: snapshotsRes.data || [],
-      donations: donationsRes.data || [],
-      donationSources: donationSourcesRes?.data || [],
-      personOrganizations: personOrgsRes?.data || []
+      people,
+      organizations,
+      sources,
+      wealthSnapshots,
+      donations,
+      donationSources,
+      personOrganizations
     };
   } catch (err) {
     console.warn(`[Ingest] Could not fetch remote dataset: ${err.message}. Operating with local tracking.`);

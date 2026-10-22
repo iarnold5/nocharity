@@ -6,12 +6,14 @@ import * as secForm4 from './source-sec-form4.js';
 import * as givingPledge from './source-giving-pledge.js';
 import * as seedPhase13 from '../seed/seed-phase13.js';
 import * as expansionData from './expansion-data.js';
+import * as forbesBillionaires from './forbes-billionaires.js';
 
 export const REGISTERED_SOURCES = Object.freeze({
   'sec-form4': secForm4,
   'giving-pledge': givingPledge,
   'seed-phase13': seedPhase13,
-  'expansion-data': expansionData
+  'expansion-data': expansionData,
+  'forbes-billionaires': forbesBillionaires
 });
 
 /**

@@ -132,14 +132,60 @@ export function matchPerson(incomingPerson, existingPeople = []) {
     const existingClean = normalizeStringForComparison(existing.canonical_name);
     const dist = calculateLevenshteinDistance(incomingClean, existingClean);
 
-    // If names differ by <= 2 characters (e.g. typos, "MacKenzie Scott" vs "Mackenzie Scott")
+    // If names differ by <= 2 characters (e.g. typos, "MacKenzie Scott" vs "MacKenzie Scot")
     if (dist <= 2 && Math.abs(incomingClean.length - existingClean.length) <= 2) {
-      return {
-        matchType: 'POTENTIAL_DUPLICATE',
-        confidence: 0.85,
-        reason: `Close name edit distance (${dist}) between "${incomingPerson.canonical_name}" and "${existing.canonical_name}"`,
-        existing
-      };
+      // Disqualify if generational suffixes differ (e.g. II vs III, Jr vs Sr)
+      const hasSuffixMismatch = (
+        (/\b(ii|iii|iv|jr|sr)\b/i.test(incomingClean) || /\b(ii|iii|iv|jr|sr)\b/i.test(existingClean)) &&
+        incomingClean.replace(/\b(ii|iii|iv|jr|sr)\b/gi, '').trim() === existingClean.replace(/\b(ii|iii|iv|jr|sr)\b/gi, '').trim() &&
+        incomingClean !== existingClean
+      );
+
+      // Check for incompatible distinct tokens (e.g. Michael Kim vs Michael Xie, Ray Davis vs Ray Dalio, Richard Li vs Richard Liu, Sanjiv vs Rajiv)
+      const inTokens = incomingClean.split(/\s+/);
+      const exTokens = existingClean.split(/\s+/);
+      let tokensIncompatible = false;
+      if (inTokens.length === exTokens.length) {
+        for (let i = 0; i < inTokens.length; i++) {
+          const t1 = inTokens[i];
+          const t2 = exTokens[i];
+          if (t1 !== t2) {
+            // Short tokens (length <= 3) are completely distinct entities even at edit distance 1 or 2 (Li vs Liu, Kim vs Xie)
+            if (t1.length <= 3 || t2.length <= 3) {
+              tokensIncompatible = true;
+              break;
+            }
+            const tokenDist = calculateLevenshteinDistance(t1, t2);
+            // More than 2 edits within a single word
+            if (tokenDist > 2) {
+              tokensIncompatible = true;
+              break;
+            }
+            // Same-length substitution of 2 or more letters (e.g. Davis vs Dalio, Mark vs Hank)
+            if (t1.length === t2.length && tokenDist >= 2) {
+              tokensIncompatible = true;
+              break;
+            }
+            // Different first letter with edit distance >= 2 (e.g. Sanjiv vs Rajiv)
+            if (t1[0] !== t2[0] && tokenDist >= 2) {
+              tokensIncompatible = true;
+              break;
+            }
+          }
+        }
+      }
+
+      const maxLen = Math.max(incomingClean.length, existingClean.length);
+      const ratioOk = (dist / maxLen) <= 0.20;
+
+      if (!hasSuffixMismatch && !tokensIncompatible && ratioOk) {
+        return {
+          matchType: 'POTENTIAL_DUPLICATE',
+          confidence: 0.85,
+          reason: `Close name edit distance (${dist}) between "${incomingPerson.canonical_name}" and "${existing.canonical_name}"`,
+          existing
+        };
+      }
     }
 
     // Matching last name + same birth date if both present
