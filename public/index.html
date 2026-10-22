@@ -28,6 +28,9 @@
             <span class="brand-title">NoCharity</span>
             <span class="brand-subtitle-tag">Parity Calculator</span>
           </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+            Billionaire philanthropy scaled to your everyday paycheck
+          </p>
         </div>
       </div>
 
@@ -44,9 +47,9 @@
         <!-- Custom Date Range Picker Row -->
         <div class="custom-date-row" id="customDateRow">
           <span>From:</span>
-          <input type="date" id="customStartDate" class="date-input" value="2023-01-01">
+          <input type="date" id="customStartDate" class="date-input" value="2023-01-01" aria-label="Start Date">
           <span>To:</span>
-          <input type="date" id="customEndDate" class="date-input" value="2026-12-31">
+          <input type="date" id="customEndDate" class="date-input" value="2026-12-31" aria-label="End Date">
           <button id="btnApplyCustomDates" class="btn-header" style="padding: 4px 10px; font-size: 0.76rem;">Apply</button>
         </div>
 
@@ -213,7 +216,7 @@
       <div class="settings-group">
         <label class="settings-label" for="settingsIncomeInput">Your Monthly Take-Home Pay</label>
         <div class="settings-input-row">
-          <select id="settingsCurrencySelect" class="settings-select" title="Currency">
+          <select id="settingsCurrencySelect" class="settings-select" aria-label="Select Currency" title="Currency">
             <option value="₹">INR (₹)</option>
             <option value="$" selected>USD ($)</option>
             <option value="€">EUR (€)</option>
@@ -221,23 +224,23 @@
             <option value="C$">CAD (C$)</option>
             <option value="A$">AUD (A$)</option>
           </select>
-          <input type="number" id="settingsIncomeInput" class="settings-number-input" value="4000" min="50" step="100">
+          <input type="number" id="settingsIncomeInput" class="settings-number-input" value="4000" min="50" max="100000000" step="100" aria-label="Monthly Take-Home Pay Amount">
         </div>
-        <input type="range" id="settingsIncomeSlider" class="income-range-slider" min="500" max="25000" step="250" value="4000">
+        <input type="range" id="settingsIncomeSlider" class="income-range-slider" min="500" max="25000" step="250" value="4000" aria-label="Monthly Take-Home Pay Slider">
       </div>
 
       <div class="settings-group">
         <label class="settings-label">User Income Frequency</label>
         <div class="mode-radio-box">
-          <label class="mode-option">
-            <input type="radio" name="calcMode" value="monthly" checked>
+          <label class="mode-option" for="calcModeMonthly">
+            <input type="radio" id="calcModeMonthly" name="calcMode" value="monthly" aria-label="Monthly Take-Home Pay (Default)" checked>
             <div>
               <strong>Monthly Take-Home Pay (Default)</strong>
               <p style="font-size: 0.8rem; color: var(--text-muted);">Compares the donation's percentage of wealth against your monthly paycheck.</p>
             </div>
           </label>
-          <label class="mode-option">
-            <input type="radio" name="calcMode" value="annual">
+          <label class="mode-option" for="calcModeAnnual">
+            <input type="radio" id="calcModeAnnual" name="calcMode" value="annual" aria-label="Annual Income">
             <div>
               <strong>Annual Income</strong>
               <p style="font-size: 0.8rem; color: var(--text-muted);">Compares the donation's percentage of wealth against your annual take-home salary.</p>
@@ -262,7 +265,7 @@
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Basic</span>
             <label class="switch-toggle" style="flex-shrink: 0;" title="Toggle between Basic Mode and Advanced Mode">
-              <input type="checkbox" id="settingsAdvancedModeToggle">
+              <input type="checkbox" id="settingsAdvancedModeToggle" aria-label="Toggle between Basic Mode and Advanced Mode">
               <span class="slider"></span>
             </label>
             <span style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Advanced</span>
@@ -284,9 +287,9 @@
       </p>
 
       <div class="settings-group" style="text-align: left;">
-        <label class="settings-label">Monthly Take-Home Pay</label>
+        <label class="settings-label" for="welcomeIncomeInput">Monthly Take-Home Pay</label>
         <div class="settings-input-row">
-          <select id="welcomeCurrencySelect" class="settings-select">
+          <select id="welcomeCurrencySelect" class="settings-select" aria-label="Select Currency">
             <option value="₹">INR (₹)</option>
             <option value="$" selected>USD ($)</option>
             <option value="€">EUR (€)</option>
@@ -294,7 +297,7 @@
             <option value="C$">CAD (C$)</option>
             <option value="A$">AUD (A$)</option>
           </select>
-          <input type="number" id="welcomeIncomeInput" class="settings-number-input" value="4000" min="50" step="100">
+          <input type="number" id="welcomeIncomeInput" class="settings-number-input" value="4000" min="50" max="100000000" step="100" aria-label="Monthly Take-Home Pay Amount">
         </div>
       </div>
 

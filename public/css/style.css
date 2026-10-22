@@ -257,6 +257,9 @@ body {
 .satirical-preamble {
   margin-bottom: 14px;
   text-align: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .satirical-tag {
@@ -279,6 +282,8 @@ body {
   font-weight: 700;
   color: #1e293b;
   line-height: 1.4;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .satirical-lead strong {
@@ -291,19 +296,20 @@ body {
 }
 
 /* ==========================================================================
-   Two-Sided Interactive Stage (EXACT SAME SIZE: 1fr 48px 1fr)
+   Two-Sided Interactive Stage (EXACT SAME SIZE: minmax(0, 1fr) 48px minmax(0, 1fr))
    ========================================================================== */
 .calculator-stage {
   display: grid;
-  grid-template-columns: 1fr 48px 1fr;
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
   align-items: stretch;
   gap: 20px;
   margin-bottom: 24px;
+  max-width: 100%;
 }
 
 @media (max-width: 960px) {
   .calculator-stage {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 20px;
   }
   .versus-divider {
@@ -323,6 +329,9 @@ body {
   flex-direction: column;
   justify-content: space-between;
   min-height: 580px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Side 1: "ME" Panel */
@@ -378,6 +387,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .match-subheading {
@@ -395,6 +408,8 @@ body {
   line-height: 1.5;
   margin-bottom: 18px;
   max-width: 440px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* Percentage color matches the right side (% purple) */
@@ -1259,4 +1274,126 @@ body {
 .footer-maintainer-note {
   color: var(--text-muted);
 }
+
+/* ==========================================================================
+   Accessibility: High-Contrast Focus Visible & Reduced Motion
+   ========================================================================== */
+:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Mobile Responsive Adjustments (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .app-wrapper {
+    padding: 16px 12px 40px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .timeframe-header-group {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .custom-date-row {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .panel-me, .panel-billionaire {
+    padding: 20px 14px;
+    min-height: auto;
+  }
+
+  .match-card {
+    padding: 22px 14px;
+  }
+
+  .match-hero-number {
+    font-size: clamp(2rem, 7vw, 3rem);
+  }
+
+  .satirical-lead {
+    font-size: 0.95rem;
+  }
+
+  .match-target-quote {
+    font-size: 0.92rem;
+  }
+
+  .tangible-banner {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    max-width: 100%;
+  }
+
+  .carousel-top-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .billionaire-profile-header {
+    gap: 12px;
+  }
+
+  .billionaire-photo-wrap,
+  .billionaire-photo {
+    width: 68px;
+    height: 68px;
+  }
+
+  .profile-meta h3 {
+    font-size: 1.25rem;
+  }
+
+  .b-stats-grid {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .b-stat-box .val {
+    font-size: 1.15rem;
+  }
+
+  .versus-divider {
+    margin: 4px auto;
+  }
+}
+
+
 

@@ -2846,7 +2846,7 @@
               <span class="financial-hint">What you own minus what you owe</span>
             </div>
             <div class="calc-input-wrapper">
-              <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency">
+              <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency" aria-label="Display Currency">
                 <option value="₹">₹ INR</option>
                 <option value="$">$ USD</option>
                 <option value="€">€ EUR</option>
@@ -3261,8 +3261,8 @@
             <p class="card-panel-desc">Multi-dimensional filtering across wealth, documented personal sacrifice, and giving pledge status</p>
           </div>
           <div class="switch-toggle-row" title="Toggle Associated Organization Giving in table">
-            <label class="switch-toggle">
-              <input type="checkbox" id="toggleBillionaireOrgGiving">
+            <label class="switch-toggle" for="toggleBillionaireOrgGiving">
+              <input type="checkbox" id="toggleBillionaireOrgGiving" aria-label="Show Foundation or Org Giving">
               <span class="slider"></span>
             </label>
             <span style="font-size: 0.8rem; font-weight: 600; color: #c084fc;">Show Foundation / Org Giving</span>
@@ -3400,8 +3400,8 @@
           
           <!-- Personal vs Organization Toggle Switch -->
           <div class="switch-toggle-row" title="Include Foundation and Corporate donations in list">
-            <label class="switch-toggle">
-              <input type="checkbox" id="toggleDonationOrgGiving">
+            <label class="switch-toggle" for="toggleDonationOrgGiving">
+              <input type="checkbox" id="toggleDonationOrgGiving" aria-label="Include foundation and company donations">
               <span class="slider"></span>
             </label>
             <span id="labelToggleDonationOrg" style="font-size: 0.82rem; font-weight: 700; color: #94a3b8;">
@@ -3869,14 +3869,14 @@
         <div class="parity-calc-box" style="margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: rgba(15, 23, 42, 0.6); padding: 12px 18px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Your Parity Baseline:</span>
-            <select id="profileUserCurrency" class="filter-select" style="min-width: 80px; padding: 6px 10px;">
+            <select id="profileUserCurrency" class="filter-select" style="min-width: 80px; padding: 6px 10px;" aria-label="User Currency">
               <option value="₹">₹ (INR)</option>
               <option value="$" selected>$ (USD)</option>
               <option value="€">€ (EUR)</option>
               <option value="£">£ (GBP)</option>
             </select>
-            <input type="number" id="profileUserIncome" class="filter-input" value="4000" style="width: 120px; padding: 6px 10px;" placeholder="Income">
-            <select id="profileIncomeFrequency" class="filter-select" style="min-width: 110px; padding: 6px 10px;">
+            <input type="number" id="profileUserIncome" class="filter-input" value="4000" style="width: 120px; padding: 6px 10px;" placeholder="Income" aria-label="User Income">
+            <select id="profileIncomeFrequency" class="filter-select" style="min-width: 110px; padding: 6px 10px;" aria-label="Income Frequency">
               <option value="monthly" selected>/ Month</option>
               <option value="annual">/ Year</option>
             </select>
@@ -4225,7 +4225,7 @@
 
         <form id="maintainerVerifyForm">
           <div style="margin-bottom: 14px;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+            <label for="modalFundingSourceSelect" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
               Funding Source Classification
             </label>
             <select id="modalFundingSourceSelect" class="form-input" style="width: 100%;">
@@ -4240,7 +4240,7 @@
           </div>
 
           <div style="margin-bottom: 14px;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+            <label for="modalStatusSelect" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
               Verification Status
             </label>
             <select id="modalStatusSelect" class="form-input" style="width: 100%;">
@@ -4251,19 +4251,19 @@
           </div>
 
           <div style="margin-bottom: 14px;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+            <label for="modalCitationUrl" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
               Primary Citation / Verification URL
             </label>
-            <input type="url" id="modalCitationUrl" class="form-input" placeholder="https://www.sec.gov/edgar/... or IRS 990-PF" style="width: 100%;" required>
+            <input type="url" id="modalCitationUrl" class="form-input" placeholder="https://www.sec.gov/edgar/... or IRS 990-PF" style="width: 100%;" aria-label="Primary Citation Verification URL" required>
           </div>
 
           <div style="margin-bottom: 18px;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+            <span style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
               Citation Publisher & Title
-            </label>
+            </span>
             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
-              <input type="text" id="modalCitationPublisher" class="form-input" placeholder="e.g. SEC EDGAR / IRS" required>
-              <input type="text" id="modalCitationTitle" class="form-input" placeholder="Document title / Form 4 Filing" required>
+              <input type="text" id="modalCitationPublisher" aria-label="Citation Publisher" class="form-input" placeholder="e.g. SEC EDGAR / IRS" required>
+              <input type="text" id="modalCitationTitle" aria-label="Citation Title" class="form-input" placeholder="Document title / Form 4 Filing" required>
             </div>
           </div>
 
@@ -4272,10 +4272,10 @@
           </div>
 
           <div style="margin-bottom: 18px;">
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+            <label for="modalMaintainerToken" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
               Maintainer Token (Optional if using CLI)
             </label>
-            <input type="password" id="modalMaintainerToken" class="form-input" placeholder="Enter MAINTAINER_TOKEN (never hardcoded)" style="width: 100%;">
+            <input type="password" id="modalMaintainerToken" class="form-input" placeholder="Enter MAINTAINER_TOKEN (never hardcoded)" autocomplete="off" aria-label="Maintainer Token" style="width: 100%;">
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
             <button type="button" id="btnCancelMaintainerModal" class="btn btn-secondary">Cancel</button>
