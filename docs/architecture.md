@@ -18,10 +18,11 @@ NoCharity operates under a **strict dual-mode architecture**:
                    │                                           │
   ┌────────────────┴────────────────┐         ┌────────────────┴────────────────┐
   │ • Fast, playful Soresi calculator│         │ • Truthful historical parity    │
-  │ • Hardcoded `public/js/data.js` │         │ • Attribution taxonomy          │
-  │ • In-memory / client-side state  │         │ • Primary source verification   │
-  │ • Free Google News RSS scan      │         │ • Supabase PostgreSQL store     │
-  │ • 100% backwards-compatible      │         │ • Paginated, indexed queries    │
+  │ • Canonical Supabase dataset API│         │ • Attribution taxonomy          │
+  │ • Verified offline snapshot     │         │ • Primary source verification   │
+  │ • In-memory / client-side state │         │ • Supabase PostgreSQL store     │
+  │ • Free Google News RSS scan     │         │ • Paginated, indexed queries    │
+  │ • 100% backwards-compatible     │         │ • Verified leaderboards/rankings│
   └─────────────────────────────────┘         └─────────────────────────────────┘
 ```
 
@@ -1024,6 +1025,19 @@ Migration `supabase/migrations/20261022000009_phase14_resource_and_performance_o
 - Headroom: **178x database capacity remaining**
 - Outbound Data Egress: **~60–250 MB / month at 10k visits (3–12.5% of 2 GB limit)**
 - Detailed audit documentation: [`docs/free-tier-audit.md`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/docs/free-tier-audit.md)
+
+---
+
+## 22. Dataset Unification Across Basic and Advanced Modes
+
+### 22.1 Canonical Dataset as Single Source of Truth
+Historically, Basic Mode relied on `public/js/data.js` while Advanced Mode queried Supabase PostgreSQL. This risk of divergence is eliminated by unifying both modes under the canonical Supabase dataset:
+1. **Canonical Public API (`GET /api/billionaires`):** Powered by `server/data-access.js` (`getCanonicalBillionaires`), querying `v_person_giving_summary` and `v_donations_with_parity`. Returns canonical net worth, verified peak donation percentage, and personal parity equivalent.
+2. **Preserved Basic Mode UX:** Basic Mode retains its fast, playful "Pick billionaire → see donation → see ridiculous comparison" experience. Advanced database mechanics remain behind progressive disclosure.
+3. **Bundled Verified Offline Snapshot:** `public/js/data.js` is generated directly from the canonical dataset via `scripts/generate-offline-snapshot.js`. It is not an independently maintained second dataset.
+4. **Resilient Offline Fallback & Status Badging:** If Supabase is offline or unconfigured, the application gracefully loads the verified snapshot and displays a subtle status badge (`#dataSourceBadge`) indicating whether data is live or from the verified offline snapshot.
+5. **Exact Data Parity:** Both modes share identical facts for people, wealth, donations, dates, amounts, and currencies.
+6. **Zero Performance Overhead:** Backed by 1-hour in-memory cache TTL (`appCache`). Zero polling, zero per-visitor database writes, and zero new infrastructure.
 
 
 

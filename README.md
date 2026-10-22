@@ -18,15 +18,15 @@ NoCharity operates with a strict dual-mode model to preserve simplicity and prev
                    │                                           │
   ┌────────────────┴────────────────┐         ┌────────────────┴────────────────┐
   │ • Fast, playful Soresi calculator│         │ • Truthful historical parity    │
-  │ • Hardcoded public/js/data.js   │         │ • Attribution taxonomy          │
-  │ • 100% Client-side state        │         │ • Primary regulatory sources    │
-  │ • Zero database required        │         │ • Supabase PostgreSQL store     │
+  │ • Canonical Supabase dataset API│         │ • Attribution taxonomy          │
+  │ • Verified offline snapshot     │         │ • Primary regulatory sources    │
+  │ • Instant zero-friction state   │         │ • Supabase PostgreSQL store     │
   │ • Live Google News RSS scan     │         │ • Donation & Person Explorers   │
   │ • 100% backwards-compatible     │         │ • Verified leaderboards/rankings│
   └─────────────────────────────────┘         └─────────────────────────────────┘
 ```
 
-1. **Basic Meme Mode (`/`):** Instant, zero-friction Gianmarco Soresi-style calculator comparing billionaire net worth percentages to your monthly take-home pay. Runs anywhere with zero configuration.
+1. **Basic Meme Mode (`/`):** Instant, zero-friction Gianmarco Soresi-style calculator comparing billionaire net worth percentages to your monthly take-home pay. Reads the canonical public dataset from Supabase via `/api/billionaires` with an instant, bundled verified offline snapshot fallback (`public/js/data.js`).
 2. **Advanced Mode (`/advanced`):** Backed by Supabase PostgreSQL, separating personal gifts from foundation/corporate disbursements, pairing gifts with dated historical wealth snapshots, and enforcing a strict 8-question data quality audit.
 3. **Settings Toggle:** Switch between modes seamlessly via the Settings modal (⚙️) on the top bar or dedicated buttons. Users are never forced into Advanced Mode.
 
@@ -46,7 +46,7 @@ NoCharity operates with a strict dual-mode model to preserve simplicity and prev
    - **Tier 3: Discovery / Unverified** (Google News RSS candidates requiring maintainer review)
 7. **Historical Figures (Nominal Historical USD):** For historical titans like Andrew Carnegie ($350M net worth in 1901) and John D. Rockefeller ($900M in 1913), values are recorded strictly in **nominal historical USD**. Arbitrary inflation multipliers are forbidden.
 8. **Maintainer Authorization:** Dataset mutations (`POST /api/advanced/discover/verify`) require maintainer token authorization (`MAINTAINER_TOKEN`). The authoritative mutation workflow is the local CLI: `node scripts/review-discovery.js`. Public web visits are 100% read-only.
-9. **Graceful Degradation:** If Supabase is offline or unconfigured, Advanced Mode falls back to a verified offline snapshot with clear notices.
+9. **Graceful Degradation:** If Supabase is offline or unconfigured, both Basic Mode and Advanced Mode seamlessly fall back to the bundled verified offline snapshot (`public/js/data.js`), generated directly from the canonical dataset, with subtle non-intrusive status badges.
 
 ---
 

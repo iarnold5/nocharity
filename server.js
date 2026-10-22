@@ -32,7 +32,8 @@ import {
   getAdvancedBillionaires,
   getAdvancedDonations,
   calculateHistoricalParity,
-  compareBillionairesParity
+  compareBillionairesParity,
+  getCanonicalBillionaires
 } from './server/supabase.js';
 import {
   discoverDonationsFromNews,
@@ -68,56 +69,35 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /**
  * GET /api/billionaires
- * Returns list of billionaires with donation totals calculated for the requested timeframe
+ * Returns canonical list of billionaires and verified donations backed by Supabase
+ * with cached performance and graceful degradation to verified offline snapshot.
  */
-app.get('/api/billionaires', (req, res) => {
-  const timeframe = req.query.timeframe || 'all';
-  const startDate = req.query.startDate;
-  const endDate = req.query.endDate;
-  const monthlyIncome = parseFloat(req.query.monthlyIncome) || 4000;
-  const currency = req.query.currency || '$';
-  const mode = req.query.mode || 'networth';
+app.get('/api/billionaires', async (req, res) => {
+  try {
+    const timeframe = req.query.timeframe || 'all';
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    const monthlyIncome = parseFloat(req.query.monthlyIncome) || 35000;
+    const currency = req.query.currency || '₹';
+    const mode = req.query.mode || 'networth';
 
-  const processed = BILLIONAIRES_DATA.map(b => {
-    const filteredDonations = filterDonationsByTimeframe(b.historicalDonations, timeframe, startDate, endDate);
-    const totalDonatedInPeriod = filteredDonations.reduce((acc, curr) => acc + curr.amount, 0);
-    const parity = calculateDonationParity(b, totalDonatedInPeriod, monthlyIncome, currency, mode);
+    const result = await getCanonicalBillionaires({
+      timeframe,
+      startDate,
+      endDate,
+      monthlyIncome,
+      currency,
+      mode
+    });
 
-    return {
-      id: b.id,
-      name: b.name,
-      company: b.company,
-      country: b.country,
-      industry: b.industry,
-      netWorth: b.netWorth,
-      netWorthSourceUrl: b.netWorthSourceUrl,
-      netWorthSourceName: b.netWorthSourceName,
-      image: b.image,
-      givingPledge: b.givingPledge,
-      forbesPhilanthropyScore: b.forbesPhilanthropyScore,
-      tagline: b.tagline,
-      summary: b.summary,
-      totalDonatedInPeriod,
-      percentage: parity.percentage,
-      percentageFormatted: parity.percentageFormatted,
-      userEquivalentMonthly: parity.userEquivalentMonthly,
-      userEquivalentAnnual: parity.userEquivalentAnnual,
-      baseMetricLabel: parity.baseMetricLabel,
-      donations: filteredDonations
-    };
-  });
-
-  res.json({
-    timeframe,
-    startDate,
-    endDate,
-    monthlyIncome,
-    currency,
-    mode,
-    billionaires: processed,
-    totalTrackedWealth: BILLIONAIRES_DATA.reduce((acc, b) => acc + b.netWorth, 0),
-    totalDonatedAcrossAll: processed.reduce((acc, b) => acc + b.totalDonatedInPeriod, 0)
-  });
+    res.json(result);
+  } catch (err) {
+    console.error('Error in GET /api/billionaires:', err);
+    res.status(500).json({
+      error: 'Failed to retrieve canonical billionaires',
+      message: err.message
+    });
+  }
 });
 
 /**
@@ -345,8 +325,6 @@ app.get(['/api/advanced/parity', '/api/advanced/parity/calculate'], async (req, 
       funding_source_type,
       status,
       verificationStatus,
-      userIncome,
-      incomeFrequency,
       userNetWorth,
       user_net_worth,
       monthlyIncome,

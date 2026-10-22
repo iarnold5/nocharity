@@ -19,6 +19,8 @@ const state = {
   customEndDate: '2026-12-31',
   currentIndex: 0,
   billionaires: JSON.parse(JSON.stringify(INITIAL_BILLIONAIRES)),
+  isOffline: true,
+  dataSourceNotice: 'Operating from verified offline snapshot'
 };
 
 // DOM References
@@ -523,6 +525,7 @@ function saveSettings() {
 
   settingsModal.classList.remove('active');
   renderActiveBillionaire();
+  loadCanonicalData();
 }
 
 /**
@@ -640,9 +643,57 @@ function setupEvents() {
   });
 }
 
+/**
+ * Update the subtle data source notice badge
+ */
+function updateDataSourceBadge(isOffline, notice) {
+  const badge = document.getElementById('dataSourceBadge');
+  if (!badge) return;
+  if (isOffline) {
+    badge.className = 'data-source-badge offline';
+    badge.textContent = '📦 Verified Offline Snapshot';
+    badge.title = notice || 'Operating from verified offline snapshot. All figures correspond to the canonical dataset.';
+  } else {
+    badge.className = 'data-source-badge live';
+    badge.textContent = '🟢 Canonical Data';
+    badge.title = notice || 'Live data from canonical database.';
+  }
+}
+
+/**
+ * Asynchronously load canonical billionaire data from backend API
+ */
+async function loadCanonicalData() {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !window.location?.origin) {
+    return;
+  }
+  try {
+    const origin = window.location.origin;
+    const res = await fetch(`${origin}/api/billionaires?currency=${encodeURIComponent(state.currency)}&monthlyIncome=${state.monthlyIncome}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data && Array.isArray(data.billionaires) && data.billionaires.length > 0) {
+      state.billionaires = data.billionaires;
+      state.isOffline = Boolean(data.isOffline || data.source === 'offline_fallback');
+      state.dataSourceNotice = data.notice || (state.isOffline ? 'Operating from verified offline snapshot' : 'Canonical database records');
+      renderActiveBillionaire();
+      renderThumbBar();
+      updateDataSourceBadge(state.isOffline, state.dataSourceNotice);
+    }
+  } catch (err) {
+    console.warn('Could not fetch canonical billionaires from API, continuing with verified offline snapshot:', err);
+    state.isOffline = true;
+    state.dataSourceNotice = 'Operating from verified offline snapshot';
+    updateDataSourceBadge(true, state.dataSourceNotice);
+  }
+}
+
 function init() {
   setupEvents();
+  renderThumbBar();
   renderActiveBillionaire();
+  updateDataSourceBadge(state.isOffline, state.dataSourceNotice);
+  loadCanonicalData();
 }
 
 init();

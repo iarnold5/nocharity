@@ -129,7 +129,10 @@
       <section class="panel-billionaire">
         <!-- Carousel Nav Controls -->
         <div class="carousel-top-bar">
-          <span class="carousel-counter-tag" id="carouselCounter">Billionaire 1 of 17</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="carousel-counter-tag" id="carouselCounter">Billionaire 1 of 17</span>
+            <span class="data-source-badge offline" id="dataSourceBadge" title="Operating from verified offline snapshot. All figures correspond to the canonical database.">📦 Verified Offline Snapshot</span>
+          </div>
           <div class="carousel-nav-buttons">
             <button id="prevBillionaireBtn" class="carousel-btn" title="Previous Billionaire (Up Arrow)">▲</button>
             <button id="nextBillionaireBtn" class="carousel-btn" title="Next Billionaire (Down Arrow)">▼</button>

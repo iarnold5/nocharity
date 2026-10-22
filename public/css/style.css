@@ -494,6 +494,30 @@ body {
   border-radius: var(--radius-full);
 }
 
+.data-source-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition-fast);
+  cursor: help;
+}
+
+.data-source-badge.live {
+  color: #15803d;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.data-source-badge.offline {
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+
 .carousel-nav-buttons {
   display: flex;
   gap: 8px;

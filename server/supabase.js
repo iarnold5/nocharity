@@ -90,7 +90,9 @@ export {
   findClosestHistoricalWealthSnapshot,
   classifySnapshotQuality,
   QUALITY_TIERS,
-  QUALITY_METADATA
+  QUALITY_METADATA,
+  getCanonicalBillionaires,
+  filterDonationsByTimeframe
 } from './data-access.js';
 
 // Backwards compatibility aliases

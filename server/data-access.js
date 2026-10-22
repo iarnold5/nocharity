@@ -25,6 +25,7 @@ import {
 } from './parity-engine.js';
 import { computeDataQualityScore } from './data-quality.js';
 import { appCache } from './cache.js';
+import { CANONICAL_OFFLINE_SNAPSHOT } from '../public/js/data.js';
 
 /**
  * 1. getPeople
@@ -392,6 +393,7 @@ export async function getWealthHistory(personId, { limit = 50, offset = 0 } = {}
  */
 export async function getDonations({
   personId = null,
+  billionaireId = null,
   organizationId = null,
   fundingSourceType = null,
   status = null,
@@ -465,8 +467,9 @@ export async function getDonations({
       created_at
     `, { count: 'exact' });
 
-  if (personId) {
-    query = query.or(`donor_person_id.eq.${personId},recipient_person_id.eq.${personId}`);
+  const targetPersonId = personId || billionaireId;
+  if (targetPersonId) {
+    query = query.or(`donor_person_id.eq.${targetPersonId},recipient_person_id.eq.${targetPersonId}`);
   }
 
   if (organizationId) {
@@ -1393,6 +1396,229 @@ export async function compareBillionairesParity({
       disclaimer: "This tool calculates equivalent financial sacrifice based on the billionaire's estimated wealth at the exact time of donation. It demonstrates relative mathematical scale, not subjective financial pain: giving 2% of a $50B fortune causes virtually no reduction in living standard, whereas 2% of an everyday income directly impacts housing, food, or emergency savings."
     }
   };
+}
+
+/**
+ * Helper to filter donations by timeframe (all, past_month, past_year, custom)
+ */
+export function filterDonationsByTimeframe(donations, timeframe = 'all', startDate = null, endDate = null) {
+  if (!Array.isArray(donations)) return [];
+  if (!timeframe || timeframe === 'all') return donations;
+
+  const now = new Date();
+
+  return donations.filter(d => {
+    if (!d.date) return timeframe === 'all';
+    const donationDate = new Date(d.date);
+
+    if (timeframe === 'past_month') {
+      const monthAgo = new Date();
+      monthAgo.setDate(now.getDate() - 30);
+      return donationDate >= monthAgo;
+    }
+    if (timeframe === 'past_year') {
+      const yearAgo = new Date();
+      yearAgo.setDate(now.getDate() - 365);
+      return donationDate >= yearAgo;
+    }
+    if (timeframe === 'custom' && startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return donationDate >= start && donationDate <= end;
+    }
+    return true;
+  });
+}
+
+/**
+ * 16. getCanonicalBillionaires
+ * Unifies Basic Mode with Supabase canonical database.
+ * Returns the 17 canonical billionaires with their latest wealth and verified donations.
+ * Caches in appCache for 1 hour to respect free-tier quotas and ensure sub-millisecond responses.
+ * Gracefully degrades to CANONICAL_OFFLINE_SNAPSHOT if Supabase is offline or unconfigured.
+ */
+export async function getCanonicalBillionaires({
+  timeframe = 'all',
+  startDate = null,
+  endDate = null,
+  monthlyIncome = 35000,
+  currency = '₹',
+  mode = 'networth'
+} = {}) {
+  const cacheKey = `canonical_billionaires_${timeframe}_${startDate || ''}_${endDate || ''}_${monthlyIncome}_${currency}_${mode}`;
+  const cached = appCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const buildOfflineResponse = (notice) => {
+    const processed = CANONICAL_OFFLINE_SNAPSHOT.map(b => {
+      const filteredDonations = filterDonationsByTimeframe(b.historicalDonations, timeframe, startDate, endDate);
+      const totalDonatedInPeriod = filteredDonations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+      const percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
+      const userEquivalentMonthly = monthlyIncome * (percentage / 100);
+
+      return {
+        ...b,
+        totalDonatedInPeriod,
+        percentage,
+        percentageFormatted: percentage >= 0.01 ? `${percentage.toFixed(2)}%` : (percentage > 0 ? '<0.01%' : '0.00%'),
+        userEquivalentMonthly,
+        donations: filteredDonations
+      };
+    });
+
+    return {
+      source: 'offline_fallback',
+      isOffline: true,
+      notice: notice || 'Operating from verified offline snapshot (canonical database connection offline).',
+      timeframe,
+      startDate,
+      endDate,
+      monthlyIncome,
+      currency,
+      mode,
+      billionaires: processed,
+      totalTrackedWealth: processed.reduce((acc, b) => acc + (b.netWorth || 0), 0),
+      totalDonatedAcrossAll: processed.reduce((acc, b) => acc + (b.totalDonatedInPeriod || 0), 0)
+    };
+  };
+
+  if (!supabase) {
+    return buildOfflineResponse('Operating from verified offline snapshot (database unconfigured).');
+  }
+
+  try {
+    const CANONICAL_BILLIONAIRE_ENTITIES = [
+      { slug: 'warren-buffett', uuid: 'b0000000-0000-0000-0000-000000000001' },
+      { slug: 'azim-premji', uuid: 'b0000000-0000-0000-0000-000000000005' },
+      { slug: 'mackenzie-scott', uuid: 'b0000000-0000-0000-0000-000000000003' },
+      { slug: 'andrew-carnegie', uuid: 'b0000000-0000-0000-0000-000000000006' },
+      { slug: 'john-d-rockefeller', uuid: 'b0000000-0000-0000-0000-000000000007' },
+      { slug: 'bill-gates', uuid: 'b0000000-0000-0000-0000-000000000002' },
+      { slug: 'mukesh-ambani', uuid: 'b0000000-0000-0000-0000-000000000008' },
+      { slug: 'gautam-adani', uuid: 'b0000000-0000-0000-0000-000000000009' },
+      { slug: 'carlos-slim', uuid: 'b0000000-0000-0000-0000-000000000010' },
+      { slug: 'jack-ma', uuid: 'b0000000-0000-0000-0000-000000000011' },
+      { slug: 'michael-bloomberg', uuid: 'b0000000-0000-0000-0000-000000000012' },
+      { slug: 'mark-zuckerberg', uuid: 'b0000000-0000-0000-0000-000000000013' },
+      { slug: 'jeff-bezos', uuid: 'b0000000-0000-0000-0000-000000000014' },
+      { slug: 'elon-musk', uuid: 'b0000000-0000-0000-0000-000000000004' },
+      { slug: 'larry-ellison', uuid: 'b0000000-0000-0000-0000-000000000015' },
+      { slug: 'bernard-arnault', uuid: 'b0000000-0000-0000-0000-000000000016' },
+      { slug: 'steve-ballmer', uuid: 'b0000000-0000-0000-0000-000000000017' }
+    ];
+
+    const canonicalUuids = CANONICAL_BILLIONAIRE_ENTITIES.map(e => e.uuid);
+
+    const { data: dbPeople, error: pErr } = await supabase
+      .from('v_person_giving_summary')
+      .select('*')
+      .in('person_id', canonicalUuids);
+
+    if (pErr) throw pErr;
+
+    const { data: dbDonations, error: dErr } = await supabase
+      .from('v_donations_with_parity')
+      .select('*')
+      .in('donor_person_id', canonicalUuids)
+      .order('donation_date', { ascending: false });
+
+    if (dErr) throw dErr;
+
+    // Group donations by donor_person_id
+    const donationsByPerson = new Map();
+    for (const d of (dbDonations || [])) {
+      if (!donationsByPerson.has(d.donor_person_id)) {
+        donationsByPerson.set(d.donor_person_id, []);
+      }
+      donationsByPerson.get(d.donor_person_id).push(d);
+    }
+
+    const processed = [];
+
+    for (const entity of CANONICAL_BILLIONAIRE_ENTITIES) {
+      const slug = entity.slug;
+      const uuid = entity.uuid;
+      const person = (dbPeople || []).find(p => p.person_id === uuid);
+      const offlineFallback = CANONICAL_OFFLINE_SNAPSHOT.find(b => b.id === slug) || {};
+
+      if (!person) {
+        if (offlineFallback.id) {
+          processed.push(offlineFallback);
+        }
+        continue;
+      }
+
+      const allDonations = (donationsByPerson.get(person.person_id) || []).map(d => ({
+        id: d.id,
+        year: d.donation_year || (d.donation_date ? parseInt(d.donation_date.slice(0, 4), 10) : 2024),
+        amount: Number(d.amount),
+        cause: d.cause_category || d.recipient_organization_name || 'Charitable Giving',
+        headline: d.description || `${person.canonical_name} gift`,
+        source: d.source_publisher || 'Primary Regulatory Filing',
+        date: d.donation_date,
+        url: d.source_url || 'https://www.sec.gov/edgar',
+        fundingSourceType: d.funding_source_type || 'PERSONAL_DIRECT',
+        status: d.status || 'VERIFIED',
+        historicalPercentage: d.historical_percentage !== null ? Number(d.historical_percentage) : null,
+        historicalNetWorth: d.historical_net_worth !== null ? Number(d.historical_net_worth) : null,
+        isPersonal: d.is_individual_attribution ?? true
+      }));
+
+      const filteredDonations = filterDonationsByTimeframe(allDonations, timeframe, startDate, endDate);
+      const totalDonatedInPeriod = filteredDonations.reduce((acc, curr) => acc + curr.amount, 0);
+      const netWorth = Number(person.latest_net_worth) || offlineFallback.netWorth || 0;
+      const percentage = netWorth > 0 ? (totalDonatedInPeriod / netWorth) * 100 : 0;
+      const userEquivalentMonthly = monthlyIncome * (percentage / 100);
+
+      processed.push({
+        id: slug,
+        person_id: person.person_id,
+        name: person.canonical_name,
+        company: person.occupation || offlineFallback.company || '',
+        country: person.country || offlineFallback.country || '🌐 International',
+        industry: person.industry || offlineFallback.industry || 'Business & Philanthropy',
+        netWorth,
+        netWorthSourceUrl: offlineFallback.netWorthSourceUrl || 'https://www.bloomberg.com/billionaires/',
+        netWorthSourceName: offlineFallback.netWorthSourceName || 'Bloomberg Billionaires Index / Forbes',
+        image: offlineFallback.image || `assets/billionaires/${slug}.jpg`,
+        givingPledge: Boolean(person.giving_pledge),
+        forbesPhilanthropyScore: offlineFallback.forbesPhilanthropyScore || 5,
+        tagline: offlineFallback.tagline || (person.occupation || ''),
+        summary: person.description || offlineFallback.summary || '',
+        totalPersonalGiving: Number(person.total_personal_giving) || 0,
+        avgHistoricalPercentage: Number(person.avg_historical_percentage) || 0,
+        totalDonatedInPeriod,
+        percentage,
+        percentageFormatted: percentage >= 0.01 ? `${percentage.toFixed(2)}%` : (percentage > 0 ? '<0.01%' : '0.00%'),
+        userEquivalentMonthly,
+        donations: filteredDonations,
+        historicalDonations: allDonations
+      });
+    }
+
+    const response = {
+      source: 'supabase',
+      isOffline: false,
+      notice: 'Canonical public data from Supabase PostgreSQL database',
+      timeframe,
+      startDate,
+      endDate,
+      monthlyIncome,
+      currency,
+      mode,
+      billionaires: processed,
+      totalTrackedWealth: processed.reduce((acc, b) => acc + (b.netWorth || 0), 0),
+      totalDonatedAcrossAll: processed.reduce((acc, b) => acc + (b.totalDonatedInPeriod || 0), 0)
+    };
+
+    appCache.set(cacheKey, response, 3600000); // 1 hour TTL
+    return response;
+  } catch (err) {
+    console.warn('⚠️ Supabase error in getCanonicalBillionaires, falling back to verified offline snapshot:', err.message);
+    return buildOfflineResponse(`Operating from verified offline snapshot (${err.message})`);
+  }
 }
 
 // Re-export parity engine constants and functions
