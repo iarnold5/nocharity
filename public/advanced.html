@@ -4656,10 +4656,10 @@
       const incomeSymbol = document.getElementById('calcIncomeCurrencySymbol');
       if (incomeSymbol) incomeSymbol.textContent = c.currency;
 
-      // Fetch billionaires list if not already loaded
+      // Fetch billionaires list if not already loaded (prioritizing givers with documented receipts)
       if (!c.allBillionaires || c.allBillionaires.length === 0) {
         try {
-          const res = await fetch('/api/advanced/people?limit=100');
+          const res = await fetch('/api/advanced/people?limit=100&sortBy=personal_giving&sortOrder=desc');
           const data = await res.json();
           c.allBillionaires = data.people || [];
         } catch (err) {
@@ -4673,7 +4673,7 @@
         billSelect.innerHTML = `
           <option value="canonical" ${c.isCanonicalExample ? 'selected' : ''}>⭐ Canonical Benchmark ($500M on $100B)</option>
           ${c.allBillionaires.map(b => `
-            <option value="${b.id}" ${(!c.isCanonicalExample && c.selectedBillionaireId === b.id) ? 'selected' : ''}>
+            <option value="${b.id || b.person_id}" ${(!c.isCanonicalExample && c.selectedBillionaireId === (b.id || b.person_id)) ? 'selected' : ''}>
               ${b.canonical_name} (${formatCurrency(b.latest_net_worth)}) · ${b.country || ''}
             </option>
           `).join('')}
@@ -4713,18 +4713,18 @@
           return;
         }
 
-        donSelect.innerHTML = c.currentDonationsList.map((d, idx) => {
+        if (!c.selectedDonationId || c.selectedDonationId === 'canonical' || !c.currentDonationsList.some(d => d.id === c.selectedDonationId)) {
+          c.selectedDonationId = c.currentDonationsList.length > 0 ? c.currentDonationsList[0].id : null;
+        }
+
+        donSelect.innerHTML = c.currentDonationsList.map((d) => {
           const dateStr = d.donation_date ? d.donation_date.split('T')[0] : 'Historical';
           const amtStr = formatCurrency(d.amount);
           const recip = d.recipient ? d.recipient.substring(0, 30) : 'Charitable Cause';
           const ratioStr = d.generosity_ratio ? ` (${d.generosity_ratio}%)` : '';
-          const isSelected = c.selectedDonationId === d.id || (!c.selectedDonationId && idx === 0);
+          const isSelected = c.selectedDonationId === d.id;
           return `<option value="${d.id}" ${isSelected ? 'selected' : ''}>${dateStr} · ${amtStr} · ${recip}${ratioStr}</option>`;
         }).join('');
-
-        if (!c.selectedDonationId && c.currentDonationsList.length > 0) {
-          c.selectedDonationId = c.currentDonationsList[0].id;
-        }
       } catch (err) {
         console.error('Error loading donations for calculator:', err);
       }
@@ -6410,8 +6410,8 @@
       }
     }
 
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', () => {
+    // Event Listeners & App Lifecycle
+    function initAdvancedApp() {
       // Header Back / Return Basic Mode
       document.getElementById('btnQuickReturnBasic').addEventListener('click', () => {
         localStorage.setItem('nocharity_advanced_mode', 'false');
@@ -6837,6 +6837,7 @@
           } else {
             state.calculator.isCanonicalExample = false;
             state.calculator.selectedBillionaireId = val;
+            state.calculator.selectedDonationId = null;
             await loadDonationsForCalculator(val);
             await calculateAndRenderParity();
           }
@@ -7389,7 +7390,13 @@
 
       window.addEventListener('hashchange', handleHashRoute);
       handleHashRoute();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAdvancedApp);
+    } else {
+      initAdvancedApp();
+    }
   </script>
 </body>
 </html>
