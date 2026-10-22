@@ -267,19 +267,19 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Notice Banner */
+    /* Notice Banner (Sleek Trust Strip) */
     .documented-notice-banner {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
-      padding: 14px 18px;
-      background: rgba(14, 165, 233, 0.08);
-      border: 1px solid rgba(14, 165, 233, 0.25);
+      padding: 10px 16px;
+      background: rgba(14, 165, 233, 0.07);
+      border: 1px solid rgba(14, 165, 233, 0.22);
       border-radius: var(--radius-md);
-      margin-bottom: 24px;
-      font-size: 0.84rem;
+      margin-bottom: 20px;
+      font-size: 0.82rem;
       color: #bae6fd;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .documented-notice-banner strong {
@@ -2568,48 +2568,45 @@
       <button class="nav-tab-item active" data-tab="calculator" role="tab" aria-selected="true">
         <span>⚖️</span>
         <span>Reality Check</span>
-        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-gold); font-size: 0.68rem; margin-left: 4px;">Receipts Flow</span>
       </button>
       <button class="nav-tab-item" data-tab="donations" role="tab" aria-selected="false">
         <span>💸</span>
-        <span>Documented Donations</span>
+        <span>Donations</span>
         <span class="nav-tab-badge" id="tabBadgeDonations">51</span>
       </button>
       <button class="nav-tab-item" data-tab="billionaires" role="tab" aria-selected="false">
         <span>👤</span>
-        <span>Billionaire Registry</span>
+        <span>Billionaires</span>
         <span class="nav-tab-badge" id="tabBadgeBillionaires">17</span>
       </button>
       <button class="nav-tab-item" data-tab="rankings" role="tab" aria-selected="false">
         <span>🏆</span>
-        <span>Parity Rankings</span>
+        <span>Rankings</span>
       </button>
       <button class="nav-tab-item" data-tab="dashboard" role="tab" aria-selected="false">
         <span>📊</span>
-        <span>Data Scope & Audit</span>
+        <span>Data Scope</span>
       </button>
       <button class="nav-tab-item" data-tab="profile" role="tab" aria-selected="false" style="display: none;">
         <span>🔍</span>
-        <span>Billionaire Profile</span>
+        <span>Profile</span>
       </button>
       <button class="nav-tab-item" data-tab="discovery" role="tab" aria-selected="false">
         <span>📡</span>
-        <span>News Discovery</span>
-        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.68rem; margin-left: 4px;">Candidate Pipeline</span>
+        <span>News Scan</span>
       </button>
       <button class="nav-tab-item" data-tab="methodology" role="tab" aria-selected="false">
         <span>📖</span>
         <span>Methodology</span>
-        <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; margin-left: 4px;">Data Quality</span>
       </button>
     </nav>
 
     <!-- Documented Giving Disclaimer / Methodology Callout -->
     <aside class="documented-notice-banner">
-      <span style="font-size: 1.3rem;">🛡️</span>
+      <span style="font-size: 1.15rem; flex-shrink: 0;" aria-hidden="true">🛡️</span>
       <div>
-        <strong>DOCUMENTED GIVING METHODOLOGY & RIGOROUS DATA NOTICE:</strong>
-        All figures shown in NoCharity Advanced Mode represent <em>strictly documented public regulatory disclosures</em> (SEC Form 4, IRS Form 990-PF, audited institutional grants) and verified investigative journalism. They do <strong>not</strong> claim to represent complete, private, or undocumented financial transactions. Corporate treasury gifts, foundation disbursements, and donor-advised funds (DAFs) are clearly isolated and never automatically counted as personal billionaire sacrifice.
+        <strong>Verified Regulatory Data:</strong>
+        All figures reflect strictly documented public filings (SEC Form 4, IRS 990-PF) anchored to verified net worth on the date of gift. Corporate gifts, foundation grants, and pledges are strictly isolated from personal sacrifice.
       </div>
     </aside>
 
@@ -2775,7 +2772,70 @@
         </div>
       </div>
 
-      <!-- 3. Steps 3, 4, 5, 7: The Visually Dominant Result Presentation -->
+      <!-- 3. Step 6: Enter/View User Financial Context -->
+      <div class="flow-financial-card">
+        <div class="flow-financial-head">
+          <div class="flow-financial-title-row">
+            <span class="flow-step-number">3</span>
+            <h3 class="flow-financial-title">Your Financial Context</h3>
+            <span class="flow-optional-tag">Optional Baseline</span>
+          </div>
+          <p class="flow-financial-desc">
+            Wealth-to-wealth comparison uses estimated net worth. Monthly take-home pay translates the sacrifice into your paycheck reality.
+          </p>
+        </div>
+
+        <div class="financial-inputs-grid">
+          <!-- Input 1: Estimated Net Worth -->
+          <div class="financial-input-box">
+            <div class="financial-label-row">
+              <label class="financial-label" for="calcUserNetWorthInput">1. Estimated Net Worth</label>
+              <span class="financial-hint">What you own minus what you owe</span>
+            </div>
+            <div class="calc-input-wrapper">
+              <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency" aria-label="Display Currency">
+                <option value="₹">₹ INR</option>
+                <option value="$">$ USD</option>
+                <option value="€">€ EUR</option>
+                <option value="£">£ GBP</option>
+                <option value="¥">¥ JPY</option>
+                <option value="C$">C$ CAD</option>
+                <option value="A$">A$ AUD</option>
+                <option value="CHF">CHF</option>
+              </select>
+              <input type="number" id="calcUserNetWorthInput" class="calc-amount-input" value="1000000" step="50000" placeholder="e.g. 1000000 (leave empty if unknown)" aria-label="Estimated Net Worth">
+            </div>
+            <div class="calc-preset-row">
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="0">₹0 / Debts</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="500000">5L</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip active" data-amount="1000000">10L (Benchmark)</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="2500000">25L</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="clear">Clear</button>
+            </div>
+          </div>
+
+          <!-- Input 2: Monthly Take-Home Pay -->
+          <div class="financial-input-box">
+            <div class="financial-label-row">
+              <label class="financial-label" for="calcUserIncomeInput">2. Monthly Take-Home Pay</label>
+              <span class="financial-hint">For paycheck context</span>
+            </div>
+            <div class="calc-input-wrapper">
+              <span class="calc-currency-badge" id="calcIncomeCurrencySymbol">₹</span>
+              <input type="number" id="calcUserIncomeInput" class="calc-amount-input" value="35000" min="0" step="1000" placeholder="e.g. 35000 (optional)" aria-label="Monthly Take-Home Pay">
+            </div>
+            <div class="calc-preset-row">
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="20000">20K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip active" data-amount="35000">35K (Benchmark)</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="60000">60K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="100000">100K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="clear">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Steps 3, 4, 5, 7: The Visually Dominant Result Presentation -->
       <div class="dominant-result-card" id="calcDominantResultCard">
         <!-- Step 3: See the donation -->
         <div class="result-step-eyebrow">The Documented Donation</div>
@@ -2822,69 +2882,6 @@
           <!-- Hidden compatibility elements -->
           <span id="calcCalloutRatioText" style="display: none;">0.50%</span>
           <span id="calcCalloutRatioText2" style="display: none;">0.50%</span>
-        </div>
-      </div>
-
-      <!-- 4. Step 6: Enter/View User Financial Context -->
-      <div class="flow-financial-card">
-        <div class="flow-financial-head">
-          <div class="flow-financial-title-row">
-            <span class="flow-step-number">3</span>
-            <h3 class="flow-financial-title">Your Financial Context</h3>
-            <span class="flow-optional-tag">Optional</span>
-          </div>
-          <p class="flow-financial-desc">
-            Wealth-to-wealth comparison uses estimated net worth. Monthly take-home pay translates the sacrifice into your paycheck reality.
-          </p>
-        </div>
-
-        <div class="financial-inputs-grid">
-          <!-- Input 1: Estimated Net Worth -->
-          <div class="financial-input-box">
-            <div class="financial-label-row">
-              <label class="financial-label" for="calcUserNetWorthInput">1. Estimated Net Worth</label>
-              <span class="financial-hint">What you own minus what you owe</span>
-            </div>
-            <div class="calc-input-wrapper">
-              <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency" aria-label="Display Currency">
-                <option value="₹">₹ INR</option>
-                <option value="$">$ USD</option>
-                <option value="€">€ EUR</option>
-                <option value="£">£ GBP</option>
-                <option value="¥">¥ JPY</option>
-                <option value="C$">C$ CAD</option>
-                <option value="A$">A$ AUD</option>
-                <option value="CHF">CHF</option>
-              </select>
-              <input type="number" id="calcUserNetWorthInput" class="calc-amount-input" value="1000000" step="50000" placeholder="e.g. 1000000 (leave empty if unknown)">
-            </div>
-            <div class="calc-preset-row">
-              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="0">₹0 / Debts</button>
-              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="500000">5L</button>
-              <button type="button" class="calc-preset-chip calc-nw-chip active" data-amount="1000000">10L (Benchmark)</button>
-              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="2500000">25L</button>
-              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="clear">Clear</button>
-            </div>
-          </div>
-
-          <!-- Input 2: Monthly Take-Home Pay -->
-          <div class="financial-input-box">
-            <div class="financial-label-row">
-              <label class="financial-label" for="calcUserIncomeInput">2. Monthly Take-Home Pay</label>
-              <span class="financial-hint">For paycheck context</span>
-            </div>
-            <div class="calc-input-wrapper">
-              <span class="calc-currency-badge" id="calcIncomeCurrencySymbol">₹</span>
-              <input type="number" id="calcUserIncomeInput" class="calc-amount-input" value="35000" min="0" step="1000" placeholder="e.g. 35000 (optional)">
-            </div>
-            <div class="calc-preset-row">
-              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="20000">20K</button>
-              <button type="button" class="calc-preset-chip calc-income-chip active" data-amount="35000">35K (Benchmark)</button>
-              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="60000">60K</button>
-              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="100000">100K</button>
-              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="clear">Clear</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -3160,60 +3157,72 @@
       </div>
 
       <!-- 6. Visual Proportional Scale (Scale Bars & ASCII Diagram) -->
-      <div class="calc-visual-panel">
-        <div class="visual-panel-head">
-          <h4 class="visual-panel-title">Visual Explanation: Proportional Scale</h4>
-          <span class="visual-panel-sub">Scaled to identical proportions (100% baseline)</span>
-        </div>
+      <details class="receipt-accordion" id="acc-visual-scale" style="margin-bottom: 20px;">
+        <summary class="receipt-accordion-summary">
+          <div class="accordion-title-row">
+            <span class="accordion-icon">📊</span>
+            <span class="accordion-label">Visual Proportional Scale & ASCII Diagram</span>
+          </div>
+          <div class="accordion-meta-row">
+            <span class="receipt-summary-badge">Visual Scale</span>
+            <span class="accordion-caret">▾</span>
+          </div>
+        </summary>
+        <div class="receipt-accordion-body" style="padding-top: 14px;">
+          <div class="calc-visual-panel" style="margin-bottom: 0; box-shadow: none; border: none; background: transparent; padding: 0;">
+            <div class="visual-panel-head">
+              <h4 class="visual-panel-title">Visual Explanation: Proportional Scale</h4>
+              <span class="visual-panel-sub">Scaled to identical proportions (100% baseline)</span>
+            </div>
 
-        <!-- Billionaire Wealth Scale -->
-        <div class="calc-scale-row">
-          <div class="calc-scale-header">
-            <span style="color: #38bdf8;">Their documented wealth at time of donation (100%)</span>
-            <span id="calcVisualWealthLabel" style="font-family: var(--font-mono); color: #38bdf8;">$100,000,000,000</span>
-          </div>
-          <div class="calc-scale-track">
-            <div class="calc-scale-fill wealth"></div>
-          </div>
-        </div>
+            <!-- Billionaire Wealth Scale -->
+            <div class="calc-scale-row">
+              <div class="calc-scale-header">
+                <span style="color: #38bdf8;">Their documented wealth at time of donation (100%)</span>
+                <span id="calcVisualWealthLabel" style="font-family: var(--font-mono); color: #38bdf8;">$100,000,000,000</span>
+              </div>
+              <div class="calc-scale-track">
+                <div class="calc-scale-fill wealth"></div>
+              </div>
+            </div>
 
-        <!-- Billionaire Donation Scale -->
-        <div class="calc-scale-row">
-          <div class="calc-scale-header">
-            <span style="color: var(--accent-gold);">Donation slice (<span id="calcVisualDonationPct">0.50%</span>)</span>
-            <span id="calcVisualDonationLabel" style="font-family: var(--font-mono); color: var(--accent-gold);">$500,000,000</span>
-          </div>
-          <div class="calc-scale-track">
-            <div class="calc-scale-fill donation" id="calcVisualDonationFill" style="width: 0.5%;"></div>
-          </div>
-        </div>
+            <!-- Billionaire Donation Scale -->
+            <div class="calc-scale-row">
+              <div class="calc-scale-header">
+                <span style="color: var(--accent-gold);">Donation slice (<span id="calcVisualDonationPct">0.50%</span>)</span>
+                <span id="calcVisualDonationLabel" style="font-family: var(--font-mono); color: var(--accent-gold);">$500,000,000</span>
+              </div>
+              <div class="calc-scale-track">
+                <div class="calc-scale-fill donation" id="calcVisualDonationFill" style="width: 0.5%;"></div>
+              </div>
+            </div>
 
-        <div style="height: 1px; background: rgba(51, 65, 85, 0.5); margin: 18px 0;"></div>
+            <div style="height: 1px; background: rgba(51, 65, 85, 0.5); margin: 18px 0;"></div>
 
-        <!-- User Net Worth Scale -->
-        <div class="calc-scale-row">
-          <div class="calc-scale-header">
-            <span style="color: #cbd5e1;">Your estimated net worth base (100%)</span>
-            <span id="calcVisualIncomeLabel" style="font-family: var(--font-mono); color: #cbd5e1;">₹10,00,000</span>
-          </div>
-          <div class="calc-scale-track">
-            <div class="calc-scale-fill income"></div>
-          </div>
-        </div>
+            <!-- User Net Worth Scale -->
+            <div class="calc-scale-row">
+              <div class="calc-scale-header">
+                <span style="color: #cbd5e1;">Your estimated net worth base (100%)</span>
+                <span id="calcVisualIncomeLabel" style="font-family: var(--font-mono); color: #cbd5e1;">₹10,00,000</span>
+              </div>
+              <div class="calc-scale-track">
+                <div class="calc-scale-fill income"></div>
+              </div>
+            </div>
 
-        <!-- User Equivalent Sacrifice Scale -->
-        <div class="calc-scale-row">
-          <div class="calc-scale-header">
-            <span style="color: #34d399;">Your equivalent sacrifice (<span id="calcVisualEquivPct">0.50%</span>)</span>
-            <span id="calcVisualEquivLabel" style="font-family: var(--font-mono); color: #34d399;">₹5,000</span>
-          </div>
-          <div class="calc-scale-track">
-            <div class="calc-scale-fill sacrifice" id="calcVisualEquivFill" style="width: 0.5%;"></div>
-          </div>
-        </div>
+            <!-- User Equivalent Sacrifice Scale -->
+            <div class="calc-scale-row">
+              <div class="calc-scale-header">
+                <span style="color: #34d399;">Your equivalent sacrifice (<span id="calcVisualEquivPct">0.50%</span>)</span>
+                <span id="calcVisualEquivLabel" style="font-family: var(--font-mono); color: #34d399;">₹5,000</span>
+              </div>
+              <div class="calc-scale-track">
+                <div class="calc-scale-fill sacrifice" id="calcVisualEquivFill" style="width: 0.5%;"></div>
+              </div>
+            </div>
 
-        <!-- Interactive ASCII Proportional Diagram -->
-        <div class="calc-ascii-box" id="calcAsciiDiagram">
+            <!-- Interactive ASCII Proportional Diagram -->
+            <div class="calc-ascii-box" id="calcAsciiDiagram">
 <strong>Their wealth</strong>
 <span class="ascii-bar-wealth">████████████████████</span> $100,000,000,000 (100.0%)
 
@@ -3225,29 +3234,45 @@
 
 <strong>Your equivalent</strong>
 <span class="ascii-bar-equiv">▌</span> ₹5,000 (0.50%)
+            </div>
+          </div>
         </div>
-      </div>
+      </details>
 
       <!-- 7. Multi-Billionaire Side-by-Side Comparison Section -->
-      <div class="calc-compare-section">
-        <div class="card-panel-head">
-          <div>
-            <h3 class="card-panel-title"><span>👥</span> Multi-Billionaire Side-by-Side Comparison</h3>
-            <p class="card-panel-desc">Compare proportional wealth sacrifice across multiple tracked billionaires calibrated to your <span id="calcCompareIncomeSubtitle">₹60,000/month</span> income</p>
+      <details class="receipt-accordion" id="acc-compare-grid" style="margin-bottom: 24px;">
+        <summary class="receipt-accordion-summary">
+          <div class="accordion-title-row">
+            <span class="accordion-icon">👥</span>
+            <span class="accordion-label">Compare Across All 17 Tracked Billionaires</span>
           </div>
-          <div class="filter-chips-row" id="calcCompareFilterChips">
-            <button class="filter-chip-btn active" data-filter="all">All Tracked (17)</button>
-            <button class="filter-chip-btn" data-filter="top">Top Givers</button>
-            <button class="filter-chip-btn" data-filter="tech">Tech Giants</button>
-            <button class="filter-chip-btn" data-filter="india">🇮🇳 Indian Donors</button>
-            <button class="filter-chip-btn" data-filter="us">🇺🇸 US Donors</button>
+          <div class="accordion-meta-row">
+            <span class="receipt-summary-badge badge-personal">17 Tracked Givers</span>
+            <span class="accordion-caret">▾</span>
           </div>
-        </div>
+        </summary>
+        <div class="receipt-accordion-body" style="padding-top: 14px;">
+          <div class="calc-compare-section" style="margin-bottom: 0; box-shadow: none; border: none; background: transparent; padding: 0;">
+            <div class="card-panel-head">
+              <div>
+                <h3 class="card-panel-title"><span>👥</span> Multi-Billionaire Side-by-Side Comparison</h3>
+                <p class="card-panel-desc">Compare proportional wealth sacrifice across multiple tracked billionaires calibrated to your <span id="calcCompareIncomeSubtitle">₹60,000/month</span> income</p>
+              </div>
+              <div class="filter-chips-row" id="calcCompareFilterChips">
+                <button class="filter-chip-btn active" data-filter="all">All Tracked (17)</button>
+                <button class="filter-chip-btn" data-filter="top">Top Givers</button>
+                <button class="filter-chip-btn" data-filter="tech">Tech Giants</button>
+                <button class="filter-chip-btn" data-filter="india">🇮🇳 Indian Donors</button>
+                <button class="filter-chip-btn" data-filter="us">🇺🇸 US Donors</button>
+              </div>
+            </div>
 
-        <div class="calc-compare-grid" id="calcCompareCardsGrid">
-          <!-- Rendered via JS -->
+            <div class="calc-compare-grid" id="calcCompareCardsGrid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
         </div>
-      </div>
+      </details>
     </section>
 
     <!-- ===================================================================== -->
@@ -4136,10 +4161,10 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <!-- Left: Input JSON -->
           <div>
-            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">
+            <label for="qualityTesterInput" style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">
               Donation Record Payload (JSON)
             </label>
-            <textarea id="qualityTesterInput" style="width: 100%; height: 260px; background: var(--bg-subcard); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-main); font-family: var(--font-mono); font-size: 0.78rem; padding: 12px; resize: vertical; outline: none;"></textarea>
+            <textarea id="qualityTesterInput" aria-label="Donation Record Payload JSON" style="width: 100%; height: 260px; background: var(--bg-subcard); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-main); font-family: var(--font-mono); font-size: 0.78rem; padding: 12px; resize: vertical; outline: none;"></textarea>
             <button type="button" id="btnRunQualityAudit" class="btn btn-primary" style="margin-top: 10px; width: 100%; font-weight: 700;">
               🛡️ Audit Record Quality & Consistency
             </button>

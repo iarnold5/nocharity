@@ -486,14 +486,14 @@ function updateModeDisplay(isAdv) {
     badge.textContent = 'Selected';
     badge.style.background = 'rgba(56, 189, 248, 0.15)';
     badge.style.color = '#38bdf8';
-    sub.textContent = 'Navigating to historical wealth parity & verified attribution explorer...';
+    sub.textContent = 'Show me the receipts. Deep dive into documented donation filings, historical wealth dates, and audit evidence.';
   } else {
     title.textContent = 'Basic Mode';
     title.style.color = 'inherit';
     badge.textContent = 'Current';
     badge.style.background = 'rgba(245, 158, 11, 0.15)';
     badge.style.color = '#f59e0b';
-    sub.textContent = 'Fast meme-inspired Soresi calculator with client-side comparisons.';
+    sub.textContent = 'The quick everyday meme calculator. Simple, fast comparisons against your monthly paycheck.';
   }
 }
 
