@@ -316,9 +316,13 @@ body {
     transform: rotate(90deg);
     margin: 8px auto;
   }
+  .panel-me, .panel-billionaire {
+    height: auto;
+    min-height: 430px;
+  }
 }
 
-/* Both Panels are Symmetric and Compact in Dimensions */
+/* Both Panels are Symmetric, Compact, and Height-Locked (No Jumping) */
 .panel-me, .panel-billionaire {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
@@ -328,7 +332,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: 430px;
+  height: 515px;
+  min-height: 515px;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
