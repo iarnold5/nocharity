@@ -119,7 +119,7 @@ npm start
 npm start              # Start production server
 npm run dev            # Start development server with file watch
 npm run mcp            # Start MCP server via stdio
-npm test               # Run all automated test suites (220+ tests)
+npm test               # Run all automated test suites (269 tests across 15 suites)
 npm run test:audit     # Run resource & performance audit tests
 npm run test:integration # Run full integration and regression test suite
 npm run seed           # Seed high-quality Phase 13 dataset (--dry-run or --commit)
@@ -131,7 +131,7 @@ npm run ingest         # Run discovery ingestion pipeline
 
 ## 🗄️ Database Architecture & Migrations
 
-All schema definitions, functions, and seed datasets are managed via idempotent SQL migrations in [`supabase/migrations/`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/supabase/migrations):
+All schema definitions, functions, views, and security configurations are managed via idempotent SQL migrations in [`supabase/migrations/`](file:///e:/PersonalProjects/ProjectFiles/AI%20Slop/nocharity/supabase/migrations):
 
 1. `20261021000001_phase1_core_schema.sql` — Core tables (`people`, `organizations`, `sources`, `wealth_snapshots`, `donations`, etc.).
 2. `20261021000002_phase1_seed_data.sql` — Initial schema seed data.
@@ -140,15 +140,27 @@ All schema definitions, functions, and seed datasets are managed via idempotent 
 5. `20261021000005_phase5_classification_verification.sql` — Attribution classification and verification statuses.
 6. `20261022000006_phase6_advanced_mode_views_and_seed.sql` — Advanced Mode dashboard views.
 7. `20261022000007_phase8_rankings_and_donation_explorer.sql` — Leaderboard and explorer composite views.
-8. `20261022000008_phase13_high_quality_seed.sql` — 25 verified billionaires, 46 organizations, 131 snapshots, 68 donations.
+8. `20261022000008_phase13_high_quality_seed.sql` — 25 verified billionaires, 46 organizations, 131 snapshots, 68 donations, 1 disputed test fixture.
 9. `20261022000009_phase14_resource_and_performance_optimization.sql` — Performance B-Tree and partial indexes.
+10. `20261022000010_remediation_views_and_functions.sql` — Eliminates invalid cumulative lifetime ratio, enforces `snapshot_date <= donation_date`, and establishes Peak Donation / Wealth ranking.
+11. `20261022000011_security_hardening_and_least_privilege.sql` — Zero Supabase Security Advisor lints: enables `security_invoker = true` on all 4 public views, pins `search_path = ''` on all functions, revokes write permissions on tables/views from `anon` and `authenticated`, and restricts maintenance procedures.
+
+---
+
+## 🔒 Security & Supabase Least Privilege (Zero Findings)
+
+NoCharity enforces strict defense-in-depth security audited via the Supabase Security Advisor (0 errors, 0 warnings):
+- **Security-Invoker Views:** Public read views (`v_donations_with_parity`, `v_person_giving_summary`, `v_person_rankings`, `v_advanced_dashboard_metrics`) run with `security_invoker = true`. Anonymous visitors query underlying tables strictly according to active Row-Level Security (RLS) policies.
+- **Immutable Search Paths:** All database functions (`get_closest_net_worth`, `get_historical_snapshot_details`, `get_sources_for_donation`) run with `SET search_path = ''` and schema-qualified references, preventing search path hijacking.
+- **Read-Only Public Surface:** Modifying privileges (`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`) are revoked from `anon`, `authenticated`, and `public`. Public visitors cannot mutate data.
+- **Maintenance Procedure Isolation:** Administrative, test, and DDL functions (`rls_auto_enable`, `fn_clean_tables`, `test_cleanup`) have execution revoked from `PUBLIC`, `anon`, and `authenticated`.
 
 ---
 
 ## 🌿 Free-Tier & Resource Considerations
 
 NoCharity is engineered to operate at **$0.00/month** on developer free tiers:
-- **Database Size:** ~2.8 MB total footprint (0.56% of Supabase 500 MB limit).
+- **Database Size:** ~3.0 MB total footprint (< 1% of Supabase 500 MB limit).
 - **Outbound Egress:** Bounded LRU in-memory caching (`server/cache.js`) reduces monthly bandwidth to < 100 MB at 10k visits.
 - **Connection Safety:** Max pooled connections ≤ 5 (Supavisor pool limit is 60).
 - **Zero Polling & Zero Visit Ingestion:** No continuous `setInterval` polling loops; user visits are 100% read-only.
