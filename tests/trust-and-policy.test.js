@@ -30,44 +30,28 @@ describe('NoCharity Trust, Disclaimer, Legal, & Site Navigation Layer Tests', ()
   const sitemapHtml = fs.readFileSync(path.join(rootDir, 'public', 'sitemap.html'), 'utf8');
   const methodologyHtml = fs.readFileSync(path.join(rootDir, 'public', 'methodology.html'), 'utf8');
   const advancedHtml = fs.readFileSync(path.join(rootDir, 'public', 'advanced.html'), 'utf8');
+  const aboutHtml = fs.readFileSync(path.join(rootDir, 'public', 'about.html'), 'utf8');
   const serverJs = fs.readFileSync(path.join(rootDir, 'server.js'), 'utf8');
 
   // =========================================================================
-  // 1. Home Page Disclaimer Tests
+  // 1. About Us Page & Disclaimer Verification
   // =========================================================================
-  describe('1. Home Page Disclaimer Verification', () => {
-    test('1.1 Disclaimer is positioned directly underneath the Gianmarco Soresi credit banner', () => {
-      const soresiPos = indexHtml.indexOf('class="soresi-credit-banner"');
-      const disclaimerPos = indexHtml.indexOf('class="home-disclaimer-card"');
-      const footerPos = indexHtml.indexOf('class="app-footer-bar"');
-
-      assert.ok(soresiPos > -1, 'Soresi banner exists');
-      assert.ok(disclaimerPos > -1, 'Home disclaimer exists');
-      assert.ok(footerPos > -1, 'Footer exists');
-
-      assert.ok(
-        disclaimerPos > soresiPos && disclaimerPos < footerPos,
-        'Home disclaimer must sit directly between Soresi banner and footer'
-      );
+  describe('1. About Us Page & Disclaimer Verification', () => {
+    test('1.1 About Us page (about.html) exists and details project mission', () => {
+      assert.ok(aboutHtml.length > 0, 'about.html exists');
+      assert.ok(aboutHtml.includes('About NoCharity'), 'Contains About NoCharity title');
     });
 
-    test('1.2 Contains all required trust & disclaimer assertions in concise wording', () => {
-      const disclaimerSection = indexHtml.match(/<aside class="home-disclaimer-card"[\s\S]*?<\/aside>/)?.[0] || '';
-      assert.ok(disclaimerSection.length > 0, 'Disclaimer section found');
-
-      // Check required principles
-      assert.match(disclaimerSection, /independent project/i, 'States independent project');
-      assert.match(disclaimerSection, /comedic premise|Gianmarco Soresi/i, 'States comedic premise inspired by quote');
-      assert.match(disclaimerSection, /satirical/i, 'States intended to be satirical/light-hearted');
-      assert.match(disclaimerSection, /publicly available/i, 'States uses publicly available information');
-      assert.match(disclaimerSection, /accurately as reasonably possible/i, 'States attempts to present accurately as reasonably possible');
-      assert.match(disclaimerSection, /incomplete|estimated|disputed|revised/i, 'States public wealth/donations can be incomplete, estimated, disputed, or revised');
-      assert.match(disclaimerSection, /not affiliated/i, 'States not affiliated or endorsed');
-      assert.match(disclaimerSection, /financial.*legal.*tax|entertainment/i, 'States calculations are for entertainment/informational context, not financial/tax/legal advice');
-
-      // Verify conciseness: not a giant legal warning
-      const textOnly = disclaimerSection.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      assert.ok(textOnly.length < 900, `Disclaimer is concise (${textOnly.length} chars < 900)`);
+    test('1.2 Contains all required trust & disclaimer assertions in clear wording', () => {
+      // Check required principles in aboutHtml
+      assert.match(aboutHtml, /independent project/i, 'States independent project');
+      assert.match(aboutHtml, /comedic premise|Gianmarco Soresi/i, 'States comedic premise inspired by quote');
+      assert.match(aboutHtml, /satirical/i, 'States intended to be satirical/light-hearted');
+      assert.match(aboutHtml, /publicly available/i, 'States uses publicly available information');
+      assert.match(aboutHtml, /accurately as reasonably possible/i, 'States attempts to present accurately as reasonably possible');
+      assert.match(aboutHtml, /incomplete|estimated|disputed|revised/i, 'States public wealth/donations can be incomplete, estimated, disputed, or revised');
+      assert.match(aboutHtml, /not affiliated/i, 'States not affiliated or endorsed');
+      assert.match(aboutHtml, /financial.*legal.*tax|entertainment/i, 'States calculations are for entertainment/informational context, not financial/tax/legal advice');
     });
   });
 
@@ -157,6 +141,7 @@ describe('NoCharity Trust, Disclaimer, Legal, & Site Navigation Layer Tests', ()
   describe('5. AI Attribution & Clean Footer Verification', () => {
     const pages = [
       { name: 'index.html', content: indexHtml },
+      { name: 'about.html', content: aboutHtml },
       { name: 'advanced.html', content: advancedHtml },
       { name: 'methodology.html', content: methodologyHtml },
       { name: 'terms.html', content: termsHtml },
@@ -189,6 +174,7 @@ describe('NoCharity Trust, Disclaimer, Legal, & Site Navigation Layer Tests', ()
         assert.ok(page.content.includes('/privacy'), `${page.name} must link to /privacy`);
         assert.ok(page.content.includes('/methodology'), `${page.name} must link to /methodology`);
         assert.ok(page.content.includes('/sitemap'), `${page.name} must link to /sitemap`);
+        assert.ok(page.content.includes('/about'), `${page.name} must link to /about`);
       }
     });
   });
@@ -204,6 +190,9 @@ describe('NoCharity Trust, Disclaimer, Legal, & Site Navigation Layer Tests', ()
       const app = express();
       app.use(express.static(path.join(rootDir, 'public')));
 
+      app.get('/about', (req, res) => {
+        res.sendFile(path.join(rootDir, 'public', 'about.html'));
+      });
       app.get('/methodology', (req, res) => {
         res.sendFile(path.join(rootDir, 'public', 'methodology.html'));
       });
@@ -292,6 +281,14 @@ describe('NoCharity Trust, Disclaimer, Legal, & Site Navigation Layer Tests', ()
       assert.equal(res.statusCode, 200);
       assert.ok(res.headers['content-type']?.includes('text/html'));
       assert.ok(res.body.includes('Methodology'));
+    });
+
+    test('6.6 GET /about returns 200 with HTML content and About NoCharity', async () => {
+      const res = await fetchRoute('/about');
+      assert.equal(res.statusCode, 200);
+      assert.ok(res.headers['content-type']?.includes('text/html'));
+      assert.ok(res.body.includes('About NoCharity'));
+      assert.ok(res.body.includes('AI Slopped by Arnold'));
     });
   });
 

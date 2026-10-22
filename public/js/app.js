@@ -37,7 +37,6 @@ const settingsModal = document.getElementById('settingsModal');
 const closeSettingsModal = document.getElementById('closeSettingsModal');
 const settingsCurrencySelect = document.getElementById('settingsCurrencySelect');
 const settingsIncomeInput = document.getElementById('settingsIncomeInput');
-const settingsIncomeSlider = document.getElementById('settingsIncomeSlider');
 const settingsAdvancedModeToggle = document.getElementById('settingsAdvancedModeToggle');
 const btnSaveSettings = document.getElementById('btnSaveSettings');
 
@@ -71,7 +70,6 @@ const modalLoadingIndicator = document.getElementById('modalLoadingIndicator');
 const modalArticlesContainer = document.getElementById('modalArticlesContainer');
 
 const mcpModal = document.getElementById('mcpModal');
-const openMcpModalBtn = document.getElementById('openMcpModalBtn');
 const closeMcpModal = document.getElementById('closeMcpModal');
 
 /**
@@ -464,7 +462,6 @@ async function runLiveMcpNewsScan(billionaireName) {
 function openSettings() {
   settingsCurrencySelect.value = state.currency;
   settingsIncomeInput.value = state.monthlyIncome;
-  settingsIncomeSlider.value = Math.min(state.monthlyIncome, 25000);
   
   const radio = document.querySelector(`input[name="calcMode"][value="${state.incomeFrequency}"]`) ||
                 document.querySelector(`input[name="calcMode"][value="${state.calcMode}"]`);
@@ -567,30 +564,13 @@ function setupEvents() {
     if (e.target === settingsModal) settingsModal.classList.remove('active');
   });
 
-  // Settings income input/slider sync
-  settingsIncomeInput.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value) || 0;
-    settingsIncomeSlider.value = Math.min(val, 25000);
-  });
-  settingsIncomeSlider.addEventListener('input', (e) => {
-    settingsIncomeInput.value = e.target.value;
-  });
-
   // Save Settings
   btnSaveSettings.addEventListener('click', saveSettings);
 
-  // Settings Advanced Mode toggle immediate redirect
+  // Settings Advanced Mode toggle display update (redirect happens only upon Save)
   if (settingsAdvancedModeToggle) {
     settingsAdvancedModeToggle.addEventListener('change', (e) => {
       updateModeDisplay(e.target.checked);
-      if (e.target.checked) {
-        localStorage.setItem('nocharity_advanced_mode', 'true');
-        setTimeout(() => {
-          window.location.href = '/advanced';
-        }, 180);
-      } else {
-        localStorage.setItem('nocharity_advanced_mode', 'false');
-      }
     });
   }
 
@@ -640,11 +620,12 @@ function setupEvents() {
     if (e.target === newsModal) newsModal.classList.remove('active');
   });
 
-  openMcpModalBtn.addEventListener('click', () => mcpModal.classList.add('active'));
-  closeMcpModal.addEventListener('click', () => mcpModal.classList.remove('active'));
-  mcpModal.addEventListener('click', (e) => {
-    if (e.target === mcpModal) mcpModal.classList.remove('active');
-  });
+  if (closeMcpModal && mcpModal) {
+    closeMcpModal.addEventListener('click', () => mcpModal.classList.remove('active'));
+    mcpModal.addEventListener('click', (e) => {
+      if (e.target === mcpModal) mcpModal.classList.remove('active');
+    });
+  }
 }
 
 /**

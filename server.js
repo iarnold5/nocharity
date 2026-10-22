@@ -128,6 +128,11 @@ app.get('/api/news', async (req, res) => {
  * ADVANCED MODE ROUTES (Supabase Integration)
  */
 
+// About Us HTML entry point
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
 // Advanced Mode HTML entry point
 app.get('/advanced', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'advanced.html'));
@@ -162,6 +167,11 @@ app.get('/sitemap.xml', (req, res) => {
     <loc>https://nocharity.org/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://nocharity.org/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nocharity.org/advanced</loc>

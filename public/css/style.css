@@ -212,47 +212,6 @@ body {
   color: #92400e;
 }
 
-/* Header Mode Switcher Pill */
-.mode-switcher-pill {
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 3px;
-  gap: 3px;
-  box-shadow: var(--shadow-sm);
-}
-
-.mode-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--text-muted);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.mode-pill:hover {
-  color: var(--text-main);
-}
-
-.mode-pill.active {
-  background: #0f172a;
-  color: #f8fafc;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-.mode-pill#headerGoAdvancedBtn:hover {
-  color: #0284c7;
-  background: #e0f2fe;
-}
-
 /* Satirical Preamble Rhythm */
 .satirical-preamble {
   margin-bottom: 14px;
@@ -1094,27 +1053,6 @@ body {
 
 .settings-number-input:focus {
   border-color: var(--color-amber);
-}
-
-.income-range-slider {
-  width: 100%;
-  margin-top: 10px;
-  -webkit-appearance: none;
-  height: 8px;
-  border-radius: 4px;
-  background: #fed7aa;
-  outline: none;
-  cursor: pointer;
-}
-
-.income-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #ea580c;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.4);
 }
 
 .mode-radio-box {

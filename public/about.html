@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — NoCharity</title>
+  <meta name="description" content="About NoCharity. An independent project built on a comedic premise inspired by Gianmarco Soresi, exploring relative wealth sacrifice through public data and satire.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --about-bg: #0b0f19;
+      --about-surface: #111827;
+      --about-card: #1f2937;
+      --about-border: rgba(148, 163, 184, 0.15);
+      --about-text: #f8fafc;
+      --about-muted: #94a3b8;
+      --about-accent: #f59e0b;
+      --about-gold: #fbbf24;
+      --about-emerald: #10b981;
+      --about-cyan: #38bdf8;
+    }
+
+    body {
+      background-color: var(--about-bg);
+      color: var(--about-text);
+      font-family: 'Plus Jakarta Sans', var(--font-body);
+      line-height: 1.7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .about-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    /* Top Navigation Bar */
+    .about-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--about-surface);
+      border: 1px solid var(--about-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .about-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--about-text);
+    }
+
+    .about-brand-badge {
+      font-size: 1.4rem;
+    }
+
+    .about-brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .about-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .about-nav-links a {
+      color: var(--about-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .about-nav-links a:hover,
+    .about-nav-links a.active {
+      color: var(--about-accent);
+    }
+
+    /* Header Hero */
+    .about-hero {
+      background: linear-gradient(180deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.4) 100%);
+      border: 1px solid var(--about-border);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .about-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--about-accent);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .about-title {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+
+    .about-subtitle {
+      font-size: 1.05rem;
+      color: var(--about-muted);
+      margin: 0 0 20px;
+      max-width: 720px;
+    }
+
+    /* Content Cards */
+    .about-section {
+      background: var(--about-surface);
+      border: 1px solid var(--about-border);
+      border-radius: var(--radius-md);
+      padding: 28px 30px;
+      margin-bottom: 24px;
+    }
+
+    .about-section h2 {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      color: #fff;
+      margin-top: 0;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .about-section p {
+      margin: 0 0 14px;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .about-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-highlight-box {
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 3px solid var(--about-accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .about-highlight-box p {
+      color: #fef3c7;
+      margin: 0;
+      font-size: 0.92rem;
+      font-style: italic;
+    }
+
+    .about-grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 680px) {
+      .about-grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-mini-card {
+      background: rgba(31, 41, 55, 0.5);
+      border: 1px solid var(--about-border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .about-mini-card h3 {
+      font-size: 1rem;
+      color: #fff;
+      margin: 0 0 6px;
+    }
+
+    .about-mini-card p {
+      font-size: 0.85rem;
+      color: var(--about-muted);
+      margin: 0;
+    }
+
+    /* Footer */
+    .site-footer-card {
+      margin-top: 48px;
+      padding-top: 28px;
+      border-top: 1px solid var(--about-border);
+      text-align: center;
+    }
+
+    .site-footer-brand {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      color: var(--about-accent);
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    .site-footer-desc {
+      color: var(--about-muted);
+      font-size: 0.85rem;
+      max-width: 580px;
+      margin: 0 auto 20px;
+    }
+
+    .site-footer-nav {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .site-footer-nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.15s;
+    }
+
+    .site-footer-nav a:hover {
+      color: var(--about-accent);
+    }
+
+    .site-footer-slopped {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--about-muted);
+      flex-wrap: wrap;
+    }
+
+    .slopped-pill {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--about-accent);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.72rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="about-container">
+
+    <!-- Top Navigation Header -->
+    <header class="about-nav-header">
+      <a href="/" class="about-brand">
+        <span class="about-brand-badge">🪙</span>
+        <span class="about-brand-name">NoCharity</span>
+      </a>
+      <nav class="about-nav-links" aria-label="Main Navigation">
+        <a href="/">Home</a>
+        <a href="/about" class="active">About</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms">Terms of Use</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/sitemap">Sitemap</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="about-hero">
+      <div class="about-badge">Satirical Premise • Public Data</div>
+      <h1 class="about-title">About NoCharity</h1>
+      <p class="about-subtitle">
+        A comedic, mathematical lens on billionaire philanthropy and relative financial sacrifice, inspired by Gianmarco Soresi's standup comedy.
+      </p>
+    </section>
+
+    <!-- Context & Origin -->
+    <article class="about-section">
+      <h2><span>🎭</span> Comedic Origin & Inspiration</h2>
+      <p>
+        <strong>NoCharity</strong> is an independent project built on a comedic premise inspired by Gianmarco Soresi's standup joke: when a multi-billionaire donates millions of dollars to charity, it sounds monumental—until you compare it to what that same percentage represents out of an everyday worker's paycheck.
+      </p>
+      <div class="about-highlight-box">
+        <p>
+          "When you have hundreds of billions of dollars, giving away half a percent doesn't change your grocery bill, your housing security, or your generational wealth. When you earn a median monthly wage, giving away that same fraction requires real everyday sacrifice."
+        </p>
+      </div>
+      <p>
+        The project is intended to be light-hearted and satirical. It uses humor to reframe astronomical dollar figures in relatable, everyday financial terms like cups of coffee, restaurant dinners, grocery bills, or daily work hours.
+      </p>
+    </article>
+
+    <!-- Public Data & Standards -->
+    <article class="about-section">
+      <h2><span>📊</span> Public Data & Reasonable Accuracy</h2>
+      <p>
+        We use publicly available information and attempt to present it as accurately as reasonably possible. Wealth figures and donation amounts are gathered from public regulatory disclosures (SEC Form 4 beneficial ownership filings, IRS Form 990-PF private foundation returns), verified philanthropic indexes (Forbes, Bloomberg Billionaires Index), and the Giving Pledge.
+      </p>
+      <p>
+        However, publicly reported wealth and donation figures can be incomplete, estimated, disputed, or later revised. Billionaire fortunes fluctuate daily with capital markets, and private giving records may not always be transparent or real-time.
+      </p>
+      <div class="about-grid-two">
+        <div class="about-mini-card">
+          <h3>Strict Attribution</h3>
+          <p>We distinguish between direct personal giving and disbursements made by corporate balance sheets or tax-exempt private endowments.</p>
+        </div>
+        <div class="about-mini-card">
+          <h3>Temporal Anchoring</h3>
+          <p>Donations are evaluated against the billionaire's documented net worth at the approximate date of gift rather than current market peaks.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Independence & Disclaimer -->
+    <article class="about-section">
+      <h2><span>⚖️</span> Independence & Disclaimers</h2>
+      <p>
+        NoCharity is an entirely independent project. NoCharity is not affiliated with, sponsored by, or endorsed by the people, organizations, publications, or sources referenced.
+      </p>
+      <p>
+        These calculations are strictly for entertainment and informational context—not financial, investment, legal, tax, or charitable advice. No user financial data or salary information is ever stored, tracked, or sent to external servers; calculations take place strictly inside your browser.
+      </p>
+      <p>
+        To learn more about our data sources, citation hierarchy, and proportional math formulas, please review our comprehensive <a href="/methodology" style="color: var(--about-accent); text-decoration: underline;">Methodology Guide</a>.
+      </p>
+    </article>
+
+    <!-- Footer -->
+    <footer class="site-footer-card">
+      <div class="site-footer-brand">🪙 NoCharity</div>
+      <p class="site-footer-desc">
+        A satirical perspective on billionaire philanthropy and relative wealth sacrifice, grounded in public disclosures and wealth indices.
+      </p>
+      <nav class="site-footer-nav" aria-label="Footer Navigation">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/terms">Terms of Use</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/sitemap">Sitemap</a>
+        <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </nav>
+      <div class="site-footer-slopped">
+        <span class="slopped-pill">AI Slopped by Arnold</span>
+        <span>• Human maintainer responsible for published dataset & methodology</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

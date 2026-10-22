@@ -53,22 +53,10 @@
           <button id="btnApplyCustomDates" class="btn-header" style="padding: 4px 10px; font-size: 0.76rem;">Apply</button>
         </div>
 
-        <!-- Mode Switcher Pill -->
-        <div class="mode-switcher-pill" title="Toggle between Basic Meme Mode and Advanced Mode (The Receipts)">
-          <span class="mode-pill active">🎭 Basic</span>
-          <a href="/advanced" class="mode-pill" id="headerGoAdvancedBtn">🔬 Advanced</a>
-        </div>
-
         <!-- Settings Button in Title Bar -->
         <button id="openSettingsBtn" class="btn-header btn-settings">
           <span>⚙️</span>
           <span id="headerSettingsLabel">Settings</span>
-        </button>
-
-        <!-- Free MCP Server Guide -->
-        <button id="openMcpModalBtn" class="btn-header">
-          <span>🌐</span>
-          <span>Free MCP Guide</span>
         </button>
       </div>
     </header>
@@ -173,16 +161,7 @@
       </p>
     </aside>
 
-    <!-- Home Page Context & Disclaimer (Directly under Gianmarco Soresi Quote) -->
-    <aside class="home-disclaimer-card" aria-label="Project context and disclaimer">
-      <div class="disclaimer-header">
-        <span class="disclaimer-badge">About NoCharity</span>
-        <span class="disclaimer-pill">Satirical Premise • Public Data</span>
-      </div>
-      <p class="disclaimer-text">
-        <strong>NoCharity</strong> is an independent project built on a comedic premise inspired by Gianmarco Soresi's joke. It is intended to be light-hearted and satirical. We use publicly available information and attempt to present it as accurately as reasonably possible. However, publicly reported wealth and donation figures can be incomplete, estimated, disputed, or later revised. NoCharity is not affiliated with, sponsored by, or endorsed by the people, organizations, publications, or sources referenced. These calculations are strictly for entertainment and informational context—not financial, investment, legal, tax, or charitable advice.
-      </p>
-    </aside>
+
 
     <!-- Footer -->
     <footer class="app-footer-bar">
@@ -192,7 +171,7 @@
       </div>
       <nav class="footer-nav-row" aria-label="Footer links">
         <a href="/">Home</a>
-        <a href="/advanced">Advanced Mode</a>
+        <a href="/about">About</a>
         <a href="/methodology">Methodology</a>
         <a href="/terms">Terms of Use</a>
         <a href="/privacy">Privacy Policy</a>
@@ -230,7 +209,6 @@
           </select>
           <input type="number" id="settingsIncomeInput" class="settings-number-input" value="4000" min="50" max="100000000" step="100" aria-label="Monthly Take-Home Pay Amount">
         </div>
-        <input type="range" id="settingsIncomeSlider" class="income-range-slider" min="500" max="25000" step="250" value="4000" aria-label="Monthly Take-Home Pay Slider">
       </div>
 
       <div class="settings-group">
