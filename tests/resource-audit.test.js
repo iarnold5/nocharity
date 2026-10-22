@@ -123,8 +123,14 @@ describe('NoCharity Advanced Mode — Phase 14: Free-Tier Resource & Performance
 
     test('2.2 Client-side Supabase requests strictly route through backend API or public anon key', () => {
       const advancedHtml = fs.readFileSync(path.resolve('public/advanced.html'), 'utf8');
-      assert.ok(advancedHtml.includes('/api/advanced/'), 'Routes via backend API endpoints');
-      assert.strictEqual(advancedHtml.includes('createClient('), false, 'Does not instantiate direct raw client with credentials in HTML');
+      const advancedJs = fs.readdirSync(path.resolve('public/js/advanced'))
+        .filter(f => f.endsWith('.js'))
+        .map(f => fs.readFileSync(path.resolve('public/js/advanced', f), 'utf8'))
+        .join('\n');
+      const advancedSource = advancedHtml + '\n' + advancedJs;
+
+      assert.ok(advancedSource.includes('/api/advanced/'), 'Routes via backend API endpoints');
+      assert.strictEqual(advancedSource.includes('createClient('), false, 'Does not instantiate direct raw client with credentials in HTML or JS');
     });
   });
 
@@ -135,6 +141,7 @@ describe('NoCharity Advanced Mode — Phase 14: Free-Tier Resource & Performance
     test('3.1 Zero continuous polling intervals in frontend or backend servers', () => {
       const filesToCheck = [
         'public/advanced.html',
+        'public/js/advanced/main.js',
         'public/js/app.js',
         'server.js',
         'mcp-server.js'
@@ -145,42 +152,51 @@ describe('NoCharity Advanced Mode — Phase 14: Free-Tier Resource & Performance
         assert.strictEqual(
           content.includes('setInterval'),
           false,
-          `File ${file} must not contain background interval polling`
+          `File \${file} must not contain background interval polling`
         );
       }
     });
 
     test('3.2 Advanced Mode does not fetch all donations at startup', () => {
-      const advancedHtml = fs.readFileSync(path.resolve('public/advanced.html'), 'utf8');
+      const advancedJs = fs.readdirSync(path.resolve('public/js/advanced'))
+        .filter(f => f.endsWith('.js'))
+        .map(f => fs.readFileSync(path.resolve('public/js/advanced', f), 'utf8'))
+        .join('\n');
       // At startup on loadDashboard:
       assert.ok(
-        advancedHtml.includes('/api/advanced/donations?limit=6'),
+        advancedJs.includes('/api/advanced/donations?limit=6'),
         'Dashboard startup only fetches top 6 recent highlights, not all donations'
       );
       assert.ok(
-        advancedHtml.includes('limit: 20'),
+        advancedJs.includes('limit: 20'),
         'Default table pagination limit is 20'
       );
     });
 
     test('3.3 Google News RSS is queried strictly on explicit user demand and cached', () => {
-      const advancedHtml = fs.readFileSync(path.resolve('public/advanced.html'), 'utf8');
+      const advancedJs = fs.readdirSync(path.resolve('public/js/advanced'))
+        .filter(f => f.endsWith('.js'))
+        .map(f => fs.readFileSync(path.resolve('public/js/advanced', f), 'utf8'))
+        .join('\n');
       // Must only be triggered inside runDiscoveryScan() when button clicked
       assert.ok(
-        advancedHtml.includes('function runDiscoveryScan()'),
+        advancedJs.includes('function runDiscoveryScan()') || advancedJs.includes('async function runDiscoveryScan()'),
         'Discovery news search is encapsulated in explicit on-demand handler'
       );
       assert.strictEqual(
-        advancedHtml.includes('loadDashboard()') && advancedHtml.includes('discoverDonationsFromNews'),
+        advancedJs.includes('loadDashboard()') && advancedJs.includes('discoverDonationsFromNews'),
         false,
         'Dashboard startup must never trigger news scrapers'
       );
     });
 
     test('3.4 Shared cache reuse between Calculator and Discovery prevents duplicate requests', () => {
-      const advancedHtml = fs.readFileSync(path.resolve('public/advanced.html'), 'utf8');
+      const advancedJs = fs.readdirSync(path.resolve('public/js/advanced'))
+        .filter(f => f.endsWith('.js'))
+        .map(f => fs.readFileSync(path.resolve('public/js/advanced', f), 'utf8'))
+        .join('\n');
       assert.ok(
-        advancedHtml.includes('state.calculator?.allBillionaires'),
+        advancedJs.includes('state.calculator?.allBillionaires'),
         'Discovery tab checks and reuses calculator people cache before fetching'
       );
     });

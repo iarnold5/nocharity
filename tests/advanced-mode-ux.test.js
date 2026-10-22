@@ -42,6 +42,12 @@ const rootDir = path.resolve(__dirname, '..');
 describe('NoCharity Advanced Mode UX & "Show Me the Receipts" Verification', () => {
 
   const advancedHtml = fs.readFileSync(path.join(rootDir, 'public', 'advanced.html'), 'utf8');
+  const advancedCss = fs.readFileSync(path.join(rootDir, 'public', 'css', 'advanced.css'), 'utf8');
+  const advancedJsFiles = fs.readdirSync(path.join(rootDir, 'public', 'js', 'advanced'))
+    .filter(f => f.endsWith('.js'))
+    .map(f => fs.readFileSync(path.join(rootDir, 'public', 'js', 'advanced', f), 'utf8'))
+    .join('\n');
+  const advancedFullSource = advancedHtml + '\n' + advancedCss + '\n' + advancedJsFiles;
 
   // =========================================================================
   // 1. Primary Flow & Visual Dominance in Template
@@ -69,12 +75,12 @@ describe('NoCharity Advanced Mode UX & "Show Me the Receipts" Verification', () 
     });
 
     test('1.2 Dominant result card is styled for visual prominence', () => {
-      assert.match(advancedHtml, /\.dominant-result-card/, 'CSS defines dominant result card container');
-      assert.match(advancedHtml, /\.result-headline-amount/, 'CSS defines large headline typography');
-      assert.match(advancedHtml, /\.result-reaction-line/, 'CSS defines reaction line style');
-      assert.match(advancedHtml, /\.result-percentage-highlight/, 'CSS defines percentage highlight');
-      assert.match(advancedHtml, /\.result-user-amount/, 'CSS defines prominent user equivalent amount');
-      assert.match(advancedHtml, /\.result-satire-box/, 'CSS defines calm satire box');
+      assert.match(advancedCss, /\.dominant-result-card/, 'CSS defines dominant result card container');
+      assert.match(advancedCss, /\.result-headline-amount/, 'CSS defines large headline typography');
+      assert.match(advancedCss, /\.result-reaction-line/, 'CSS defines reaction line style');
+      assert.match(advancedCss, /\.result-percentage-highlight/, 'CSS defines percentage highlight');
+      assert.match(advancedCss, /\.result-user-amount/, 'CSS defines prominent user equivalent amount');
+      assert.match(advancedCss, /\.result-satire-box/, 'CSS defines calm satire box');
     });
   });
 
@@ -137,10 +143,10 @@ describe('NoCharity Advanced Mode UX & "Show Me the Receipts" Verification', () 
   // =========================================================================
   describe('3. Mobile Viewport Responsiveness', () => {
     test('3.1 Mobile media queries exist and enforce thumb-friendly, non-overflowing layouts', () => {
-      assert.match(advancedHtml, /@media\s*\(max-width:\s*768px\)/, 'Must have 768px media query');
-      assert.match(advancedHtml, /grid-template-columns:\s*1fr/, 'Grid containers must collapse to 1 column on mobile');
-      assert.match(advancedHtml, /overflow-x:\s*hidden/, 'Must prevent horizontal overflow');
-      assert.match(advancedHtml, /word-break:\s*break-word/, 'Must break long text to prevent card blowouts');
+      assert.match(advancedCss, /@media\s*\(max-width:\s*768px\)/, 'Must have 768px media query');
+      assert.match(advancedCss, /grid-template-columns:\s*1fr/, 'Grid containers must collapse to 1 column on mobile');
+      assert.match(advancedCss, /overflow-x:\s*hidden/, 'Must prevent horizontal overflow');
+      assert.match(advancedCss, /word-break:\s*break-word/, 'Must break long text to prevent card blowouts');
     });
   });
 
@@ -216,12 +222,12 @@ describe('NoCharity Advanced Mode UX & "Show Me the Receipts" Verification', () 
   // =========================================================================
   describe('6. Source Tiers & Citation Cleanliness', () => {
     test('6.1 Template formats Tier 1 primary regulatory sources cleanly without DB metadata dump', () => {
-      assert.match(advancedHtml, /\.source-tier-pill\.tier-1/, 'Has Tier 1 CSS styling');
-      assert.match(advancedHtml, /\.source-tier-pill\.tier-2/, 'Has Tier 2 CSS styling');
-      assert.match(advancedHtml, /class="source-evidence-card"/, 'Has source evidence card structure');
-      assert.match(advancedHtml, /class="source-evidence-head"/, 'Displays publisher/title header');
-      assert.match(advancedHtml, /class="source-evidence-fact"/, 'Displays specific fact supported');
-      assert.match(advancedHtml, /renderEvidenceSources/, 'Has renderEvidenceSources function');
+      assert.match(advancedCss, /\.source-tier-pill\.tier-1/, 'Has Tier 1 CSS styling');
+      assert.match(advancedCss, /\.source-tier-pill\.tier-2/, 'Has Tier 2 CSS styling');
+      assert.match(advancedFullSource, /class="source-evidence-card"/, 'Has source evidence card structure');
+      assert.match(advancedFullSource, /class="source-evidence-head"/, 'Displays publisher/title header');
+      assert.match(advancedFullSource, /class="source-evidence-fact"/, 'Displays specific fact supported');
+      assert.match(advancedFullSource, /renderEvidenceSources/, 'Has renderEvidenceSources function');
     });
   });
 

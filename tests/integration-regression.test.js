@@ -87,11 +87,17 @@ describe('NoCharity Complete Integration & Regression Pass (20 Invariants)', () 
   // Check 3: Missing Supabase data produces graceful empty states
   // ---------------------------------------------------------------------------
   test('Check 3: Missing or empty data produces graceful empty states and fallbacks', async () => {
-    // Advanced HTML template verification
+    // Advanced HTML template and client module verification
     const advancedHtml = fs.readFileSync(path.join(rootDir, 'public', 'advanced.html'), 'utf8');
-    assert.match(advancedHtml, /No matching billionaires found/i, 'Billionaire explorer must have empty state');
-    assert.match(advancedHtml, /No matching donations found/i, 'Donation explorer must have empty state');
-    assert.match(advancedHtml, /No rankings available for this metric/i, 'Rankings table must have empty state');
+    const advancedJsDir = path.join(rootDir, 'public', 'js', 'advanced');
+    const advancedJsFiles = fs.existsSync(advancedJsDir)
+      ? fs.readdirSync(advancedJsDir).filter(f => f.endsWith('.js')).map(f => fs.readFileSync(path.join(advancedJsDir, f), 'utf8')).join('\n')
+      : '';
+    const advancedSource = advancedHtml + '\n' + advancedJsFiles;
+
+    assert.match(advancedSource, /No matching billionaires found/i, 'Billionaire explorer must have empty state');
+    assert.match(advancedSource, /No matching donations found/i, 'Donation explorer must have empty state');
+    assert.match(advancedSource, /No rankings available for this metric/i, 'Rankings table must have empty state');
 
     // Data access empty filter response
     const emptyPeople = await getPeople({ search: 'NON_EXISTENT_NAME_XYZ_12345' });
@@ -248,8 +254,11 @@ describe('NoCharity Complete Integration & Regression Pass (20 Invariants)', () 
     const basicCss = fs.readFileSync(path.join(rootDir, 'public', 'css', 'style.css'), 'utf8');
     assert.match(basicCss, /@media\s*\(max-width:\s*768px\)/, 'Basic mode style.css must have mobile media queries');
 
-    const advancedHtml = fs.readFileSync(path.join(rootDir, 'public', 'advanced.html'), 'utf8');
-    assert.match(advancedHtml, /@media\s*\(max-width:\s*768px\)/, 'Advanced mode must have mobile media queries');
+    const advancedCssPath = path.join(rootDir, 'public', 'css', 'advanced.css');
+    const advancedCss = fs.existsSync(advancedCssPath)
+      ? fs.readFileSync(advancedCssPath, 'utf8')
+      : fs.readFileSync(path.join(rootDir, 'public', 'advanced.html'), 'utf8');
+    assert.match(advancedCss, /@media\s*\(max-width:\s*768px\)/, 'Advanced mode must have mobile media queries');
   });
 
   // ---------------------------------------------------------------------------
