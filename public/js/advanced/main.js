@@ -18,22 +18,30 @@ import {
   loadBillionaires, 
   removeBillionaireFilter, 
   clearBillionaireFilters, 
-  openBillionaireFilterPopover, 
-  applyBillionaireFilter 
+  renderBillionaireActiveChips,
+  addBillionaireFilterFromInput,
+  removeBillionaireFilterChip,
+  clearAllBillionaireFilterChips,
+  goToBillionairePage,
+  renderBillionairesTable
 } from './explorer.js';
 import { 
   loadDonations, 
   removeDonationFilter, 
   clearDonationFilters, 
-  openDonationFilterPopover, 
-  applyDonationFilter, 
+  renderDonationActiveChips,
+  addDonationFilterFromInput,
+  removeDonationFilterChip,
+  clearAllDonationFilterChips,
+  goToDonationPage,
+  updateDonationOrgToggleTooltip,
   applyDonationSort, 
   handleDonationSortClick, 
   showCitationDetails 
 } from './donations.js';
-import { loadRankings } from './rankings.js';
+import { loadRankings, goToRankingsPage } from './rankings.js';
 import { loadProfile, viewBillionaireProfile } from './profile.js';
-import { loadDiscoveryTab, runDiscoveryScan, loadMethodologyTab } from './discovery.js';
+import { loadDiscoveryTab, runDiscoveryScan, loadMethodologyTab, setupMethodologyLab } from './discovery.js';
 
 // Expose public controller methods on window for HTML event handlers
 window.switchTab = switchTab;
@@ -43,19 +51,24 @@ window.switchMethTab = switchMethTab;
 window.viewBillionaireProfile = viewBillionaireProfile;
 window.selectBillionaireInCalculator = selectBillionaireInCalculator;
 window.setCompareFilter = setCompareFilter;
-window.applyBillionaireFilter = applyBillionaireFilter;
+window.addBillionaireFilterFromInput = addBillionaireFilterFromInput;
+window.removeBillionaireFilterChip = removeBillionaireFilterChip;
+window.clearAllBillionaireFilterChips = clearAllBillionaireFilterChips;
+window.goToBillionairePage = goToBillionairePage;
 window.removeBillionaireFilter = removeBillionaireFilter;
 window.clearBillionaireFilters = clearBillionaireFilters;
-window.openBillionaireFilterPopover = openBillionaireFilterPopover;
-window.applyDonationFilter = applyDonationFilter;
-window.applyDonationSort = applyDonationSort;
+window.addDonationFilterFromInput = addDonationFilterFromInput;
+window.removeDonationFilterChip = removeDonationFilterChip;
+window.clearAllDonationFilterChips = clearAllDonationFilterChips;
+window.goToDonationPage = goToDonationPage;
 window.removeDonationFilter = removeDonationFilter;
 window.clearDonationFilters = clearDonationFilters;
-window.openDonationFilterPopover = openDonationFilterPopover;
+window.applyDonationSort = applyDonationSort;
 window.handleDonationSortClick = handleDonationSortClick;
 window.showCitationDetails = showCitationDetails;
 window.loadDonations = loadDonations;
 window.loadBillionaires = loadBillionaires;
+window.goToRankingsPage = goToRankingsPage;
 
 export function switchTab(tabName) {
   state.activeTab = tabName;
@@ -137,10 +150,14 @@ function handleHashRoute() {
     } else if (state.activeProfileId) {
       loadProfile(state.activeProfileId);
     }
+  } else if (rawHash.startsWith('overview') || rawHash.startsWith('dashboard')) {
+    switchTab('dashboard');
+  } else if (rawHash.startsWith('giving') || rawHash.startsWith('donations')) {
+    switchTab('donations');
   } else if (['dashboard', 'calculator', 'billionaires', 'donations', 'rankings', 'discovery', 'methodology'].includes(rawHash)) {
     switchTab(rawHash);
   } else {
-    switchTab('calculator');
+    switchTab('dashboard');
   }
 }
 
@@ -188,50 +205,40 @@ export function initAdvancedApp() {
     });
   }
 
-  // Billionaire Search
-  const inputBSearch = document.getElementById('inputBillionaireSearch');
+  // Billionaire Search & Filter Controls
+  const inputBSearch = document.getElementById('filterBillionaireSearch');
+  const btnBClear = document.getElementById('btnClearBillionaireSearch');
   let bSearchTimer = null;
   inputBSearch?.addEventListener('input', (e) => {
+    if (btnBClear) btnBClear.style.display = e.target.value.trim() ? 'block' : 'none';
     clearTimeout(bSearchTimer);
     bSearchTimer = setTimeout(() => {
-      state.billionaireFilters.search = e.target.value.trim();
       state.billionaireFilters.offset = 0;
       loadBillionaires();
     }, 250);
   });
 
-  // Billionaire Add Filter Dropdown & Popover
-  const btnBAddFilter = document.getElementById('btnBillionaireAddFilter');
-  const menuBFilter = document.getElementById('menuBFilterDropdown');
-  const popoverBFilter = document.getElementById('popoverBillionaireFilter');
-  const btnCloseBPopover = document.getElementById('btnCloseBFilterPopover');
-
-  btnBAddFilter?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isShown = menuBFilter.style.display !== 'none';
-    menuBFilter.style.display = isShown ? 'none' : 'flex';
-    if (popoverBFilter) popoverBFilter.style.display = 'none';
-  });
-
-  document.querySelectorAll('#menuBFilterDropdown .pf-menu-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filterType = btn.dataset.filterType;
-      menuBFilter.style.display = 'none';
-      openBillionaireFilterPopover(filterType);
-    });
-  });
-
-  btnCloseBPopover?.addEventListener('click', () => {
-    if (popoverBFilter) popoverBFilter.style.display = 'none';
-  });
-
-  document.addEventListener('click', (e) => {
-    if (menuBFilter && !menuBFilter.contains(e.target) && e.target !== btnBAddFilter) {
-      menuBFilter.style.display = 'none';
+  inputBSearch?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addBillionaireFilterFromInput();
     }
-    if (popoverBFilter && !popoverBFilter.contains(e.target) && !menuBFilter?.contains(e.target)) {
-      popoverBFilter.style.display = 'none';
-    }
+  });
+
+  btnBClear?.addEventListener('click', () => {
+    if (inputBSearch) inputBSearch.value = '';
+    btnBClear.style.display = 'none';
+    state.billionaireFilters.offset = 0;
+    loadBillionaires();
+  });
+
+  document.getElementById('btnAddBillionaireFilter')?.addEventListener('click', () => {
+    addBillionaireFilterFromInput();
+  });
+
+  document.getElementById('toggleBillionaireOrgGiving')?.addEventListener('change', (e) => {
+    state.showBillionaireOrgGiving = e.target.checked;
+    renderBillionairesTable(state.billionaires);
   });
 
   // Billionaire Pagination
@@ -245,69 +252,41 @@ export function initAdvancedApp() {
     loadBillionaires();
   });
 
-  // Donation Search
-  const inputDSearch = document.getElementById('inputDonationSearch');
+  // Donation Search & Filter Controls
+  const inputDSearch = document.getElementById('filterDonationSearch');
+  const btnDClear = document.getElementById('btnClearDonationSearch');
   let dSearchTimer = null;
   inputDSearch?.addEventListener('input', (e) => {
+    if (btnDClear) btnDClear.style.display = e.target.value.trim() ? 'block' : 'none';
     clearTimeout(dSearchTimer);
     dSearchTimer = setTimeout(() => {
-      state.donationFilters.search = e.target.value.trim();
       state.donationFilters.offset = 0;
       loadDonations();
     }, 250);
   });
 
-  // Donation Add Filter Dropdown & Popover
-  const btnDAddFilter = document.getElementById('btnDonationAddFilter');
-  const menuDFilter = document.getElementById('menuDFilterDropdown');
-  const popoverDFilter = document.getElementById('popoverDonationFilter');
-  const btnCloseDPopover = document.getElementById('btnCloseDFilterPopover');
-
-  btnDAddFilter?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isShown = menuDFilter.style.display !== 'none';
-    menuDFilter.style.display = isShown ? 'none' : 'flex';
-    if (popoverDFilter) popoverDFilter.style.display = 'none';
-  });
-
-  document.querySelectorAll('#menuDFilterDropdown .pf-menu-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const filterType = btn.dataset.filterType;
-      menuDFilter.style.display = 'none';
-      openDonationFilterPopover(filterType);
-    });
-  });
-
-  btnCloseDPopover?.addEventListener('click', () => {
-    if (popoverDFilter) popoverDFilter.style.display = 'none';
-  });
-
-  document.addEventListener('click', (e) => {
-    if (menuDFilter && !menuDFilter.contains(e.target) && e.target !== btnDAddFilter) {
-      menuDFilter.style.display = 'none';
+  inputDSearch?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addDonationFilterFromInput();
     }
-    if (popoverDFilter && !popoverDFilter.contains(e.target) && !menuDFilter?.contains(e.target)) {
-      popoverDFilter.style.display = 'none';
-    }
+  });
+
+  btnDClear?.addEventListener('click', () => {
+    if (inputDSearch) inputDSearch.value = '';
+    btnDClear.style.display = 'none';
+    state.donationFilters.offset = 0;
+    loadDonations();
+  });
+
+  document.getElementById('btnAddDonationFilter')?.addEventListener('click', () => {
+    addDonationFilterFromInput();
   });
 
   document.getElementById('toggleDonationOrgGiving')?.addEventListener('change', (e) => {
     state.donationFilters.includeAssociatedOrgGiving = e.target.checked;
     state.donationFilters.offset = 0;
-    const notice = document.getElementById('donationModeNotice');
-    if (notice) {
-      if (e.target.checked) {
-        notice.style.background = 'rgba(168, 85, 247, 0.08)';
-        notice.style.borderColor = 'rgba(168, 85, 247, 0.25)';
-        notice.style.color = '#e9d5ff';
-        notice.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><span>🏛️</span><div><strong>CONTEXTUAL EXPLORATION MODE: Including Foundation & Corporate Grants.</strong> These organizational disbursements provide research context but are strictly excluded from personal parity calculations.</div></div>`;
-      } else {
-        notice.style.background = 'rgba(16, 185, 129, 0.08)';
-        notice.style.borderColor = 'rgba(16, 185, 129, 0.25)';
-        notice.style.color = '#a7f3d0';
-        notice.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><span>👤</span><div><strong>DEFAULT MODE: Showing Documented Personal Giving Only.</strong> Corporate, Foundation, and DAF grants are excluded by default to ensure personal billionaire sacrifice is never artificially inflated.</div></div>`;
-      }
-    }
+    updateDonationOrgToggleTooltip(e.target.checked);
     loadDonations();
   });
 
@@ -470,7 +449,10 @@ export function initAdvancedApp() {
   });
 
   // Discovery & Quality Tester
-  document.getElementById('btnRunDiscoveryScan')?.addEventListener('click', runDiscoveryScan);
+  document.getElementById('btnRunDiscoveryScan')?.addEventListener('click', () => runDiscoveryScan(false));
+  document.getElementById('btnTriggerIngestScan')?.addEventListener('click', () => runDiscoveryScan(true));
+  setupMethodologyLab();
+
   document.getElementById('btnCloseCitationModal')?.addEventListener('click', () => {
     const m = document.getElementById('citationDetailsModal');
     if (m) m.style.display = 'none';

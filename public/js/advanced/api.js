@@ -61,8 +61,9 @@ export async function fetchCitations(donationId) {
   return res.json();
 }
 
-export async function fetchDiscovery(limit = 10) {
-  const res = await fetch(`/api/advanced/discover?limit=${limit}`);
+export async function fetchDiscovery(limit = 10, billionaire = '') {
+  const bParam = billionaire ? `&billionaire=${encodeURIComponent(billionaire)}` : '';
+  const res = await fetch(`/api/advanced/discover?limit=${limit}${bParam}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

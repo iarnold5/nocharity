@@ -586,15 +586,17 @@ app.get('/api/advanced/billionaires', async (req, res) => {
 // GET /api/advanced/discover - Phase 11: News Discovery Mechanism
 app.get('/api/advanced/discover', async (req, res) => {
   try {
-    const { billionaire, timeframe, startDate, endDate } = req.query;
-    if (!billionaire) {
-      return res.status(400).json({ error: 'Missing billionaire parameter' });
-    }
-    const result = await discoverDonationsFromNews(billionaire, {
+    const { billionaire, timeframe, startDate, endDate, limit } = req.query;
+    const targetBillionaire = (billionaire && String(billionaire).trim()) || 'Billionaire';
+    const result = await discoverDonationsFromNews(targetBillionaire, {
       timeframe: timeframe || 'all',
       startDate,
       endDate
     });
+    if (limit && result && Array.isArray(result.candidates)) {
+      const max = parseInt(limit, 10);
+      if (max > 0) result.candidates = result.candidates.slice(0, max);
+    }
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });

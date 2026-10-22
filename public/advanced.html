@@ -44,21 +44,21 @@
     <!-- Top Section Navigation Tabs -->
     <nav class="nav-tabs-bar" id="mainNavTabs" role="tablist">
       <div class="nav-tabs-main">
-        <button class="nav-tab-item active" data-tab="calculator" role="tab" aria-selected="true">
+        <button class="nav-tab-item active" data-tab="dashboard" role="tab" aria-selected="true">
+          <span>📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="nav-tab-item" data-tab="calculator" role="tab" aria-selected="false">
           <span>⚖️</span>
           <span>Reality Check</span>
         </button>
-        <button class="nav-tab-item" data-tab="dashboard" role="tab" aria-selected="false">
-          <span>📊</span>
-          <span>Overview</span>
+        <button class="nav-tab-item" data-tab="donations" role="tab" aria-selected="false">
+          <span>💸</span>
+          <span>Donations</span>
         </button>
         <button class="nav-tab-item" data-tab="billionaires" role="tab" aria-selected="false">
           <span>👤</span>
           <span>People</span>
-        </button>
-        <button class="nav-tab-item" data-tab="donations" role="tab" aria-selected="false">
-          <span>💸</span>
-          <span>Giving</span>
         </button>
         <button class="nav-tab-item" data-tab="rankings" role="tab" aria-selected="false">
           <span>🏆</span>
@@ -90,7 +90,7 @@
     <!-- ===================================================================== -->
     <!-- 1. REALITY CHECK CALCULATOR (CENTERPIECE OF ADVANCED MODE)            -->
     <!-- ===================================================================== -->
-    <section id="view-calculator" class="view-section active">
+    <section id="view-calculator" class="view-section">
       <div class="calc-primary-stage">
         <!-- Input Configuration Card -->
         <div class="calc-step-card">
@@ -409,22 +409,24 @@
     <!-- ===================================================================== -->
     <!-- 2. ADVANCED DASHBOARD / OVERVIEW SECTION                              -->
     <!-- ===================================================================== -->
-    <section id="view-dashboard" class="view-section">
+    <section id="view-dashboard" class="view-section active">
       <!-- High-Impact Value Proposition -->
       <div class="overview-hero-card">
-        <div class="overview-badge">⚖️ Philanthropic Reality Check</div>
-        <h2 class="overview-hero-title">Where Billionaire Headlines Meet Real-World Math.</h2>
-        <p class="overview-hero-desc">
-          When a billionaire pledges $500 million, the press proclaims extraordinary selflessness. 
-          NoCharity audits what that gift actually cost relative to their accumulated fortune at the date of gift — 
-          and calculates the exact same sacrifice against your own everyday budget.
-        </p>
-        <div class="overview-actions-row">
+        <div class="overview-hero-content">
+          <div class="overview-badge">⚖️ Philanthropic Reality Check</div>
+          <h2 class="overview-hero-title">Where Billionaire Headlines Meet Real-World Math.</h2>
+          <p class="overview-hero-desc">
+            When a billionaire pledges $500 million, the press proclaims extraordinary selflessness. 
+            NoCharity audits what that gift actually cost relative to their accumulated fortune at the date of gift — 
+            and calculates the exact same sacrifice against your own everyday budget.
+          </p>
+        </div>
+        <div class="overview-actions-column">
           <button type="button" class="btn btn-primary" onclick="switchTab('calculator')">
             <span>⚖️</span> <span>Launch Reality Check Calculator</span>
           </button>
           <button type="button" class="btn btn-outline" onclick="switchTab('donations')">
-            <span>💸</span> <span>Explore Documented Giving</span>
+            <span>💸</span> <span>Explore Documented Donations</span>
           </button>
           <button type="button" class="btn btn-outline" onclick="switchTab('billionaires')">
             <span>👤</span> <span>View Tracked People</span>
@@ -432,42 +434,44 @@
         </div>
       </div>
 
-      <!-- Live Data Scope Ribbon (Restrained, non-cluttered) -->
-      <div class="metrics-ribbon-grid">
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>👤</span> Tracked Billionaires</div>
-          <div class="stat-kpi-value" id="kpiTrackedBillionaires">1,019</div>
-          <div class="metric-ribbon-sub">Independently profiled</div>
-        </div>
+      <!-- Live Data Scope Carousel -->
+      <div class="metrics-ribbon-carousel-wrap">
+        <div class="metrics-ribbon-carousel">
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>👤</span> Tracked Billionaires</div>
+            <div class="stat-kpi-value" id="kpiTrackedBillionaires">1,019</div>
+            <div class="metric-ribbon-sub">Independently profiled</div>
+          </div>
 
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>💰</span> Verified Personal Giving</div>
-          <div class="stat-kpi-value" id="kpiDocumentedPersonalGivingTotal" style="color: #34d399;">$102.27B</div>
-          <div class="metric-ribbon-sub">Direct personal sacrifice</div>
-        </div>
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>💰</span> Verified Personal Giving</div>
+            <div class="stat-kpi-value" id="kpiDocumentedPersonalGivingTotal" style="color: #34d399;">$102.27B</div>
+            <div class="metric-ribbon-sub">Direct personal sacrifice</div>
+          </div>
 
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>🏷️</span> Personal Gifts</div>
-          <div class="stat-kpi-value" id="kpiDocumentedPersonalDonations">69</div>
-          <div class="metric-ribbon-sub">Verified personal transactions</div>
-        </div>
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>🏷️</span> Personal Gifts</div>
+            <div class="stat-kpi-value" id="kpiDocumentedPersonalDonations">69</div>
+            <div class="metric-ribbon-sub">Verified personal transactions</div>
+          </div>
 
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>✅</span> Audited Transactions</div>
-          <div class="stat-kpi-value" id="kpiVerifiedDonations">103</div>
-          <div class="metric-ribbon-sub">Primary source audited</div>
-        </div>
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>✅</span> Audited Transactions</div>
+            <div class="stat-kpi-value" id="kpiVerifiedDonations">103</div>
+            <div class="metric-ribbon-sub">Primary source audited</div>
+          </div>
 
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>📑</span> Regulatory Citations</div>
-          <div class="stat-kpi-value" id="kpiSourcesCount">1,093</div>
-          <div class="metric-ribbon-sub">SEC Form 4 & IRS 990-PF</div>
-        </div>
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>📑</span> Regulatory Citations</div>
+            <div class="stat-kpi-value" id="kpiSourcesCount">1,093</div>
+            <div class="metric-ribbon-sub">SEC Form 4 & IRS 990-PF</div>
+          </div>
 
-        <div class="metric-ribbon-item">
-          <div class="metric-ribbon-label"><span>📅</span> Latest Record Date</div>
-          <div class="stat-kpi-value" id="kpiLatestDataDate" style="font-size: 1.3rem;">2025-06-28</div>
-          <div class="metric-ribbon-sub">Continuously maintained</div>
+          <div class="metric-ribbon-item">
+            <div class="metric-ribbon-label"><span>📅</span> Latest Record Date</div>
+            <div class="stat-kpi-value" id="kpiLatestDataDate" style="font-size: 1.3rem;">2025-06-28</div>
+            <div class="metric-ribbon-sub">Continuously maintained</div>
+          </div>
         </div>
       </div>
 
@@ -559,42 +563,33 @@
         <!-- PROGRESSIVE FILTER COMPONENT -->
         <div class="pf-container" id="pfBillionairesContainer">
           <div class="pf-search-row">
+            <select id="selectBillionaireFilterField" class="filter-field-select" aria-label="Select filter field">
+              <option value="name" selected>👤 Name</option>
+              <option value="country">🌐 Country</option>
+              <option value="industry">🏭 Industry</option>
+              <option value="wealth">💎 Net Worth</option>
+              <option value="giving">💰 Personal Giving</option>
+              <option value="pledge">✍️ Giving Pledge</option>
+              <option value="all">🔍 All Fields</option>
+            </select>
+
             <div class="pf-search-input-wrap">
               <span class="pf-search-icon">🔍</span>
-              <input type="text" id="filterBillionaireSearch" class="pf-search-input" placeholder="Search billionaires by name or company...">
-              <button type="button" class="pf-clear-search-btn" id="btnClearBillionaireSearch" title="Clear search" style="display: none;">✕</button>
+              <input type="text" id="filterBillionaireSearch" class="pf-search-input" placeholder="Type search term..." aria-label="Search term">
+              <button type="button" class="pf-clear-search-btn" id="btnClearBillionaireSearch" title="Clear input" style="display: none;">✕</button>
             </div>
 
-            <div class="pf-trigger-wrap">
-              <button type="button" class="btn-add-filter" id="btnAddBillionaireFilter">
-                <span>＋</span> <span>Add Filter</span>
-              </button>
-              <div class="pf-dropdown-menu" id="menuBillionaireFilter" style="display: none;">
-                <button type="button" class="pf-menu-item" data-filter="country">🌐 Country</button>
-                <button type="button" class="pf-menu-item" data-filter="industry">🏭 Industry</button>
-                <button type="button" class="pf-menu-item" data-filter="wealth">💎 Net Worth Range</button>
-                <button type="button" class="pf-menu-item" data-filter="giving">💰 Documented Giving</button>
-                <button type="button" class="pf-menu-item" data-filter="pledge">✍️ Giving Pledge</button>
-                <button type="button" class="pf-menu-item" data-filter="sortBy">↕️ Sort By</button>
-              </div>
-            </div>
+            <button type="button" class="btn-add-filter" id="btnAddBillionaireFilter">
+              <span>＋</span> <span>Add Filter</span>
+            </button>
 
-            <label class="switch-toggle-row" title="Toggle Associated Organization Giving in table">
+            <label class="switch-toggle-row" id="toggleBillionaireOrgRow" title="Toggle Associated Organization Giving in table">
               <span class="switch-toggle">
                 <input type="checkbox" id="toggleBillionaireOrgGiving" aria-label="Show Foundation or Org Giving">
                 <span class="slider"></span>
               </span>
               <span style="font-size: 0.8rem; font-weight: 600; color: #c084fc;">Show Foundation / Org Giving</span>
             </label>
-          </div>
-
-          <!-- Popover for selecting a filter value -->
-          <div class="pf-input-popover" id="popoverBillionaireFilter" style="display: none;">
-            <div class="pf-popover-header">
-              <span id="popoverBillionaireTitle">Filter</span>
-              <button type="button" class="pf-popover-close" id="btnCloseBillionairePopover">✕</button>
-            </div>
-            <div class="pf-options-list" id="popoverBillionaireOptions"></div>
           </div>
 
           <!-- Active Filter Chips Row -->
@@ -638,6 +633,7 @@
           <div id="billionairePaginationInfo">Showing 1-20 of 1019 billionaires</div>
           <div class="pagination-nav">
             <button type="button" id="btnBillionairePrev" class="btn-page" disabled>Previous</button>
+            <div class="pagination-pages" id="billionairePaginationPages"></div>
             <button type="button" id="btnBillionaireNext" class="btn-page" disabled>Next</button>
           </div>
         </div>
@@ -655,7 +651,7 @@
             <p class="card-panel-desc">Inspect documented philanthropic gifts with primary citations, timestamps, and attribution tags</p>
           </div>
           
-          <div class="switch-toggle-row" title="Include Foundation and Corporate donations in list">
+          <div class="switch-toggle-row" id="donationOrgToggleWrapper" title="Default: Personal Giving Only. Corporate, Foundation, and DAF grants are excluded so personal billionaire sacrifice is never artificially inflated.">
             <label class="switch-toggle" for="toggleDonationOrgGiving">
               <input type="checkbox" id="toggleDonationOrgGiving" aria-label="Include foundation and company donations">
               <span class="slider"></span>
@@ -666,48 +662,26 @@
           </div>
         </div>
 
-        <!-- Mode Indicator Banner -->
-        <div id="donationModeNotice" class="subtle-provenance-bar" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25); color: #a7f3d0;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span>👤</span>
-            <div>
-              <strong>DEFAULT MODE: Showing Documented Personal Giving Only.</strong>
-              Corporate, Foundation, and DAF grants are excluded by default to ensure personal billionaire sacrifice is never artificially inflated.
-            </div>
-          </div>
-        </div>
-
         <!-- PROGRESSIVE FILTER COMPONENT -->
         <div class="pf-container" id="pfDonationsContainer">
           <div class="pf-search-row">
+            <select id="selectDonationFilterField" class="filter-field-select" aria-label="Select filter field">
+              <option value="donor" selected>👤 Donor / Person</option>
+              <option value="recipient">🎯 Recipient / Cause</option>
+              <option value="fundingSource">🏛️ Funding Source</option>
+              <option value="status">✅ Verification Status</option>
+              <option value="all">🔍 All Fields</option>
+            </select>
+
             <div class="pf-search-input-wrap">
               <span class="pf-search-icon">🔍</span>
-              <input type="text" id="filterDonationSearch" class="pf-search-input" placeholder="Search by recipient, cause, or donor name...">
-              <button type="button" class="pf-clear-search-btn" id="btnClearDonationSearch" title="Clear search" style="display: none;">✕</button>
+              <input type="text" id="filterDonationSearch" class="pf-search-input" placeholder="Type search term..." aria-label="Search term">
+              <button type="button" class="pf-clear-search-btn" id="btnClearDonationSearch" title="Clear input" style="display: none;">✕</button>
             </div>
 
-            <div class="pf-trigger-wrap">
-              <button type="button" class="btn-add-filter" id="btnAddDonationFilter">
-                <span>＋</span> <span>Add Filter</span>
-              </button>
-              <div class="pf-dropdown-menu" id="menuDonationFilter" style="display: none;">
-                <button type="button" class="pf-menu-item" data-filter="billionaire">👤 Billionaire</button>
-                <button type="button" class="pf-menu-item" data-filter="fundingSource">🏛️ Funding Source</button>
-                <button type="button" class="pf-menu-item" data-filter="status">✅ Verification Status</button>
-                <button type="button" class="pf-menu-item" data-filter="amount">💰 Amount Range</button>
-                <button type="button" class="pf-menu-item" data-filter="sourceType">📑 Source Type</button>
-                <button type="button" class="pf-menu-item" data-filter="sortBy">↕️ Sort By</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Popover for selecting a filter value -->
-          <div class="pf-input-popover" id="popoverDonationFilter" style="display: none;">
-            <div class="pf-popover-header">
-              <span id="popoverDonationTitle">Filter</span>
-              <button type="button" class="pf-popover-close" id="btnCloseDonationPopover">✕</button>
-            </div>
-            <div class="pf-options-list" id="popoverDonationOptions"></div>
+            <button type="button" class="btn-add-filter" id="btnAddDonationFilter">
+              <span>＋</span> <span>Add Filter</span>
+            </button>
           </div>
 
           <!-- Active Filter Chips Row -->
@@ -752,6 +726,7 @@
           <div id="donationPaginationInfo">Showing 1-20 of 104 donations</div>
           <div class="pagination-nav">
             <button type="button" id="btnDonationPrev" class="btn-page" disabled>Previous</button>
+            <div class="pagination-pages" id="donationPaginationPages"></div>
             <button type="button" id="btnDonationNext" class="btn-page" disabled>Next</button>
           </div>
         </div>
@@ -812,6 +787,7 @@
           <div id="rankingsPaginationInfo">Showing 1-20 of rankings</div>
           <div class="pagination-nav">
             <button type="button" id="btnRankingsPrev" class="btn-page" disabled>Previous</button>
+            <div class="pagination-pages" id="rankingsPaginationPages"></div>
             <button type="button" id="btnRankingsNext" class="btn-page" disabled>Next</button>
           </div>
         </div>
@@ -1257,11 +1233,17 @@
     <footer class="app-footer">
       <div class="footer-nav">
         <a href="/">Home</a>
-        <a href="/about">About</a>
+        <span class="footer-dot">•</span>
+        <a href="/about">About us</a>
+        <span class="footer-dot">•</span>
         <a href="/methodology">Methodology</a>
+        <span class="footer-dot">•</span>
         <a href="/terms">Terms of Use</a>
+        <span class="footer-dot">•</span>
         <a href="/privacy">Privacy Policy</a>
+        <span class="footer-dot">•</span>
         <a href="/sitemap">Sitemap</a>
+        <span class="footer-dot">•</span>
         <a href="https://github.com/iarnold5/nocharity" target="_blank" rel="noopener">GitHub ↗</a>
       </div>
       <div class="footer-credit">

@@ -1,38 +1,23 @@
 /**
  * Advanced Mode Billionaire Explorer Module
- * Handles progressive filtering, search, pagination, and billionaire directory rendering.
+ * Handles progressive multi-field filtering, persistent filter chips,
+ * foundation / org giving toggle, pagination with clickable page numbers,
+ * and billionaire directory rendering.
  */
 
-import { state, BF_OPTIONS } from './state.js';
-import { formatCurrency } from './utils.js';
+import { state } from './state.js';
+import { formatCurrency, escapeHtml, renderPaginationButtons } from './utils.js';
 import { fetchPeople } from './api.js';
+
+if (!state.billionaireFilters.activeFilterChips) {
+  state.billionaireFilters.activeFilterChips = [];
+}
 
 export function renderBillionaireActiveChips() {
   const container = document.getElementById('activeBillionaireChipsRow');
   if (!container) return;
-  const bf = state.billionaireFilters;
-  const chips = [];
 
-  if (bf.search) {
-    chips.push({ key: 'search', label: `Search: "${bf.search}"` });
-  }
-  if (bf.country && bf.country !== 'all') {
-    chips.push({ key: 'country', label: `Country: ${bf.country}` });
-  }
-  if (bf.industry && bf.industry !== 'all') {
-    chips.push({ key: 'industry', label: `Industry: ${bf.industry}` });
-  }
-  if (bf.wealth && bf.wealth !== 'all') {
-    const item = BF_OPTIONS.wealth.find(w => w.val === bf.wealth);
-    chips.push({ key: 'wealth', label: `Net Worth: ${item ? item.label : bf.wealth}` });
-  }
-  if (bf.giving && bf.giving !== 'all') {
-    const item = BF_OPTIONS.giving.find(g => g.val === bf.giving);
-    chips.push({ key: 'giving', label: `Giving: ${item ? item.label : bf.giving}` });
-  }
-  if (bf.pledge && bf.pledge !== 'all') {
-    chips.push({ key: 'pledge', label: bf.pledge === 'true' ? 'Pledge Signatory' : 'Non-Signatory' });
-  }
+  const chips = state.billionaireFilters.activeFilterChips || [];
 
   if (chips.length === 0) {
     container.innerHTML = '';
@@ -40,121 +25,244 @@ export function renderBillionaireActiveChips() {
   }
 
   container.innerHTML = chips.map(c => `
-    <span class="active-filter-chip">
-      <span>${c.label}</span>
-      <button type="button" class="chip-remove-btn" onclick="removeBillionaireFilter('${c.key}')">×</button>
-    </span>
+    <div class="filter-card-chip" data-id="${c.id}">
+      <span class="filter-card-field">${escapeHtml(c.fieldLabel || c.field)}:</span>
+      <span class="filter-card-val">"${escapeHtml(c.query)}"</span>
+      <button type="button" class="filter-card-remove" onclick="removeBillionaireFilterChip('${c.id}')" title="Remove this filter" aria-label="Remove filter">✕</button>
+    </div>
   `).join('') + `
-    <button type="button" class="btn-clear-all-chips" onclick="clearBillionaireFilters()">Clear all</button>
+    <button type="button" class="btn-clear-all-chips" onclick="clearAllBillionaireFilterChips()">Clear all</button>
   `;
 }
 
-export function removeBillionaireFilter(key) {
-  if (key === 'search') {
-    state.billionaireFilters.search = '';
-    const input = document.getElementById('inputBillionaireSearch');
-    if (input) input.value = '';
-  } else if (key === 'country') {
-    state.billionaireFilters.country = 'all';
-  } else if (key === 'industry') {
-    state.billionaireFilters.industry = 'all';
-  } else if (key === 'wealth') {
-    state.billionaireFilters.wealth = 'all';
-  } else if (key === 'giving') {
-    state.billionaireFilters.giving = 'all';
-  } else if (key === 'pledge') {
-    state.billionaireFilters.pledge = 'all';
+export function addBillionaireFilterFromInput() {
+  const select = document.getElementById('selectBillionaireFilterField');
+  const input = document.getElementById('filterBillionaireSearch');
+  if (!input) return;
+
+  const query = input.value.trim();
+  if (!query) return;
+
+  const field = select ? select.value : 'name';
+  const fieldLabel = select && select.selectedOptions && select.selectedOptions[0]
+    ? select.selectedOptions[0].text.replace(/^[^\w\s]+/, '').trim()
+    : field;
+
+  if (!state.billionaireFilters.activeFilterChips) {
+    state.billionaireFilters.activeFilterChips = [];
   }
+
+  // Prevent duplicate filters
+  const exists = state.billionaireFilters.activeFilterChips.some(
+    c => c.field === field && c.query.toLowerCase() === query.toLowerCase()
+  );
+
+  if (!exists) {
+    state.billionaireFilters.activeFilterChips.push({
+      id: 'bfc_' + Date.now() + Math.random().toString(36).substring(2, 6),
+      field,
+      fieldLabel,
+      query
+    });
+  }
+
+  input.value = '';
+  const clearBtn = document.getElementById('btnClearBillionaireSearch');
+  if (clearBtn) clearBtn.style.display = 'none';
+
   state.billionaireFilters.offset = 0;
   renderBillionaireActiveChips();
   loadBillionaires();
 }
 
-export function clearBillionaireFilters() {
-  state.billionaireFilters.search = '';
-  state.billionaireFilters.country = 'all';
-  state.billionaireFilters.industry = 'all';
-  state.billionaireFilters.wealth = 'all';
-  state.billionaireFilters.giving = 'all';
-  state.billionaireFilters.pledge = 'all';
+export function removeBillionaireFilterChip(id) {
+  if (!state.billionaireFilters.activeFilterChips) return;
+  state.billionaireFilters.activeFilterChips = state.billionaireFilters.activeFilterChips.filter(c => c.id !== id);
   state.billionaireFilters.offset = 0;
+  renderBillionaireActiveChips();
+  loadBillionaires();
+}
 
-  const input = document.getElementById('inputBillionaireSearch');
+export function clearAllBillionaireFilterChips() {
+  state.billionaireFilters.activeFilterChips = [];
+  state.billionaireFilters.search = '';
+  state.billionaireFilters.offset = 0;
+  const input = document.getElementById('filterBillionaireSearch');
   if (input) input.value = '';
+  const clearBtn = document.getElementById('btnClearBillionaireSearch');
+  if (clearBtn) clearBtn.style.display = 'none';
 
   renderBillionaireActiveChips();
+  loadBillionaires();
+}
+
+export function removeBillionaireFilter(key) {
+  clearAllBillionaireFilterChips();
+}
+
+export function clearBillionaireFilters() {
+  clearAllBillionaireFilterChips();
+}
+
+export function goToBillionairePage(pageNum) {
+  const limit = state.billionaireFilters.limit || 20;
+  state.billionaireFilters.offset = Math.max(0, (pageNum - 1) * limit);
   loadBillionaires();
 }
 
 export async function loadBillionaires() {
   const {
-    search,
-    country,
-    industry,
-    wealth,
-    giving,
-    pledge,
     sortBy,
     sortOrder,
     limit,
     offset
   } = state.billionaireFilters;
 
-  const params = { limit, offset, sortBy, sortOrder };
-  if (search) params.search = search;
-  if (country && country !== 'all') params.country = country;
-  if (industry && industry !== 'all') params.industry = industry;
-  if (pledge && pledge !== 'all') params.givingPledge = pledge;
+  const chips = state.billionaireFilters.activeFilterChips || [];
+  const searchInput = document.getElementById('filterBillionaireSearch');
+  const liveQuery = searchInput ? searchInput.value.trim() : '';
+  const liveField = document.getElementById('selectBillionaireFilterField')?.value || 'name';
 
-  if (wealth === '200B+') params.minNetWorth = 200000000000;
-  else if (wealth === '100B-200B') { params.minNetWorth = 100000000000; params.maxNetWorth = 200000000000; }
-  else if (wealth === '50B-100B') { params.minNetWorth = 50000000000; params.maxNetWorth = 100000000000; }
-  else if (wealth === 'under50B') params.maxNetWorth = 50000000000;
+  const params = { limit: 100, offset: 0, sortBy, sortOrder };
 
-  if (giving === '10B+') params.minPersonalGiving = 10000000000;
-  else if (giving === '1B-10B') { params.minPersonalGiving = 1000000000; params.maxPersonalGiving = 10000000000; }
-  else if (giving === '100M-1B') { params.minPersonalGiving = 100000000; params.maxPersonalGiving = 1000000000; }
-  else if (giving === 'under100M') params.maxPersonalGiving = 100000000;
+  // Pass primary filters to API if matched in chips
+  chips.forEach(c => {
+    if (c.field === 'name' || c.field === 'all') params.search = c.query;
+    if (c.field === 'country') params.country = c.query;
+    if (c.field === 'industry') params.industry = c.query;
+    if (c.field === 'pledge') {
+      const q = c.query.toLowerCase();
+      if (q.includes('yes') || q.includes('sign') || q.includes('true')) params.givingPledge = 'true';
+      else if (q.includes('no') || q.includes('false')) params.givingPledge = 'false';
+    }
+  });
+
+  if (liveQuery && !params.search) {
+    if (liveField === 'country') params.country = liveQuery;
+    else if (liveField === 'industry') params.industry = liveQuery;
+    else params.search = liveQuery;
+  }
 
   try {
     const data = await fetchPeople(params);
-    state.billionaires = data.people || [];
-    renderBillionairesTable(state.billionaires);
+    let allPeople = data.people || [];
 
-    const total = data.totalCount !== undefined ? data.totalCount : state.billionaires.length;
-    document.getElementById('billionairePaginationInfo').textContent = 
-      `Showing ${state.billionaires.length > 0 ? offset + 1 : 0}-${offset + state.billionaires.length} of ${Number(total).toLocaleString()} billionaires`;
-    document.getElementById('btnBillionairePrev').disabled = offset <= 0;
-    document.getElementById('btnBillionaireNext').disabled = offset + state.billionaires.length >= total;
+    // Filter in-memory for all persistent chips to ensure multi-filter AND precision
+    if (chips.length > 0) {
+      allPeople = allPeople.filter(p => {
+        return chips.every(c => {
+          const q = c.query.toLowerCase();
+          if (c.field === 'name') {
+            return (p.canonical_name && p.canonical_name.toLowerCase().includes(q)) ||
+                   (p.aliases && p.aliases.some(a => a.toLowerCase().includes(q)));
+          }
+          if (c.field === 'country') {
+            return p.country && p.country.toLowerCase().includes(q);
+          }
+          if (c.field === 'industry') {
+            return p.industry && p.industry.toLowerCase().includes(q);
+          }
+          if (c.field === 'wealth') {
+            const nwStr = formatCurrency(p.latest_net_worth).toLowerCase();
+            return nwStr.includes(q) || String(p.latest_net_worth).includes(q);
+          }
+          if (c.field === 'giving') {
+            const givStr = formatCurrency(p.total_personal_giving).toLowerCase();
+            return givStr.includes(q) || String(p.total_personal_giving).includes(q);
+          }
+          if (c.field === 'pledge') {
+            const isSignatory = Boolean(p.giving_pledge);
+            if (q.includes('yes') || q.includes('sign') || q.includes('true')) return isSignatory;
+            if (q.includes('no') || q.includes('false')) return !isSignatory;
+            return true;
+          }
+          // 'all'
+          return (p.canonical_name && p.canonical_name.toLowerCase().includes(q)) ||
+                 (p.country && p.country.toLowerCase().includes(q)) ||
+                 (p.industry && p.industry.toLowerCase().includes(q)) ||
+                 (p.occupation && p.occupation.toLowerCase().includes(q));
+        });
+      });
+    }
+
+    // Apply live query if present
+    if (liveQuery) {
+      const q = liveQuery.toLowerCase();
+      allPeople = allPeople.filter(p => {
+        if (liveField === 'name') return p.canonical_name && p.canonical_name.toLowerCase().includes(q);
+        if (liveField === 'country') return p.country && p.country.toLowerCase().includes(q);
+        if (liveField === 'industry') return p.industry && p.industry.toLowerCase().includes(q);
+        return (p.canonical_name && p.canonical_name.toLowerCase().includes(q)) ||
+               (p.country && p.country.toLowerCase().includes(q)) ||
+               (p.industry && p.industry.toLowerCase().includes(q));
+      });
+    }
+
+    const total = (chips.length > 0 || liveQuery) ? allPeople.length : (data.totalCount !== undefined ? data.totalCount : allPeople.length);
+    const paginatedPeople = allPeople.slice(offset, offset + limit);
+
+    state.billionaires = paginatedPeople;
+    renderBillionairesTable(paginatedPeople);
+
+    // Update pagination status
+    const startNum = total > 0 ? offset + 1 : 0;
+    const endNum = Math.min(offset + paginatedPeople.length, total);
+    const infoEl = document.getElementById('billionairePaginationInfo');
+    if (infoEl) {
+      infoEl.textContent = `Showing ${startNum}-${endNum} of ${Number(total).toLocaleString()} billionaires`;
+    }
+
+    const prevBtn = document.getElementById('btnBillionairePrev');
+    if (prevBtn) prevBtn.disabled = offset <= 0;
+
+    const nextBtn = document.getElementById('btnBillionaireNext');
+    if (nextBtn) nextBtn.disabled = offset + paginatedPeople.length >= total;
+
+    // Render clickable page numbers
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+    renderPaginationButtons('billionairePaginationPages', currentPage, totalPages, 'goToBillionairePage');
+
   } catch (err) {
     console.error('Error loading billionaires:', err);
     const tbody = document.getElementById('billionaireExplorerTableBody');
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="empty-state-cell error-state">
-          <div class="empty-state-content">
-            <span>⚠️</span>
-            <h3>We couldn't load the results</h3>
-            <p>The database request encountered an issue. Please try again.</p>
-            <button type="button" class="btn btn-sm btn-primary" onclick="loadBillionaires()">Retry</button>
-          </div>
-        </td>
-      </tr>
-    `;
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty-state-cell error-state">
+            <div class="empty-state-content">
+              <span>⚠️</span>
+              <h3>We couldn't load the results</h3>
+              <p>The database request encountered an issue. Please try again.</p>
+              <button type="button" class="btn btn-sm btn-primary" onclick="loadBillionaires()">Retry</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
   }
 }
 
 export function renderBillionairesTable(people) {
   const tbody = document.getElementById('billionaireExplorerTableBody');
+  if (!tbody) return;
+
+  const showOrg = Boolean(state.showBillionaireOrgGiving);
+
+  // Sync table header column
+  document.querySelectorAll('.col-org-giving').forEach(el => {
+    el.style.display = showOrg ? 'table-cell' : 'none';
+  });
+
   if (!people || people.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="empty-state-cell">
+        <td colspan="9" class="empty-state-cell">
           <div class="empty-state-content">
             <span>🔍</span>
             <h3>No matching billionaires found</h3>
             <p>No records match your active search or filter criteria.</p>
-            <button type="button" class="btn btn-sm btn-outline" onclick="clearBillionaireFilters()">Clear filters</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="clearAllBillionaireFilterChips()">Clear filters</button>
           </div>
         </td>
       </tr>
@@ -168,16 +276,23 @@ export function renderBillionairesTable(people) {
       : '<span class="badge badge-unverified">Non-Signatory</span>';
 
     const personId = p.person_id || p.id;
+    const orgGiving = Number(p.total_foundation_giving || 0) + Number(p.total_corporate_giving || 0) + Number(p.total_daf_transfers || 0);
+    const peakPct = p.peak_historical_percentage !== null && p.peak_historical_percentage !== undefined && !isNaN(p.peak_historical_percentage)
+      ? `${Number(p.peak_historical_percentage).toFixed(2)}%`
+      : 'N/A';
+
     return `
       <tr>
         <td>
-          <strong style="color: var(--text-main);">${p.canonical_name}</strong>
-          <div style="font-size: 0.74rem; color: var(--text-muted);">${p.occupation || ''}</div>
+          <strong style="color: var(--text-main);">${escapeHtml(p.canonical_name)}</strong>
+          <div style="font-size: 0.74rem; color: var(--text-muted);">${escapeHtml(p.occupation || '')}</div>
         </td>
-        <td>${p.country || 'Global'}</td>
-        <td>${p.industry || 'Diversified'}</td>
+        <td>${escapeHtml(p.country || 'Global')}</td>
+        <td>${escapeHtml(p.industry || 'Diversified')}</td>
         <td class="cell-numeric" style="color: var(--accent-gold); font-weight: 700;">${formatCurrency(p.latest_net_worth)}</td>
         <td class="cell-numeric" style="color: #34d399; font-weight: 700;">${formatCurrency(p.total_personal_giving)}</td>
+        <td class="cell-numeric" style="color: #38bdf8; font-weight: 600;">${peakPct}</td>
+        <td class="cell-numeric col-org-giving" style="color: #c084fc; font-weight: 700; display: ${showOrg ? 'table-cell' : 'none'};">${formatCurrency(orgGiving)}</td>
         <td>${pledgeBadge}</td>
         <td>
           <button type="button" class="btn-table-action" onclick="viewBillionaireProfile('${personId}')">
@@ -190,51 +305,17 @@ export function renderBillionairesTable(people) {
 }
 
 export function openBillionaireFilterPopover(filterType) {
-  const popover = document.getElementById('popoverBillionaireFilter');
-  const title = document.getElementById('popoverBFilterTitle');
-  const options = document.getElementById('popoverBFilterOptions');
-  if (!popover || !title || !options) return;
-
-  popover.style.display = 'block';
-
-  if (filterType === 'country') {
-    title.textContent = 'Filter by Country';
-    options.innerHTML = BF_OPTIONS.country.map(c => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('country', '${c === 'All Countries' ? 'all' : c}')">${c}</button>
-    `).join('');
-  } else if (filterType === 'industry') {
-    title.textContent = 'Filter by Industry';
-    options.innerHTML = BF_OPTIONS.industry.map(ind => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('industry', '${ind === 'All Industries' ? 'all' : ind}')">${ind}</button>
-    `).join('');
-  } else if (filterType === 'wealth') {
-    title.textContent = 'Filter by Net Worth';
-    options.innerHTML = BF_OPTIONS.wealth.map(w => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('wealth', '${w.val}')">${w.label}</button>
-    `).join('');
-  } else if (filterType === 'giving') {
-    title.textContent = 'Filter by Documented Personal Giving';
-    options.innerHTML = BF_OPTIONS.giving.map(g => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('giving', '${g.val}')">${g.label}</button>
-    `).join('');
-  } else if (filterType === 'pledge') {
-    title.textContent = 'Filter by Giving Pledge';
-    options.innerHTML = BF_OPTIONS.pledge.map(pl => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('pledge', '${pl.val}')">${pl.label}</button>
-    `).join('');
-  } else if (filterType === 'sortBy') {
-    title.textContent = 'Sort Billionaires';
-    options.innerHTML = BF_OPTIONS.sortBy.map(s => `
-      <button type="button" class="pf-option-btn" onclick="applyBillionaireFilter('sortBy', '${s.val}')">${s.label}</button>
-    `).join('');
-  }
+  // Legacy popover compatibility stub
 }
 
 export function applyBillionaireFilter(filterType, val) {
   state.billionaireFilters[filterType] = val;
   state.billionaireFilters.offset = 0;
-  const popover = document.getElementById('popoverBillionaireFilter');
-  if (popover) popover.style.display = 'none';
-  renderBillionaireActiveChips();
   loadBillionaires();
 }
+
+// Global attachments for inline handlers
+window.goToBillionairePage = goToBillionairePage;
+window.removeBillionaireFilterChip = removeBillionaireFilterChip;
+window.clearAllBillionaireFilterChips = clearAllBillionaireFilterChips;
+window.addBillionaireFilterFromInput = addBillionaireFilterFromInput;

@@ -168,40 +168,56 @@ export async function calculateAndRenderParity() {
     if (numericMonthlyIncome !== null) url += `&monthlyIncome=${numericMonthlyIncome}&userIncome=${numericMonthlyIncome}`;
 
     const data = await fetchParity(url);
-    const p = data.parityResult || {};
-    const d = data.donation || {};
+    const p = data.parityResult || data;
+    const d = data.donation || data;
 
-    const donAmt = d.amount || 0;
-    const donorName = d.donor_person_name || 'The Billionaire';
-    const wealth = p.historicalNetWorth;
-    const ratio = p.historicalGenerosityRatio;
+    const curDonation = (state.calculator.currentDonationsList || []).find(x => x.id === c.selectedDonationId);
+    const donAmt = p.donationAmount || d.amount || (curDonation ? curDonation.amount : 0) || data.donationAmount || 0;
+    const donorName = p.donorName || d.donor_person_name || (curDonation ? curDonation.donor_person_name : '') || data.donorName || 'The Billionaire';
+    let wealth = (p.historicalNetWorth !== undefined && p.historicalNetWorth !== null)
+      ? p.historicalNetWorth 
+      : (d.historical_net_worth || (curDonation ? curDonation.historical_net_worth : null) || data.historicalNetWorth);
+    let ratio = (p.historicalGenerosityRatio !== undefined && p.historicalGenerosityRatio !== null)
+      ? p.historicalGenerosityRatio
+      : (d.historical_percentage || (curDonation ? curDonation.historical_percentage : null) || data.historicalGenerosityRatio);
+
+    if ((ratio === null || ratio === undefined || isNaN(ratio)) && wealth && donAmt) {
+      ratio = (donAmt / wealth) * 100;
+    }
 
     document.getElementById('calcHeroHeadlineAmount').textContent = formatHeadlineAmount(donAmt, '$');
     document.getElementById('displayBillionaireHero').textContent = donorName;
     document.getElementById('calcHeroWealth').textContent = wealth ? formatCurrency(wealth, '$') : 'Valuation Unavailable';
-    document.getElementById('calcHeroRatio').textContent = (ratio !== null && !isNaN(ratio)) ? `${Number(ratio).toFixed(2)}%` : 'N/A';
+    document.getElementById('calcHeroRatio').textContent = (ratio !== null && ratio !== undefined && !isNaN(ratio)) ? `${Number(ratio).toFixed(2)}%` : 'N/A';
 
     let reaction = 'That sounds like a substantial gift.';
     if (donAmt >= 1e9) reaction = 'A multi-billion dollar headline that dominates news cycles.';
     else if (donAmt >= 100e6) reaction = 'An enormous headline figure lauded across media.';
     document.getElementById('calcHeroReaction').textContent = reaction;
 
-    const equiv = p.userEquivalent;
-    const userEquivStr = (equiv !== null && !isNaN(equiv)) ? `${curr}${Math.round(equiv).toLocaleString()}` : (numericNetWorth ? 'Unavailable' : 'Enter Net Worth');
+    let equiv = p.userEquivalent !== undefined ? p.userEquivalent : data.userEquivalent;
+    if ((equiv === null || equiv === undefined || isNaN(equiv)) && numericNetWorth !== null && ratio) {
+      equiv = (numericNetWorth * ratio) / 100;
+    }
+
+    const userEquivStr = (equiv !== null && equiv !== undefined && !isNaN(equiv)) 
+      ? `${curr}${Math.round(equiv).toLocaleString()}` 
+      : (numericNetWorth ? 'Unavailable' : 'Enter Net Worth');
     document.getElementById('calcHeroEquivalent').textContent = userEquivStr;
 
-    let paycheckInterp = p.incomeInterpretation || '';
-    if (!paycheckInterp && numericNetWorth && ratio) {
+    let paycheckInterp = p.incomeInterpretation || data.incomeInterpretation || '';
+    if (!paycheckInterp && equiv !== null && !isNaN(equiv) && numericMonthlyIncome && numericMonthlyIncome > 0) {
+      const share = Math.round((equiv / numericMonthlyIncome) * 100);
+      const days = Math.round(equiv / (numericMonthlyIncome / 30));
+      paycheckInterp = `That's about ${share}% of your monthly take-home pay (${days >= 1 ? `roughly ${days} days of earnings` : 'less than one workday'}).`;
+    } else if (!paycheckInterp && numericNetWorth && ratio) {
       paycheckInterp = `Scaled to ${Number(ratio).toFixed(2)}% of your financial foundation.`;
     }
     document.getElementById('calcIncomeInterpretationText').textContent = paycheckInterp || 'Enter your financial context above for paycheck translation.';
 
-    let kicker = p.explanation || '';
-    if (!kicker) {
-      kicker = (ratio && wealth) 
-        ? `Relinquishing ${Number(ratio).toFixed(2)}% of a ${formatCurrency(wealth, '$')} fortune leaves billions in surplus capital with zero material impact on lifestyle. Relinquishing ${userEquivStr} from your own resources requires conscious budgetary sacrifice.`
-        : 'Point-in-time net worth for this gift was not reliably documented within regulatory filing windows.';
-    }
+    let kicker = (ratio && wealth) 
+      ? `Relinquishing ${Number(ratio).toFixed(2)}% of a ${formatCurrency(wealth, '$')} fortune leaves billions in surplus capital with zero material impact on living standards. Relinquishing ${userEquivStr} from your own resources requires conscious budgetary sacrifice.`
+      : 'Point-in-time net worth for this gift was not reliably documented within regulatory filing windows.';
     document.getElementById('calcHumorKickerText').textContent = kicker;
 
     // Receipts

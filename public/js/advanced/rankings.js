@@ -4,8 +4,14 @@
  */
 
 import { state } from './state.js';
-import { formatCurrency } from './utils.js';
+import { formatCurrency, renderPaginationButtons } from './utils.js';
 import { fetchRankings } from './api.js';
+
+export function goToRankingsPage(pageNum) {
+  const limit = state.rankingsLimit || 20;
+  state.rankingsOffset = Math.max(0, (pageNum - 1) * limit);
+  loadRankings();
+}
 
 export async function loadRankings() {
   const metric = state.rankingsMetric;
@@ -53,12 +59,19 @@ export async function loadRankings() {
       `Showing ${state.rankings.length > 0 ? offset + 1 : 0}-${offset + state.rankings.length} of ${Number(total).toLocaleString()} rankings`;
     document.getElementById('btnRankingsPrev').disabled = offset <= 0;
     document.getElementById('btnRankingsNext').disabled = offset + state.rankings.length >= total;
+
+    // Render clickable page numbers
+    const totalPages = Math.ceil(total / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+    renderPaginationButtons('rankingsPaginationPages', currentPage, totalPages, 'goToRankingsPage');
   } catch (err) {
     console.error('Error loading rankings:', err);
     const tbody = document.getElementById('rankingsTableBody');
     tbody.innerHTML = '<tr><td colspan="8" class="empty-state-cell"><div class="empty-state-content"><span>⚠️</span><h3>No rankings available for this metric</h3><p>Unable to retrieve leaderboard data.</p></div></td></tr>';
   }
 }
+
+window.goToRankingsPage = goToRankingsPage;
 
 export function renderRankingsTable(rankings, metric) {
   const tbody = document.getElementById('rankingsTableBody');

@@ -81,3 +81,41 @@ export function getDonationBadgeHtml(d) {
 
   return `<span class="badge ${badgeClass}">${badgeLabel}</span>`;
 }
+
+export function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function renderPaginationButtons(containerId, currentPage, totalPages, onPageClickFnName) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!totalPages || totalPages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const pages = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (currentPage > 3) pages.push('...');
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (currentPage < totalPages - 2) pages.push('...');
+    pages.push(totalPages);
+  }
+
+  container.innerHTML = pages.map(p => {
+    if (p === '...') return `<span class="btn-page-ellipsis">…</span>`;
+    const isActive = p === currentPage;
+    return `<button type="button" class="btn-page-num ${isActive ? 'active' : ''}" onclick="${onPageClickFnName}(${p})" title="Page ${p}" aria-label="Page ${p}" ${isActive ? 'aria-current="page"' : ''}>${p}</button>`;
+  }).join('');
+}

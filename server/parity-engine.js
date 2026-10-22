@@ -689,14 +689,32 @@ export function calculateHistoricalDonationParity({
 
   if (Array.isArray(snapshots) && snapshots.length > 0) {
     const lookup = findClosestHistoricalWealthSnapshot(snapshots, donationDate);
-    resolvedSnapshot = lookup.snapshot;
-    resolvedNetWorth = lookup.netWorth;
-    resolvedSnapshotDate = lookup.snapshotDate;
-    quality = lookup.quality;
-    daysDiff = lookup.daysDiff;
-    reason = lookup.reason;
-    if (lookup.sourceName) sourceName = lookup.sourceName;
-    if (lookup.currency) sourceCurrency = lookup.currency;
+    if (lookup.quality !== QUALITY_TIERS.UNAVAILABLE) {
+      resolvedSnapshot = lookup.snapshot;
+      resolvedNetWorth = lookup.netWorth;
+      resolvedSnapshotDate = lookup.snapshotDate;
+      quality = lookup.quality;
+      daysDiff = lookup.daysDiff;
+      reason = lookup.reason;
+      if (lookup.sourceName) sourceName = lookup.sourceName;
+      if (lookup.currency) sourceCurrency = lookup.currency;
+    } else if (historicalNetWorth !== null && historicalNetWorth !== undefined && Number(historicalNetWorth) > 0) {
+      resolvedNetWorth = Number(historicalNetWorth);
+      resolvedSnapshotDate = snapshotDate || donationDate;
+      const classification = classifySnapshotQuality(resolvedSnapshotDate, donationDate, resolvedNetWorth);
+      quality = classification.quality;
+      daysDiff = classification.daysDiff;
+      reason = classification.reason;
+    } else {
+      resolvedSnapshot = lookup.snapshot;
+      resolvedNetWorth = lookup.netWorth;
+      resolvedSnapshotDate = lookup.snapshotDate;
+      quality = lookup.quality;
+      daysDiff = lookup.daysDiff;
+      reason = lookup.reason;
+      if (lookup.sourceName) sourceName = lookup.sourceName;
+      if (lookup.currency) sourceCurrency = lookup.currency;
+    }
   } else if (historicalNetWorth !== null && historicalNetWorth !== undefined) {
     resolvedNetWorth = Number(historicalNetWorth);
     resolvedSnapshotDate = snapshotDate || donationDate;

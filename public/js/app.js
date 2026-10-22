@@ -238,8 +238,13 @@ function renderActiveBillionaire() {
   const b = state.billionaires[state.currentIndex];
   if (!b) return;
 
-  // Filter donations for active timeframe
-  const activeDonations = filterDonations(b.historicalDonations, state.activeTimeframe, state.customStartDate, state.customEndDate);
+  // Filter donations for active timeframe and sort newest to oldest
+  const rawDonations = filterDonations(b.historicalDonations, state.activeTimeframe, state.customStartDate, state.customEndDate);
+  const activeDonations = [...rawDonations].sort((x, y) => {
+    const dx = x.date ? new Date(x.date).getTime() : 0;
+    const dy = y.date ? new Date(y.date).getTime() : 0;
+    return dy - dx;
+  });
   const totalDonatedInPeriod = activeDonations.reduce((sum, d) => sum + d.amount, 0);
 
   // Parity percentage calculation is strictly donation percentage of wealth:
@@ -432,14 +437,21 @@ async function runLiveMcpNewsScan(billionaireName) {
       return;
     }
 
+    const stripHtml = (html) => {
+      if (!html) return '';
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || '').trim();
+    };
+
     modalArticlesContainer.innerHTML = data.articles.map(a => `
       <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px;">
         <a href="${a.link}" target="_blank" rel="noopener noreferrer" style="font-size: 0.92rem; font-weight: 700; color: #0284c7; text-decoration: none; display: block; margin-bottom: 4px;">
-          ${a.title} ↗
+          ${stripHtml(a.title)} ↗
         </a>
-        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 6px;">${a.snippet || ''}</p>
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 6px;">${stripHtml(a.snippet)}</p>
         <div style="font-size: 0.74rem; color: #94a3b8; display: flex; gap: 8px; align-items: center;">
-          <span>🏛️ ${a.source}</span>
+          <span>🏛️ ${stripHtml(a.source)}</span>
           <span>•</span>
           <span>📅 ${a.pubDate}</span>
           ${a.detectedAmountStr ? `<span style="background: #d1fae5; color: #065f46; font-weight: 800; padding: 1px 8px; border-radius: 9999px;">Amount: ${a.detectedAmountStr}</span>` : ''}

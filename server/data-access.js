@@ -1224,6 +1224,12 @@ export async function calculateHistoricalParity({
     targetDate = donation.donation_date;
     targetPersonId = donation.donor_person_id;
     donorName = donation.donor_person_name;
+    if (historicalNetWorth === null || historicalNetWorth === undefined) {
+      historicalNetWorth = donation.historical_net_worth || null;
+    }
+    if (!snapshotDate) {
+      snapshotDate = donation.historical_snapshot_date || donation.historical_wealth_snapshot_date || donation.donation_date || null;
+    }
     if (!targetFundingSourceType) {
       targetFundingSourceType = donation.funding_source_type;
     }
@@ -1263,6 +1269,17 @@ export async function calculateHistoricalParity({
   }
   if (donationId && !result.donationId) {
     result.donationId = donationId;
+  }
+
+  result.parityResult = { ...result };
+  if (donationId) {
+    result.donation = {
+      amount: targetAmount,
+      donor_person_name: donorName,
+      donation_date: targetDate,
+      funding_source_type: targetFundingSourceType,
+      status: targetStatus
+    };
   }
 
   return result;
