@@ -17,7 +17,7 @@ import {
   canOverwriteField
 } from '../normalize/deduplicate.js';
 import { validateRecord } from '../validate/index.js';
-import { cleanUrl } from '../normalize/schemas.js';
+import { cleanUrl, ENTITY_TYPES } from '../normalize/schemas.js';
 
 /**
  * Loads baseline dataset from Supabase if connected
@@ -29,17 +29,21 @@ export async function fetchExistingDataset(supabase) {
       organizations: [],
       sources: [],
       wealthSnapshots: [],
-      donations: []
+      donations: [],
+      donationSources: [],
+      personOrganizations: []
     };
   }
 
   try {
-    const [peopleRes, orgsRes, sourcesRes, snapshotsRes, donationsRes] = await Promise.all([
+    const [peopleRes, orgsRes, sourcesRes, snapshotsRes, donationsRes, donationSourcesRes, personOrgsRes] = await Promise.all([
       supabase.from('people').select('*'),
       supabase.from('organizations').select('*'),
       supabase.from('sources').select('*'),
       supabase.from('wealth_snapshots').select('*'),
-      supabase.from('donations').select('*')
+      supabase.from('donations').select('*'),
+      supabase.from('donation_sources').select('*'),
+      supabase.from('person_organizations').select('*')
     ]);
 
     return {
@@ -47,7 +51,9 @@ export async function fetchExistingDataset(supabase) {
       organizations: orgsRes.data || [],
       sources: sourcesRes.data || [],
       wealthSnapshots: snapshotsRes.data || [],
-      donations: donationsRes.data || []
+      donations: donationsRes.data || [],
+      donationSources: donationSourcesRes?.data || [],
+      personOrganizations: personOrgsRes?.data || []
     };
   } catch (err) {
     console.warn(`[Ingest] Could not fetch remote dataset: ${err.message}. Operating with local tracking.`);
@@ -56,7 +62,9 @@ export async function fetchExistingDataset(supabase) {
       organizations: [],
       sources: [],
       wealthSnapshots: [],
-      donations: []
+      donations: [],
+      donationSources: [],
+      personOrganizations: []
     };
   }
 }
@@ -81,6 +89,8 @@ export function planIngestion({ incomingData, existingDataset, options = {} }) {
       updatedWealthSnapshots: 0,
       newDonations: 0,
       updatedDonations: 0,
+      newDonationSources: 0,
+      newPersonOrgs: 0,
       potentialDuplicates: 0,
       invalidRecords: 0
     },
@@ -94,7 +104,9 @@ export function planIngestion({ incomingData, existingDataset, options = {} }) {
       snapshotsToInsert: [],
       snapshotsToUpdate: [],
       donationsToInsert: [],
-      donationsToUpdate: []
+      donationsToUpdate: [],
+      donationSourcesToInsert: [],
+      personOrgsToInsert: []
     },
     potentialDuplicatesList: [],
     invalidRecordsList: [],
@@ -103,6 +115,13 @@ export function planIngestion({ incomingData, existingDataset, options = {} }) {
     orgIdByName: new Map(),
     sourceIdByUrl: new Map()
   };
+
+  const existingDonationSources = new Set(
+    (existingDataset.donationSources || []).map(ds => `${ds.donation_id}:${ds.source_id}`)
+  );
+  const existingPersonOrgs = new Set(
+    (existingDataset.personOrganizations || []).map(po => `${po.person_id}:${po.organization_id}:${po.relationship_type}`)
+  );
 
   // Seed existing lookup maps
   (existingDataset.people || []).forEach(p => {
@@ -151,6 +170,7 @@ function lookupSourceId(plan, rawUrl) {
 
   // 1. PROCESS PEOPLE
   for (const person of incomingData.people || []) {
+    if (!person.entity_type) person.entity_type = ENTITY_TYPES.PERSON;
     const val = validateRecord(person);
     if (!val.isValid) {
       plan.stats.invalidRecords++;
@@ -208,6 +228,7 @@ function lookupSourceId(plan, rawUrl) {
 
   // 2. PROCESS ORGANIZATIONS
   for (const org of incomingData.organizations || []) {
+    if (!org.entity_type) org.entity_type = ENTITY_TYPES.ORGANIZATION;
     const val = validateRecord(org);
     if (!val.isValid) {
       plan.stats.invalidRecords++;
@@ -255,6 +276,7 @@ function lookupSourceId(plan, rawUrl) {
 
   // 3. PROCESS SOURCES
   for (const source of incomingData.sources || []) {
+    if (!source.entity_type) source.entity_type = ENTITY_TYPES.SOURCE;
     const val = validateRecord(source);
     if (!val.isValid) {
       plan.stats.invalidRecords++;
@@ -308,6 +330,7 @@ function lookupSourceId(plan, rawUrl) {
 
   // 4. PROCESS WEALTH SNAPSHOTS
   for (const snapshot of incomingData.wealthSnapshots || []) {
+    if (!snapshot.entity_type) snapshot.entity_type = ENTITY_TYPES.WEALTH_SNAPSHOT;
     const val = validateRecord(snapshot);
     if (!val.isValid) {
       plan.stats.invalidRecords++;
@@ -372,6 +395,7 @@ function lookupSourceId(plan, rawUrl) {
 
   // 5. PROCESS DONATIONS
   for (const donation of incomingData.donations || []) {
+    if (!donation.entity_type) donation.entity_type = ENTITY_TYPES.DONATION;
     const val = validateRecord(donation);
     if (!val.isValid) {
       plan.stats.invalidRecords++;
@@ -419,6 +443,16 @@ function lookupSourceId(plan, rawUrl) {
         plan.stats.updatedDonations++;
         plan.operations.donationsToUpdate.push({ id: existing.id, updates });
       }
+
+      // Attach additional/better source to existing donation if provided
+      if (sourceId) {
+        const key = `${existing.id}:${sourceId}`;
+        if (!existingDonationSources.has(key)) {
+          plan.stats.newDonationSources++;
+          plan.operations.donationSourcesToInsert.push({ donation_id: existing.id, source_id: sourceId });
+          existingDonationSources.add(key);
+        }
+      }
     } else if (match.matchType === 'POTENTIAL_DUPLICATE') {
       plan.stats.potentialDuplicates++;
       plan.potentialDuplicatesList.push({
@@ -440,10 +474,206 @@ function lookupSourceId(plan, rawUrl) {
       plan.stats.newDonations++;
       plan.operations.donationsToInsert.push(newDonationRecord);
       workingDonations.push(newDonationRecord);
+
+      if (sourceId) {
+        const key = `${generatedId}:${sourceId}`;
+        if (!existingDonationSources.has(key)) {
+          plan.stats.newDonationSources++;
+          plan.operations.donationSourcesToInsert.push({ donation_id: generatedId, source_id: sourceId });
+          existingDonationSources.add(key);
+        }
+      }
+    }
+  }
+
+  // 6. PROCESS EXPLICIT DONATION SOURCES
+  for (const ds of incomingData.donationSources || []) {
+    const key = `${ds.donation_id}:${ds.source_id}`;
+    if (!existingDonationSources.has(key)) {
+      plan.stats.newDonationSources++;
+      plan.operations.donationSourcesToInsert.push(ds);
+      existingDonationSources.add(key);
+    }
+  }
+
+  // 7. PROCESS PERSON ORGANIZATIONS
+  for (const po of incomingData.personOrganizations || []) {
+    let personId = po.person_id || plan.personIdByName.get((po.person_name || '').toLowerCase());
+    let orgId = po.organization_id || plan.orgIdByName.get((po.organization_name || '').toLowerCase());
+    const rel = po.relationship_type || 'AFFILIATE';
+
+    if (personId && orgId) {
+      const key = `${personId}:${orgId}:${rel}`;
+      if (!existingPersonOrgs.has(key)) {
+        plan.stats.newPersonOrgs++;
+        plan.operations.personOrgsToInsert.push({
+          id: po.id || crypto.randomUUID(),
+          person_id: personId,
+          organization_id: orgId,
+          relationship_type: rel
+        });
+        existingPersonOrgs.add(key);
+      }
     }
   }
 
   return plan;
+}
+
+/**
+ * Escapes values for safe, clean SQL generation
+ */
+function escapeSql(val) {
+  if (val === null || val === undefined) return 'NULL';
+  if (typeof val === 'number') return isFinite(val) ? String(val) : 'NULL';
+  if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE';
+  if (Array.isArray(val)) {
+    const escaped = val.map(v => `"${String(v).replace(/"/g, '\\"')}"`).join(',');
+    return `'${escaped.replace(/'/g, "''")}'::text[]`;
+  }
+  return `'${String(val).replace(/'/g, "''")}'`;
+}
+
+/**
+ * Generates idempotent SQL statements from an Ingestion Plan.
+ * Uses ON CONFLICT clauses for tables with primary/unique constraints.
+ */
+export function generateSqlFromPlan(plan) {
+  const { operations } = plan;
+  const statements = [];
+
+  // 1. People
+  if (operations.peopleToInsert && operations.peopleToInsert.length > 0) {
+    const rows = operations.peopleToInsert.map(p =>
+      `(${escapeSql(p.id)}, ${escapeSql(p.canonical_name)}, ${escapeSql(p.first_name)}, ${escapeSql(p.last_name)}, ${escapeSql(p.country)}, ${escapeSql(p.occupation)}, ${escapeSql(p.industry)}, ${escapeSql(p.description)}, ${escapeSql(p.is_billionaire)}, ${escapeSql(p.giving_pledge || false)})`
+    );
+    statements.push(`
+INSERT INTO people (id, canonical_name, first_name, last_name, country, occupation, industry, description, is_billionaire, giving_pledge) VALUES
+${rows.join(',\n')}
+ON CONFLICT (id) DO UPDATE SET
+  canonical_name = EXCLUDED.canonical_name,
+  first_name = EXCLUDED.first_name,
+  last_name = EXCLUDED.last_name,
+  country = EXCLUDED.country,
+  occupation = EXCLUDED.occupation,
+  industry = EXCLUDED.industry,
+  description = EXCLUDED.description,
+  is_billionaire = EXCLUDED.is_billionaire,
+  giving_pledge = EXCLUDED.giving_pledge,
+  updated_at = NOW();`);
+  }
+
+  // 2. Organizations
+  if (operations.orgsToInsert && operations.orgsToInsert.length > 0) {
+    const rows = operations.orgsToInsert.map(o =>
+      `(${escapeSql(o.id)}, ${escapeSql(o.legal_name)}, ${escapeSql(o.display_name)}, ${escapeSql(o.organization_type)}, ${escapeSql(o.ein)}, ${escapeSql(o.cik)}, ${escapeSql(o.website)}, ${escapeSql(o.country)})`
+    );
+    statements.push(`
+INSERT INTO organizations (id, legal_name, display_name, organization_type, ein, cik, website, country) VALUES
+${rows.join(',\n')}
+ON CONFLICT (id) DO UPDATE SET
+  legal_name = EXCLUDED.legal_name,
+  display_name = EXCLUDED.display_name,
+  organization_type = EXCLUDED.organization_type,
+  ein = EXCLUDED.ein,
+  cik = EXCLUDED.cik,
+  website = EXCLUDED.website,
+  country = EXCLUDED.country;`);
+  }
+
+  // 3. Person Organizations
+  if (operations.personOrgsToInsert && operations.personOrgsToInsert.length > 0) {
+    const rows = operations.personOrgsToInsert.map(po =>
+      `(${escapeSql(po.id || crypto.randomUUID())}, ${escapeSql(po.person_id)}, ${escapeSql(po.organization_id)}, ${escapeSql(po.relationship_type)})`
+    );
+    statements.push(`
+INSERT INTO person_organizations (id, person_id, organization_id, relationship_type) VALUES
+${rows.join(',\n')}
+ON CONFLICT (person_id, organization_id, relationship_type) DO NOTHING;`);
+  }
+
+  // 4. Sources
+  if (operations.sourcesToInsert && operations.sourcesToInsert.length > 0) {
+    const rows = operations.sourcesToInsert.map(s =>
+      `(${escapeSql(s.id)}, ${escapeSql(s.url)}, ${escapeSql(s.publisher)}, ${escapeSql(s.title)}, ${escapeSql(s.source_type)}, ${escapeSql(s.published_at)})`
+    );
+    statements.push(`
+INSERT INTO sources (id, url, publisher, title, source_type, published_at) VALUES
+${rows.join(',\n')}
+ON CONFLICT (id) DO UPDATE SET
+  url = EXCLUDED.url,
+  publisher = EXCLUDED.publisher,
+  title = EXCLUDED.title,
+  source_type = EXCLUDED.source_type,
+  published_at = EXCLUDED.published_at;`);
+  }
+
+  // 5. Wealth Snapshots
+  if (operations.snapshotsToInsert && operations.snapshotsToInsert.length > 0) {
+    const rows = operations.snapshotsToInsert.map(ws =>
+      `(${escapeSql(ws.id || crypto.randomUUID())}, ${escapeSql(ws.person_id)}, ${escapeSql(ws.snapshot_date)}, ${escapeSql(ws.net_worth)}, ${escapeSql(ws.currency || 'USD')}, ${escapeSql(ws.source_name)}, ${escapeSql(ws.source_id)}, ${escapeSql(ws.confidence || 'HIGH')})`
+    );
+    statements.push(`
+INSERT INTO wealth_snapshots (id, person_id, snapshot_date, net_worth, currency, source_name, source_id, confidence) VALUES
+${rows.join(',\n')}
+ON CONFLICT (person_id, snapshot_date) DO UPDATE SET
+  net_worth = EXCLUDED.net_worth,
+  currency = EXCLUDED.currency,
+  source_name = EXCLUDED.source_name,
+  source_id = COALESCE(EXCLUDED.source_id, wealth_snapshots.source_id),
+  confidence = EXCLUDED.confidence;`);
+  }
+
+  // 6. Donations (Insert)
+  if (operations.donationsToInsert && operations.donationsToInsert.length > 0) {
+    const rows = operations.donationsToInsert.map(d =>
+      `(${escapeSql(d.id)}, ${escapeSql(d.donor_person_id)}, ${escapeSql(d.donor_organization_id)}, ${escapeSql(d.recipient_organization_id)}, ${escapeSql(d.amount)}, ${escapeSql(d.currency || 'USD')}, ${escapeSql(d.donation_date)}, ${escapeSql(d.donation_type || 'GIFT')}, ${escapeSql(d.funding_source_type)}, ${escapeSql(d.status || 'VERIFIED')}, ${escapeSql(d.description)}, ${escapeSql(d.cause_category)}, ${escapeSql(d.source_id)})`
+    );
+    statements.push(`
+INSERT INTO donations (id, donor_person_id, donor_organization_id, recipient_organization_id, amount, currency, donation_date, donation_type, funding_source_type, status, description, cause_category, source_id) VALUES
+${rows.join(',\n')}
+ON CONFLICT (id) DO UPDATE SET
+  donor_person_id = EXCLUDED.donor_person_id,
+  donor_organization_id = EXCLUDED.donor_organization_id,
+  recipient_organization_id = EXCLUDED.recipient_organization_id,
+  amount = EXCLUDED.amount,
+  currency = EXCLUDED.currency,
+  donation_date = EXCLUDED.donation_date,
+  donation_type = EXCLUDED.donation_type,
+  funding_source_type = EXCLUDED.funding_source_type,
+  status = EXCLUDED.status,
+  description = EXCLUDED.description,
+  cause_category = EXCLUDED.cause_category,
+  source_id = EXCLUDED.source_id,
+  updated_at = NOW();`);
+  }
+
+  // 7. Donation Updates (Enrichments)
+  if (operations.donationsToUpdate && operations.donationsToUpdate.length > 0) {
+    for (const du of operations.donationsToUpdate) {
+      const setClauses = [];
+      if (du.updates.status) setClauses.push(`status = ${escapeSql(du.updates.status)}`);
+      if (du.updates.funding_source_type) setClauses.push(`funding_source_type = ${escapeSql(du.updates.funding_source_type)}`);
+      if (du.updates.description) setClauses.push(`description = ${escapeSql(du.updates.description)}`);
+      if (du.updates.cause_category) setClauses.push(`cause_category = ${escapeSql(du.updates.cause_category)}`);
+      if (du.updates.source_id) setClauses.push(`source_id = ${escapeSql(du.updates.source_id)}`);
+      setClauses.push('updated_at = NOW()');
+      statements.push(`UPDATE donations SET ${setClauses.join(', ')} WHERE id = ${escapeSql(du.id)};`);
+    }
+  }
+
+  // 8. Donation Sources (junction table)
+  if (operations.donationSourcesToInsert && operations.donationSourcesToInsert.length > 0) {
+    const rows = operations.donationSourcesToInsert.map(ds =>
+      `(${escapeSql(ds.donation_id)}, ${escapeSql(ds.source_id)})`
+    );
+    statements.push(`
+INSERT INTO donation_sources (donation_id, source_id) VALUES
+${rows.join(',\n')}
+ON CONFLICT (donation_id, source_id) DO NOTHING;`);
+  }
+
+  return statements.join('\n\n');
 }
 
 /**
@@ -595,6 +825,40 @@ export async function executeIngestion(plan, supabase) {
       }))
     );
     if (error) throw new Error(`Error inserting donations: ${error.message}`);
+  }
+
+  // 6. Update Donations (Enrichments)
+  if (operations.donationsToUpdate.length > 0) {
+    for (const du of operations.donationsToUpdate) {
+      const { error } = await supabase.from('donations').update(du.updates).eq('id', du.id);
+      if (error) throw new Error(`Error updating donation ${du.id}: ${error.message}`);
+    }
+  }
+
+  // 7. Insert Person Organizations
+  if (operations.personOrgsToInsert && operations.personOrgsToInsert.length > 0) {
+    const { error } = await supabase.from('person_organizations').upsert(
+      operations.personOrgsToInsert.map(po => ({
+        id: po.id,
+        person_id: po.person_id,
+        organization_id: po.organization_id,
+        relationship_type: po.relationship_type
+      })),
+      { onConflict: 'person_id,organization_id,relationship_type', ignoreDuplicates: true }
+    );
+    if (error) throw new Error(`Error inserting person organizations: ${error.message}`);
+  }
+
+  // 8. Insert Donation Sources
+  if (operations.donationSourcesToInsert && operations.donationSourcesToInsert.length > 0) {
+    const { error } = await supabase.from('donation_sources').upsert(
+      operations.donationSourcesToInsert.map(ds => ({
+        donation_id: ds.donation_id,
+        source_id: ds.source_id
+      })),
+      { onConflict: 'donation_id,source_id', ignoreDuplicates: true }
+    );
+    if (error) throw new Error(`Error inserting donation sources: ${error.message}`);
   }
 
   console.log('✅ Ingestion successfully committed to Supabase database!');

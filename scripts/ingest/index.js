@@ -5,11 +5,13 @@
 import * as secForm4 from './source-sec-form4.js';
 import * as givingPledge from './source-giving-pledge.js';
 import * as seedPhase13 from '../seed/seed-phase13.js';
+import * as expansionData from './expansion-data.js';
 
 export const REGISTERED_SOURCES = Object.freeze({
   'sec-form4': secForm4,
   'giving-pledge': givingPledge,
-  'seed-phase13': seedPhase13
+  'seed-phase13': seedPhase13,
+  'expansion-data': expansionData
 });
 
 /**
@@ -31,7 +33,9 @@ export async function loadSourceRecords(requestedSource = 'all') {
     organizations: [],
     sources: [],
     wealthSnapshots: [],
-    donations: []
+    donations: [],
+    donationSources: [],
+    personOrganizations: []
   };
 
   for (const src of sourcesToRun) {
@@ -41,6 +45,8 @@ export async function loadSourceRecords(requestedSource = 'all') {
     aggregated.sources.push(...(data.sources || []));
     aggregated.wealthSnapshots.push(...(data.wealthSnapshots || []));
     aggregated.donations.push(...(data.donations || []));
+    if (data.donationSources) aggregated.donationSources.push(...data.donationSources);
+    if (data.personOrganizations) aggregated.personOrganizations.push(...data.personOrganizations);
   }
 
   return aggregated;

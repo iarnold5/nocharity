@@ -30,17 +30,36 @@ export const ORGANIZATION_TYPES = Object.freeze([
 ]);
 
 export const SOURCE_TIERS = Object.freeze([
-  'PRIMARY_REGULATORY',      // Weight: 5 (SEC Form 4, IRS Form 990, etc.)
-  'OFFICIAL_PRESS_RELEASE', // Weight: 4 (Direct entity statements)
-  'INVESTIGATIVE_REPORT',   // Weight: 3 (Independent journalistic audits)
-  'SECONDARY_NEWS',         // Weight: 2 (Mainstream news coverage)
-  'DISPUTED'                // Weight: 1 (Unverified or contested claims)
+  'PRIMARY',
+  'GOVERNMENT',
+  'TAX_FILING',
+  'SEC_FILING',
+  'FEC',
+  'NEWS',
+  'COMPANY',
+  'FOUNDATION',
+  'DATABASE',
+  'SECONDARY',
+  'PRIMARY_REGULATORY',
+  'OFFICIAL_PRESS_RELEASE',
+  'INVESTIGATIVE_REPORT',
+  'SECONDARY_NEWS',
+  'DISPUTED'
 ]);
 
 export const SOURCE_TIER_WEIGHTS = Object.freeze({
+  SEC_FILING: 5,
+  TAX_FILING: 5,
+  GOVERNMENT: 5,
+  PRIMARY: 5,
   PRIMARY_REGULATORY: 5,
   OFFICIAL_PRESS_RELEASE: 4,
+  FOUNDATION: 4,
+  COMPANY: 4,
   INVESTIGATIVE_REPORT: 3,
+  NEWS: 3,
+  SECONDARY: 2,
+  DATABASE: 2,
   SECONDARY_NEWS: 2,
   DISPUTED: 1
 });

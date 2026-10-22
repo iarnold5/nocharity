@@ -312,6 +312,13 @@ export function matchWealthSnapshot(incomingSnapshot, existingSnapshots = [], pe
 
 /**
  * 5. Match Donation
+ * 
+ * Rules:
+ * - Do NOT deduplicate solely on donor + amount + date (different recipients can receive equal gifts on same date).
+ * - Match EXACT if donor, date, amount match AND recipient matches or source matches.
+ * - If donor, date, amount match but recipients differ, they are distinct donations (NONE).
+ * - If donor, date, amount match but recipient context is ambiguous, flag as POTENTIAL_DUPLICATE for review.
+ * - Flag potential duplicate if same donor + amount occurs within 14 days.
  */
 export function matchDonation(incomingDonation, existingDonations = [], resolvedDonorId, resolvedRecipientId) {
   if (!incomingDonation || !incomingDonation.donation_date || !incomingDonation.amount) {
@@ -320,34 +327,63 @@ export function matchDonation(incomingDonation, existingDonations = [], resolved
 
   const incomingAmount = Number(incomingDonation.amount);
   const incomingDate = incomingDonation.donation_date;
+  const donorId = resolvedDonorId || incomingDonation.donor_person_id || incomingDonation.donor_organization_id;
+  const inRecipient = resolvedRecipientId || incomingDonation.recipient_organization_id || incomingDonation.recipient_person_id;
+  const inSource = cleanUrl(incomingDonation.source_url);
 
   for (const existing of existingDonations) {
     const existingAmount = Number(existing.amount);
     const existingDate = existing.donation_date;
-    const sameDonor = resolvedDonorId && (existing.donor_person_id === resolvedDonorId || existing.donor_organization_id === resolvedDonorId);
+    const sameDonor = donorId && (existing.donor_person_id === donorId || existing.donor_organization_id === donorId);
+
+    if (!sameDonor) continue;
+
+    // Check amount match
+    const amountsMatch = Math.abs(incomingAmount - existingAmount) < 1.0;
+    if (!amountsMatch) continue;
+
+    const exRecipient = existing.recipient_organization_id || existing.recipient_person_id;
+    const exSource = cleanUrl(existing.source_url);
+
+    // If both have recipients identified and they are different, they are DISTINCT donations
+    if (inRecipient && exRecipient && inRecipient !== exRecipient) {
+      continue;
+    }
 
     // Exact match: Same donor + same date + same amount
-    if (sameDonor && existingDate === incomingDate && Math.abs(incomingAmount - existingAmount) < 1.0) {
+    if (existingDate === incomingDate) {
+      const sameRecipient = inRecipient && exRecipient && inRecipient === exRecipient;
+      const sameSource = inSource && exSource && inSource === exSource;
+
+      // If recipients match or sources match or neither specifies a different recipient
+      if (sameRecipient || sameSource || (!inRecipient && !exRecipient)) {
+        return {
+          matchType: 'EXACT',
+          matchedBy: sameRecipient ? 'DONOR_RECIPIENT_DATE_AMOUNT' : 'DONOR_DATE_AMOUNT',
+          existing
+        };
+      }
+
+      // If recipient context is ambiguous (one has recipient, other does not), flag for review rather than blindly merging
       return {
-        matchType: 'EXACT',
-        matchedBy: 'DONOR_DATE_AMOUNT',
+        matchType: 'POTENTIAL_DUPLICATE',
+        confidence: 0.85,
+        reason: `Same donor, date (${incomingDate}), and amount ($${incomingAmount}), but recipient context requires maintainer verification`,
         existing
       };
     }
 
     // Potential duplicate: Same donor + same amount within 14 days
-    if (sameDonor && Math.abs(incomingAmount - existingAmount) < 1.0) {
-      const inD = new Date(incomingDate);
-      const exD = new Date(existingDate);
-      const daysDiff = Math.abs((inD - exD) / 86400000);
-      if (daysDiff <= 14) {
-        return {
-          matchType: 'POTENTIAL_DUPLICATE',
-          confidence: 0.8,
-          reason: `Same donor and amount (${incomingAmount}) recorded within 14 days (${daysDiff} days apart: ${incomingDate} vs ${existingDate})`,
-          existing
-        };
-      }
+    const inD = new Date(incomingDate);
+    const exD = new Date(existingDate);
+    const daysDiff = Math.abs((inD - exD) / 86400000);
+    if (daysDiff <= 14) {
+      return {
+        matchType: 'POTENTIAL_DUPLICATE',
+        confidence: 0.8,
+        reason: `Same donor and amount (${incomingAmount}) recorded within 14 days (${daysDiff} days apart: ${incomingDate} vs ${existingDate})`,
+        existing
+      };
     }
   }
 

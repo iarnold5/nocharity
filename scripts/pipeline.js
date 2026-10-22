@@ -12,15 +12,16 @@
 import { loadSourceRecords, REGISTERED_SOURCES } from './ingest/index.js';
 import * as seedSource from './seed/seed-data.js';
 import { supabase } from './db/client.js';
-import { fetchExistingDataset, planIngestion, executeIngestion } from './db/upsert.js';
+import { fetchExistingDataset, planIngestion, executeIngestion, generateSqlFromPlan } from './db/upsert.js';
 
 async function main() {
   const args = process.argv.slice(2);
+  const wantsSql = args.some(a => a === '--sql' || a === '--emit-sql');
   // Match --dry-run, -n, dryrun, or default if missing commit flag
   const hasDryRunArg = args.some(a => a === '--dry-run' || a === '-n' || a.includes('dry-run'));
   const hasCommitArg = args.some(a => a === '--commit' || a === '-c');
   // If explicitly dry-run, or if committing without credentials
-  const dryRun = hasDryRunArg || (!hasCommitArg && !args.includes('--live'));
+  const dryRun = hasDryRunArg || (!hasCommitArg && !args.includes('--live') && !wantsSql);
   const verbose = args.includes('--verbose') || args.includes('-v');
 
   let sourceName = 'all';
@@ -31,7 +32,7 @@ async function main() {
 
   console.log('------------------------------------------------------------');
   console.log(`📦 NoCharity Ingestion Pipeline`);
-  console.log(`Mode:    ${dryRun ? 'DRY-RUN (No writes)' : 'LIVE COMMIT'}`);
+  console.log(`Mode:    ${wantsSql ? 'EMIT SQL' : dryRun ? 'DRY-RUN (No writes)' : 'LIVE COMMIT'}`);
   console.log(`Source:  ${sourceName}`);
   console.log('------------------------------------------------------------');
 
@@ -68,6 +69,15 @@ async function main() {
       existingDataset,
       options: { dryRun, verbose }
     });
+
+    if (wantsSql) {
+      const sql = generateSqlFromPlan(plan);
+      console.log('\n-- ============================================================');
+      console.log('-- GENERATED IDEMPOTENT INGESTION SQL');
+      console.log('-- ============================================================');
+      console.log(sql);
+      process.exit(0);
+    }
 
     // Execute or print dry run
     await executeIngestion(plan, supabase);
