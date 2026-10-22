@@ -383,6 +383,36 @@
       align-items: end;
     }
 
+    .filter-details {
+      margin-bottom: 18px;
+    }
+
+    .filter-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--bg-subcard);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      user-select: none;
+    }
+
+    .filter-summary:hover {
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .filter-summary-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
     .filter-group {
       display: flex;
       flex-direction: column;
@@ -1895,85 +1925,91 @@
           </div>
         </div>
 
-        <!-- Filter Controls -->
-        <div class="filter-bar">
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireSearch">Search Name / Company</label>
-            <input type="text" id="filterBillionaireSearch" class="filter-input" placeholder="e.g. Buffett, Gates, Scott...">
-          </div>
+        <!-- Filter Controls (Collapsible on mobile) -->
+        <details class="filter-details" open>
+          <summary class="filter-summary">
+            <span>🔍 Search & Filters</span>
+            <span class="filter-summary-hint">Tap to collapse / expand</span>
+          </summary>
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireSearch">Search Name / Company</label>
+              <input type="text" id="filterBillionaireSearch" class="filter-input" placeholder="e.g. Buffett, Gates, Scott...">
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireCountry">Country</label>
-            <select id="filterBillionaireCountry" class="filter-select">
-              <option value="all">All Countries</option>
-              <option value="United States">🇺🇸 United States</option>
-              <option value="India">🇮🇳 India</option>
-              <option value="France">🇫🇷 France</option>
-              <option value="Mexico">🇲🇽 Mexico</option>
-              <option value="China">🇨🇳 China</option>
-              <option value="Scotland">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland / UK</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireCountry">Country</label>
+              <select id="filterBillionaireCountry" class="filter-select">
+                <option value="all">All Countries</option>
+                <option value="United States">🇺🇸 United States</option>
+                <option value="India">🇮🇳 India</option>
+                <option value="France">🇫🇷 France</option>
+                <option value="Mexico">🇲🇽 Mexico</option>
+                <option value="China">🇨🇳 China</option>
+                <option value="Scotland">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland / UK</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireIndustry">Industry</label>
-            <select id="filterBillionaireIndustry" class="filter-select">
-              <option value="all">All Industries</option>
-              <option value="Technology">Technology</option>
-              <option value="Finance">Finance & Investing</option>
-              <option value="Philanthropy">Philanthropy</option>
-              <option value="Energy">Energy & Telecom</option>
-              <option value="Infrastructure">Infrastructure</option>
-              <option value="Luxury">Luxury Goods</option>
-              <option value="Media">Media & Finance</option>
-              <option value="Steel">Steel & Heavy Industry</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireIndustry">Industry</label>
+              <select id="filterBillionaireIndustry" class="filter-select">
+                <option value="all">All Industries</option>
+                <option value="Technology">Technology</option>
+                <option value="Finance">Finance & Investing</option>
+                <option value="Philanthropy">Philanthropy</option>
+                <option value="Energy">Energy & Telecom</option>
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Luxury">Luxury Goods</option>
+                <option value="Media">Media & Finance</option>
+                <option value="Steel">Steel & Heavy Industry</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireWealth">Wealth Range</label>
-            <select id="filterBillionaireWealth" class="filter-select">
-              <option value="all">All Net Worths</option>
-              <option value="200B+">&gt; $200 Billion</option>
-              <option value="100B-200B">$100B – $200B</option>
-              <option value="50B-100B">$50B – $100B</option>
-              <option value="under50B">&lt; $50 Billion</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireWealth">Wealth Range</label>
+              <select id="filterBillionaireWealth" class="filter-select">
+                <option value="all">All Net Worths</option>
+                <option value="200B+">&gt; $200 Billion</option>
+                <option value="100B-200B">$100B – $200B</option>
+                <option value="50B-100B">$50B – $100B</option>
+                <option value="under50B">&lt; $50 Billion</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireGiving">Giving Range</label>
-            <select id="filterBillionaireGiving" class="filter-select">
-              <option value="all">All Giving Amounts</option>
-              <option value="10B+">&gt; $10 Billion Personal</option>
-              <option value="1B-10B">$1B – $10B Personal</option>
-              <option value="100M-1B">$100M – $1B Personal</option>
-              <option value="under100M">&lt; $100M Personal</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireGiving">Giving Range</label>
+              <select id="filterBillionaireGiving" class="filter-select">
+                <option value="all">All Giving Amounts</option>
+                <option value="10B+">&gt; $10 Billion Personal</option>
+                <option value="1B-10B">$1B – $10B Personal</option>
+                <option value="100M-1B">$100M – $1B Personal</option>
+                <option value="under100M">&lt; $100M Personal</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionairePledge">Giving Pledge</label>
-            <select id="filterBillionairePledge" class="filter-select">
-              <option value="all">All Signatories</option>
-              <option value="true">Signatories Only</option>
-              <option value="false">Non-Signatories</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionairePledge">Giving Pledge</label>
+              <select id="filterBillionairePledge" class="filter-select">
+                <option value="all">All Signatories</option>
+                <option value="true">Signatories Only</option>
+                <option value="false">Non-Signatories</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterBillionaireSort">Sort By</label>
-            <select id="filterBillionaireSort" class="filter-select">
-              <option value="name">Name (A-Z)</option>
-              <option value="net_worth">Net Worth (High to Low)</option>
-              <option value="personal_giving">Documented Personal Giving</option>
-              <option value="giving_ratio">Giving Ratio (% of Wealth)</option>
-              <option value="org_giving">Associated Org Giving</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterBillionaireSort">Sort By</label>
+              <select id="filterBillionaireSort" class="filter-select">
+                <option value="name">Name (A-Z)</option>
+                <option value="net_worth">Net Worth (High to Low)</option>
+                <option value="personal_giving">Documented Personal Giving</option>
+                <option value="giving_ratio">Peak Donation / Wealth (%)</option>
+                <option value="org_giving">Associated Org Giving</option>
+              </select>
+            </div>
 
-          <button id="btnResetBillionaireFilters" class="btn-filter-reset">Reset Filters</button>
-        </div>
+            <button id="btnResetBillionaireFilters" class="btn-filter-reset">Reset Filters</button>
+          </div>
+        </details>
 
         <!-- Billionaires Table -->
         <div class="dense-table-wrapper">
@@ -1985,7 +2021,7 @@
                 <th>Industry</th>
                 <th class="th-numeric">Latest Net Worth</th>
                 <th class="th-numeric">Documented Personal Giving</th>
-                <th class="th-numeric">Generosity Ratio</th>
+                <th class="th-numeric">Peak Donation / Wealth</th>
                 <th class="th-numeric col-org-giving" style="display: none;">Org / Foundation Giving</th>
                 <th>Giving Pledge</th>
                 <th>Action</th>
@@ -2039,92 +2075,98 @@
           </div>
         </div>
 
-        <!-- Filter Controls -->
-        <div class="filter-bar" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationBillionaire">Billionaire</label>
-            <select id="filterDonationBillionaire" class="filter-select">
-              <option value="all">All Tracked Individuals</option>
-              <!-- Dynamically populated with billionaires -->
-            </select>
-          </div>
+        <!-- Filter Controls (Collapsible on mobile) -->
+        <details class="filter-details" open>
+          <summary class="filter-summary">
+            <span>🔍 Filter Donations Feed</span>
+            <span class="filter-summary-hint">Tap to collapse / expand</span>
+          </summary>
+          <div class="filter-bar" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationBillionaire">Billionaire</label>
+              <select id="filterDonationBillionaire" class="filter-select">
+                <option value="all">All Tracked Individuals</option>
+                <!-- Dynamically populated with billionaires -->
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationFundingSource">Funding Source</label>
-            <select id="filterDonationFundingSource" class="filter-select">
-              <option value="all">All Sources</option>
-              <option value="PERSONAL_DIRECT">Direct Gift (Personal)</option>
-              <option value="PERSONAL_FUNDS_CONFIRMED">Personal Funds (Verified SEC)</option>
-              <option value="FOUNDATION">Foundation Grant</option>
-              <option value="CORPORATE">Corporate Contribution</option>
-              <option value="DAF">Donor-Advised Fund</option>
-              <option value="PLEDGE">Public Pledge / Commitment</option>
-              <option value="UNKNOWN_SOURCE">Unknown / Unattributed</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationFundingSource">Funding Source</label>
+              <select id="filterDonationFundingSource" class="filter-select">
+                <option value="all">All Sources</option>
+                <option value="PERSONAL_DIRECT">Direct Gift (Personal)</option>
+                <option value="PERSONAL_FUNDS_CONFIRMED">Personal Funds (Verified SEC)</option>
+                <option value="FOUNDATION">Foundation Grant</option>
+                <option value="CORPORATE">Corporate Contribution</option>
+                <option value="DAF">Donor-Advised Fund</option>
+                <option value="PLEDGE">Public Pledge / Commitment</option>
+                <option value="UNKNOWN_SOURCE">Unknown / Unattributed</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationStatus">Status</label>
-            <select id="filterDonationStatus" class="filter-select">
-              <option value="all">All Statuses</option>
-              <option value="VERIFIED">Verified (Primary Filings)</option>
-              <option value="PARTIALLY_VERIFIED">Partially Verified</option>
-              <option value="UNVERIFIED">Unverified</option>
-              <option value="DISCOVERED">Discovered</option>
-              <option value="DISPUTED">Disputed / Retracted</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationStatus">Status</label>
+              <select id="filterDonationStatus" class="filter-select">
+                <option value="all">All Statuses</option>
+                <option value="VERIFIED">Verified (Primary Filings)</option>
+                <option value="PARTIALLY_VERIFIED">Partially Verified</option>
+                <option value="UNVERIFIED">Unverified</option>
+                <option value="DISCOVERED">Discovered</option>
+                <option value="DISPUTED">Disputed / Retracted</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationSort">Sort By</label>
-            <select id="filterDonationSort" class="filter-select">
-              <option value="date_desc">Date (Newest First)</option>
-              <option value="date_asc">Date (Oldest First)</option>
-              <option value="amount_desc">Amount (Highest First)</option>
-              <option value="amount_asc">Amount (Lowest First)</option>
-              <option value="percentage_desc">% of Wealth (Highest First)</option>
-              <option value="percentage_asc">% of Wealth (Lowest First)</option>
-              <option value="billionaire_asc">Billionaire (A-Z)</option>
-              <option value="billionaire_desc">Billionaire (Z-A)</option>
-              <option value="status_desc">Status (Verified First)</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationSort">Sort By</label>
+              <select id="filterDonationSort" class="filter-select">
+                <option value="date_desc">Date (Newest First)</option>
+                <option value="date_asc">Date (Oldest First)</option>
+                <option value="amount_desc">Amount (Highest First)</option>
+                <option value="amount_asc">Amount (Lowest First)</option>
+                <option value="percentage_desc">% of Wealth (Highest First)</option>
+                <option value="percentage_asc">% of Wealth (Lowest First)</option>
+                <option value="billionaire_asc">Billionaire (A-Z)</option>
+                <option value="billionaire_desc">Billionaire (Z-A)</option>
+                <option value="status_desc">Status (Verified First)</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationSourceType">Source Type</label>
-            <select id="filterDonationSourceType" class="filter-select">
-              <option value="all">All Source Types</option>
-              <option value="PRIMARY">Primary Regulatory</option>
-              <option value="SEC_FILING">SEC Filing (Form 4/13D)</option>
-              <option value="TAX_FILING">Tax Filing (IRS 990-PF)</option>
-              <option value="NEWS">Investigative News</option>
-              <option value="DATABASE">Index / Database</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationSourceType">Source Type</label>
+              <select id="filterDonationSourceType" class="filter-select">
+                <option value="all">All Source Types</option>
+                <option value="PRIMARY">Primary Regulatory</option>
+                <option value="SEC_FILING">SEC Filing (Form 4/13D)</option>
+                <option value="TAX_FILING">Tax Filing (IRS 990-PF)</option>
+                <option value="NEWS">Investigative News</option>
+                <option value="DATABASE">Index / Database</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationAmount">Amount Range</label>
-            <select id="filterDonationAmount" class="filter-select">
-              <option value="all">All Amounts</option>
-              <option value="1B+">&gt; $1 Billion</option>
-              <option value="100M-1B">$100M – $1B</option>
-              <option value="10M-100M">$10M – $100M</option>
-              <option value="under10M">&lt; $10 Million</option>
-            </select>
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationAmount">Amount Range</label>
+              <select id="filterDonationAmount" class="filter-select">
+                <option value="all">All Amounts</option>
+                <option value="1B+">&gt; $1 Billion</option>
+                <option value="100M-1B">$100M – $1B</option>
+                <option value="10M-100M">$10M – $100M</option>
+                <option value="under10M">&lt; $10 Million</option>
+              </select>
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationStartDate">Start Date</label>
-            <input type="date" id="filterDonationStartDate" class="filter-input">
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationStartDate">Start Date</label>
+              <input type="date" id="filterDonationStartDate" class="filter-input">
+            </div>
 
-          <div class="filter-group">
-            <label class="filter-label" for="filterDonationEndDate">End Date</label>
-            <input type="date" id="filterDonationEndDate" class="filter-input">
-          </div>
+            <div class="filter-group">
+              <label class="filter-label" for="filterDonationEndDate">End Date</label>
+              <input type="date" id="filterDonationEndDate" class="filter-input">
+            </div>
 
-          <button id="btnResetDonationFilters" class="btn-filter-reset">Reset Filters</button>
-        </div>
+            <button id="btnResetDonationFilters" class="btn-filter-reset">Reset Filters</button>
+          </div>
+        </details>
 
         <!-- Donations Table -->
         <div class="dense-table-wrapper">
@@ -2881,6 +2923,17 @@
             </div>
           </div>
 
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.45;">
+            🔒 <strong>Maintainer Authorization Required:</strong> Database mutations are protected. Discovered candidate review is authoritatively executed via the local CLI: <code>node scripts/review-discovery.js</code>. To commit via this modal, enter your maintainer authorization token below.
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+              Maintainer Token (Optional if using CLI)
+            </label>
+            <input type="password" id="modalMaintainerToken" class="form-input" placeholder="Enter MAINTAINER_TOKEN (never hardcoded)" style="width: 100%;">
+          </div>
+
           <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
             <button type="button" id="btnCancelMaintainerModal" class="btn btn-secondary">Cancel</button>
             <button type="submit" id="btnCommitVerification" class="btn btn-primary" style="font-weight: 700;">
@@ -3510,7 +3563,7 @@
             <td><span style="color: var(--text-muted);">${p.industry || 'General'}</span></td>
             <td class="cell-numeric" style="color: var(--accent-gold);">${formatCurrency(p.latest_net_worth)}</td>
             <td class="cell-numeric" style="color: #34d399;">${formatCurrency(p.total_personal_giving)}</td>
-            <td class="cell-numeric" style="color: #38bdf8;">${formatPercent(p.lifetime_personal_giving_ratio)}</td>
+            <td class="cell-numeric" style="color: #38bdf8; font-weight: 600;">${formatPercent(p.peak_historical_percentage !== undefined && p.peak_historical_percentage !== null ? p.peak_historical_percentage : (p.peak_donation_percentage ? p.peak_donation_percentage.percentage : null))}</td>
             <td class="cell-numeric col-org-giving" style="color: #c084fc; ${showOrg ? '' : 'display: none;'}">
               ${formatCurrency(p.total_foundation_giving)}
             </td>
@@ -3684,6 +3737,9 @@
               <span class="badge ${d.status === 'VERIFIED' ? 'badge-verified' : (d.status === 'DISPUTED' ? 'badge-disputed' : 'badge-unverified')}">
                 ${d.status || 'UNVERIFIED'}
               </span>
+              <div style="margin-top: 4px; font-size: 0.74rem; font-weight: 700; color: #38bdf8;" title="NoCharity Data Quality Score heuristic based on source, verification, attribution, and historical-data confidence">
+                Data Quality: ${d.data_quality_score !== undefined ? d.data_quality_score : (d.status === 'VERIFIED' ? 95 : (d.status === 'DISPUTED' ? 25 : 75))}/100
+              </div>
             </td>
             <td class="cell-numeric">
               ${parityDisplay}
@@ -3702,6 +3758,25 @@
                   <div style="max-width: 100%; word-break: break-all;">
                     <span class="provenance-label">Source:</span> 
                     ${d.source_url ? `<a href="${d.source_url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8;">${d.source_title || d.source_url} ↗</a>` : 'Public Regulatory Record'}
+                  </div>
+                </div>
+                <div class="provenance-row" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-subtle); display: block;">
+                  <div style="font-size: 0.76rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 2px;">
+                    🛡️ Data Quality: ${d.data_quality_score !== undefined ? d.data_quality_score : 95}/100
+                  </div>
+                  <div style="font-size: 0.71rem; color: var(--text-muted); line-height: 1.45;">
+                    <em>A NoCharity data-quality heuristic based on source, verification, attribution, and historical-data confidence.</em>
+                  </div>
+                  <div style="font-size: 0.70rem; color: #94a3b8; margin-top: 4px; line-height: 1.4;">
+                    • Source: <strong>${d.source_tier || 'PRIMARY'}</strong> (${d.source_publisher || 'Public Filing'})<br>
+                    • Verification: <strong>${d.status || 'UNVERIFIED'}</strong><br>
+                    • Attribution: <strong>${d.funding_source_type || 'PERSONAL'}</strong><br>
+                    • Wealth Date Quality: <strong>${d.historical_wealth_quality_tier || 'UNAVAILABLE'}</strong>
+                  </div>
+                  <div style="margin-top: 6px;">
+                    <a href="/methodology#eight-questions" target="_blank" style="font-size: 0.72rem; color: #38bdf8; text-decoration: underline;">
+                      Scoring formula & methodology ↗
+                    </a>
                   </div>
                 </div>
               </div>
@@ -5070,15 +5145,22 @@
           const citationUrl = document.getElementById('modalCitationUrl').value;
           const citationPublisher = document.getElementById('modalCitationPublisher').value;
           const citationTitle = document.getElementById('modalCitationTitle').value;
+          const tokenInput = document.getElementById('modalMaintainerToken');
+          const maintainerToken = tokenInput ? tokenInput.value.trim() : '';
 
           const submitBtn = document.getElementById('btnCommitVerification');
           submitBtn.disabled = true;
           submitBtn.textContent = 'Saving...';
 
           try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (maintainerToken) {
+              headers['x-maintainer-token'] = maintainerToken;
+            }
+
             const res = await fetch('/api/advanced/discover/verify', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers,
               body: JSON.stringify({
                 candidate: c,
                 fundingSourceType,
@@ -5091,13 +5173,14 @@
             });
 
             const data = await res.json();
-            if (data.success) {
-              alert(`Candidate successfully verified!\nStatus: ${status}\nMode: ${data.mode}\nAction: ${data.action}`);
-              closeMaintainerModal();
-              runDiscoveryScan();
-            } else {
-              alert('Verification failed: ' + (data.error || 'Unknown error'));
+            if (res.status === 401 || !data.success) {
+              alert(data.error || 'Maintainer token required for dataset mutations.\n\nPlease supply a MAINTAINER_TOKEN or use the authoritative local CLI workflow:\nnode scripts/review-discovery.js');
+              return;
             }
+
+            alert(`Candidate successfully verified!\nStatus: ${status}\nMode: ${data.mode}\nAction: ${data.action}`);
+            closeMaintainerModal();
+            runDiscoveryScan();
           } catch (err) {
             alert('Error submitting verification: ' + err.message);
           } finally {

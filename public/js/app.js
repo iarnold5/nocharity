@@ -6,10 +6,14 @@
 import { INITIAL_BILLIONAIRES } from './data.js';
 
 // Application State with LocalStorage Persistence
+// Ensure that visiting Basic Mode clears any stale redirect flag to Advanced Mode
+localStorage.setItem('nocharity_advanced_mode', 'false');
+
 const state = {
   monthlyIncome: parseFloat(localStorage.getItem('nocharity_income')) || 35000,
   currency: localStorage.getItem('nocharity_currency') || '₹',
-  calcMode: localStorage.getItem('nocharity_mode') || 'networth', // 'networth' or 'income'
+  incomeFrequency: localStorage.getItem('nocharity_income_frequency') || 'monthly', // 'monthly' or 'annual'
+  calcMode: localStorage.getItem('nocharity_income_frequency') || 'monthly',
   activeTimeframe: 'all', // 'all', 'past_month', 'past_year', 'custom'
   customStartDate: '2023-01-01',
   customEndDate: '2026-12-31',
@@ -89,68 +93,98 @@ function formatDollars(amount, currency = '₹') {
 
 /**
  * Tangible Everyday Micro-Comparisons
+ * 
+ * Rules:
+ * - Do not apply USD thresholds directly to INR or other currencies.
+ * - For USD ('$'), provide calibrated everyday purchase comparisons.
+ * - For INR ('₹') and other currencies without a verified regional basket,
+ *   prefer a generic proportional statement ("Proportional income equivalent").
+ * - Tone: Context-aware without moralizing:
+ *   - Lower equivalent: "That's your proportional equivalent."
+ *   - Higher equivalent: "That's a substantial personal sacrifice at your income level."
+ *   - Very high equivalent: "That would consume a large share of your income."
  */
-function getTangibleMatch(userAmount, currency = '₹') {
-  if (userAmount <= 0.25) {
+export function getTangibleMatch(userAmount, currency = '₹', userIncome = null) {
+  const numericAmount = Math.max(0, Number(userAmount) || 0);
+  const numericIncome = Number(userIncome);
+  const ratio = (numericIncome && numericIncome > 0) ? (numericAmount / numericIncome) : (numericAmount / 4000);
+
+  let tip = "That's your proportional equivalent.";
+  if (ratio >= 0.25) {
+    tip = "That would consume a large share of your income.";
+  } else if (ratio >= 0.05) {
+    tip = "That's a substantial personal sacrifice at your income level.";
+  }
+
+  // Format amount cleanly (whole currency units unless very small positive amount)
+  const amountStr = (numericAmount < 1 && numericAmount > 0)
+    ? `${currency}${numericAmount.toFixed(2)}`
+    : `${currency}${Math.round(numericAmount).toLocaleString()}`;
+
+  // USD Calibrated Purchase Basket
+  if (currency === '$') {
+    if (numericAmount <= 0.25) {
+      return {
+        icon: "🪙",
+        text: `Loose pocket change (${amountStr})`,
+        tip
+      };
+    }
+    if (numericAmount < 1.00) {
+      return {
+        icon: "🍬",
+        text: `A single pack of chewing gum (${amountStr})`,
+        tip
+      };
+    }
+    if (numericAmount < 5.00) {
+      return {
+        icon: "☕",
+        text: `A modest cup of coffee (${amountStr})`,
+        tip
+      };
+    }
+    if (numericAmount < 25.00) {
+      return {
+        icon: "🍕",
+        text: `A casual takeout lunch (${amountStr})`,
+        tip
+      };
+    }
+    if (numericAmount < 100.00) {
+      return {
+        icon: "🛒",
+        text: `A portion of a grocery run (${amountStr})`,
+        tip
+      };
+    }
+    if (numericAmount < 500.00) {
+      return {
+        icon: "⚡",
+        text: `A monthly utility or electric bill (${amountStr})`,
+        tip
+      };
+    }
     return {
-      icon: "🪙",
-      text: `A loose coin found in your sofa (${currency}${userAmount.toFixed(2)})`,
-      tip: "You can match this billionaire's entire wealth-giving sacrifice with literal pocket change! 🛋️✨"
+      icon: "🏡",
+      text: `A major living expense (${amountStr})`,
+      tip
     };
   }
-  if (userAmount < 1.00) {
-    return {
-      icon: "🍬",
-      text: `A single pack of chewing gum (${currency}${userAmount.toFixed(2)})`,
-      tip: "Skip one piece of chewing gum and you're officially as generous as a global tycoon. 🍬🌟"
-    };
+
+  // Non-USD (e.g. INR ₹) without calibrated local basket:
+  // Use generic proportional statement and do NOT display misleading named purchases.
+  let icon = "⚖️";
+  if (ratio >= 0.25) {
+    icon = "⚠️";
+  } else if (ratio >= 0.05) {
+    icon = "💼";
   }
-  if (userAmount < 3.50) {
-    return {
-      icon: "☕",
-      text: `One cup of filter coffee (${currency}${userAmount.toFixed(2)})`,
-      tip: "One modest coffee this month equals their exact proportional sacrifice! ☕🎉"
-    };
-  }
-  if (userAmount < 7.00) {
-    return {
-      icon: "🚌",
-      text: `A single bus or metro ticket (${currency}${userAmount.toFixed(2)})`,
-      tip: "Walk one bus stop and you've matched their philanthropic track record! 🚶✨"
-    };
-  }
-  if (userAmount < 14.00) {
-    return {
-      icon: "🍕",
-      text: `A couple slices of pizza & a drink (${currency}${userAmount.toFixed(2)})`,
-      tip: "A casual lunch bite equals this billionaire's total percentage contribution. 🍕😋"
-    };
-  }
-  if (userAmount < 35.00) {
-    return {
-      icon: "📺",
-      text: `A standard Netflix streaming subscription (${currency}${userAmount.toFixed(2)})`,
-      tip: "One monthly subscription makes you match their lifetime generosity ratio! 📺🍿"
-    };
-  }
-  if (userAmount < 90.00) {
-    return {
-      icon: "🛒",
-      text: `A weekly grocery basket (${currency}${userAmount.toFixed(2)})`,
-      tip: "A modest grocery basket matches their public giving percentage! 🛒🥦"
-    };
-  }
-  if (userAmount < 300.00) {
-    return {
-      icon: "⚡",
-      text: `A monthly electricity & utility bill (${currency}${userAmount.toFixed(2)})`,
-      tip: "This billionaire made serious gifts — matching them requires a real monthly pledge! ⚡💪"
-    };
-  }
+
   return {
-    icon: "🏡",
-    text: `A major rent / mortgage contribution (${currency}${userAmount.toFixed(2)})`,
-    tip: "Historic philanthropy! This billionaire gave away a huge portion of their fortune. 🏆👏"
+    icon,
+    text: `Proportional income equivalent (${amountStr})`,
+    tip
   };
 }
 
@@ -204,28 +238,28 @@ function renderActiveBillionaire() {
   const activeDonations = filterDonations(b.historicalDonations, state.activeTimeframe, state.customStartDate, state.customEndDate);
   const totalDonatedInPeriod = activeDonations.reduce((sum, d) => sum + d.amount, 0);
 
-  // Parity percentage calculation based on selected mode
-  let percentage = 0;
-  let baseMetricName = "net worth";
+  // Parity percentage calculation is strictly donation percentage of wealth:
+  // (total donation amount / wealth at donation or current wealth in basic mode)
+  const percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
+  const isAnnual = state.incomeFrequency === 'annual' || state.calcMode === 'annual';
+  const periodLabel = isAnnual ? 'annual' : 'monthly';
+  const userEquivalent = state.monthlyIncome * (percentage / 100);
+  const tangible = getTangibleMatch(userEquivalent, state.currency, state.monthlyIncome);
 
-  if (state.calcMode === 'income') {
-    const annualEarnings = b.estimatedAnnualIncome || (b.netWorth * 0.08);
-    percentage = (totalDonatedInPeriod / annualEarnings) * 100;
-    baseMetricName = "estimated annual earnings";
-  } else {
-    percentage = b.netWorth > 0 ? (totalDonatedInPeriod / b.netWorth) * 100 : 0;
-    baseMetricName = "net worth";
-  }
-
-  const userEquivalentMonthly = state.monthlyIncome * (percentage / 100);
-  const tangible = getTangibleMatch(userEquivalentMonthly, state.currency);
+  // Format percentage: 2 decimals, or <0.01% for tiny values
+  const formattedPct = percentage >= 0.01
+    ? percentage.toFixed(2) + '%'
+    : (percentage > 0 ? '<0.01%' : '0.00%');
 
   // Update Left "ME" Panel
-  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s generosity of <span class="highlight-percentage" id="highlightMatchPercentage">${percentage >= 0.01 ? percentage.toFixed(2) : percentage.toFixed(4)}%</span> of their ${baseMetricName} (${getTimeframeLabel(state.activeTimeframe)}):`;
+  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s documented giving of <span class="highlight-percentage" id="highlightMatchPercentage">${formattedPct}</span> of their estimated wealth (${getTimeframeLabel(state.activeTimeframe)}):`;
   
-  // Hero number in GREEN matching right side Donated in Period color
-  matchHeroAmount.textContent = `${state.currency}${userEquivalentMonthly.toFixed(2)}`;
-  matchSubText.textContent = `out of your ${state.currency}${state.monthlyIncome.toLocaleString()} monthly paycheck`;
+  // Hero number (clean whole units unless small fraction)
+  const heroStr = (userEquivalent < 1 && userEquivalent > 0)
+    ? `${state.currency}${userEquivalent.toFixed(2)}`
+    : `${state.currency}${Math.round(userEquivalent).toLocaleString()}`;
+  matchHeroAmount.textContent = heroStr;
+  matchSubText.textContent = `Equivalent by percentage of wealth (out of your ${state.currency}${state.monthlyIncome.toLocaleString()} ${periodLabel} income)`;
   
   tangibleIcon.textContent = tangible.icon;
   tangibleText.textContent = tangible.text;
@@ -235,7 +269,7 @@ function renderActiveBillionaire() {
   carouselCounter.textContent = `Billionaire ${state.currentIndex + 1} of ${state.billionaires.length}`;
 
   // Update header settings button text
-  headerSettingsLabel.textContent = `Settings (${state.currency}${state.monthlyIncome.toLocaleString()}/mo)`;
+  headerSettingsLabel.textContent = `Settings (${state.currency}${state.monthlyIncome.toLocaleString()}/${isAnnual ? 'yr' : 'mo'})`;
 
   // Flag and Country formatting
   const countryStr = b.country || '';
@@ -243,22 +277,12 @@ function renderActiveBillionaire() {
   const flag = flagMatch ? flagMatch[0] : '🌐';
   const countryName = countryStr.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u, '').trim();
 
-  // Financial badge: Net Worth vs Monthly Income mode with clean hover tooltip
-  let financialBadge = '';
-  if (state.calcMode === 'income') {
-    const monthlyEst = (b.estimatedAnnualIncome || (b.netWorth * 0.08)) / 12;
-    financialBadge = `
-      <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'} (Estimated based on annual returns)">
-        💼 Est. Monthly Income: ${formatDollars(monthlyEst, state.currency)} / mo ↗
-      </a>
-    `;
-  } else {
-    financialBadge = `
-      <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
-        💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗
-      </a>
-    `;
-  }
+  // Financial badge: ALWAYS net worth (never infer billionaire income from net worth)
+  const financialBadge = `
+    <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
+      💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗
+    </a>
+  `;
 
   // Pledge badge
   const pledgeBadge = b.givingPledge 
@@ -429,13 +453,14 @@ function openSettings() {
   settingsIncomeInput.value = state.monthlyIncome;
   settingsIncomeSlider.value = Math.min(state.monthlyIncome, 25000);
   
-  const radio = document.querySelector(`input[name="calcMode"][value="${state.calcMode}"]`);
+  const radio = document.querySelector(`input[name="calcMode"][value="${state.incomeFrequency}"]`) ||
+                document.querySelector(`input[name="calcMode"][value="${state.calcMode}"]`);
   if (radio) radio.checked = true;
 
+  // Invariant: Basic Mode must remain Basic Mode unless the user explicitly toggles it during this session
   if (settingsAdvancedModeToggle) {
-    const isAdv = localStorage.getItem('nocharity_advanced_mode') === 'true';
-    settingsAdvancedModeToggle.checked = isAdv;
-    updateModeDisplay(isAdv);
+    settingsAdvancedModeToggle.checked = false;
+    updateModeDisplay(false);
   }
 
   settingsModal.classList.add('active');
@@ -471,10 +496,14 @@ function saveSettings() {
   state.monthlyIncome = parseFloat(settingsIncomeInput.value) || 35000;
   
   const selectedMode = document.querySelector('input[name="calcMode"]:checked');
-  if (selectedMode) state.calcMode = selectedMode.value;
+  if (selectedMode) {
+    state.calcMode = selectedMode.value;
+    state.incomeFrequency = selectedMode.value;
+  }
 
   localStorage.setItem('nocharity_income', state.monthlyIncome);
   localStorage.setItem('nocharity_currency', state.currency);
+  localStorage.setItem('nocharity_income_frequency', state.incomeFrequency);
   localStorage.setItem('nocharity_mode', state.calcMode);
 
   if (settingsAdvancedModeToggle && settingsAdvancedModeToggle.checked) {

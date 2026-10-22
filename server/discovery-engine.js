@@ -125,7 +125,7 @@ export function classifyCandidateFundingSource(text) {
   const lower = text.toLowerCase();
 
   // 1. PLEDGE (commitment rather than transfer)
-  if (/(pledges|pledged|pledging|commits to|commitment to donate|promises to give|signed the giving pledge)/i.test(lower) &&
+  if (/(pledges?|pledged|pledging|commits?(?: to)?|commitment to donate|committed to donate|promises?(?: to give)?|promised|will donate|plans? to donate|signed the giving pledge)/i.test(lower) &&
       !/(transferred|completed donation|filed sec|disbursed)/i.test(lower)) {
     return 'PLEDGE';
   }

@@ -23,6 +23,7 @@ import {
   FUNDING_SOURCE_METADATA,
   STATUS_METADATA
 } from './parity-engine.js';
+import { computeDataQualityScore } from './data-quality.js';
 import { appCache } from './cache.js';
 
 /**
@@ -134,7 +135,8 @@ export async function getPeople({
       query = query.order('total_personal_giving', { ascending: isAscending });
       break;
     case 'giving_ratio':
-      query = query.order('lifetime_personal_giving_ratio', { ascending: isAscending });
+    case 'peak_percentage':
+      query = query.order('peak_historical_percentage', { ascending: isAscending, nullsFirst: false });
       break;
     case 'org_giving':
       query = query.order('total_foundation_giving', { ascending: isAscending });
@@ -301,7 +303,8 @@ export async function getBillionaireProfile(personIdOrSlug) {
       latest_donation: latestDonation,
       average_donation: averageDonation,
       giving_as_pct_of_wealth_at_donation: Math.round(avgGivingPctAtDonation * 10000) / 10000,
-      lifetime_personal_giving_ratio: summary.lifetime_personal_giving_ratio
+      peak_donation_percentage: summary.peak_historical_percentage !== undefined ? parseFloat(summary.peak_historical_percentage) : (eligibleRatios.length > 0 ? Math.max(...eligibleRatios) : null),
+      lifetime_personal_giving_ratio: null
     },
 
     // Associated Organization Giving (Separate section - MUST NOT be merged)
@@ -449,6 +452,11 @@ export async function getDonations({
       is_individual_attribution,
       historical_net_worth,
       historical_percentage,
+      historical_snapshot_date,
+      snapshot_days_diff,
+      wealth_snapshot_quality,
+      wealth_source_name,
+      historical_generosity_ratio,
       source_id,
       source_publisher,
       source_title,
@@ -563,8 +571,30 @@ export async function getDonations({
       badgeClass = 'badge-unverified';
     }
 
+    const snapshotDate = d.historical_snapshot_date || d.historical_wealth_snapshot_date;
+    const quality = computeDataQualityScore(d, {
+      snapshotDate,
+      sources: d.source_url ? [{ url: d.source_url, publisher: d.source_publisher }] : []
+    });
+
     return {
       ...d,
+      historical_snapshot_date: snapshotDate,
+      historical_wealth_snapshot_date: snapshotDate,
+      historical_wealth_days_diff: d.snapshot_days_diff,
+      historical_wealth_quality_tier: d.wealth_snapshot_quality,
+      generosity_ratio: d.historical_generosity_ratio,
+      data_quality_score: quality.score,
+      quality_score: quality.score,
+      data_quality_grade: quality.grade,
+      data_quality_factors: {
+        eight_questions_answered: quality.answered_questions_count,
+        eight_questions_total: 8,
+        verification_status: st,
+        source_quality: d.source_tier || 'PRIMARY',
+        temporal_confidence: d.wealth_snapshot_quality || 'UNAVAILABLE',
+        attribution: fType
+      },
       funding_source_badge: badgeText,
       funding_source_badge_class: badgeClass,
       funding_source_metadata: FUNDING_SOURCE_METADATA[fType] || FUNDING_SOURCE_METADATA.UNKNOWN_SOURCE,
@@ -791,30 +821,31 @@ export async function getRankings({
         country: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland / 🇺🇸 US',
         industry: 'Steel & Heavy Industry',
         occupation: 'Industrialist & Philanthropist',
-        latest_net_worth: 350000000000,
+        latest_net_worth: 350000000,
+        wealth_note: 'Nominal historical USD (1901 peak fortune of $350 million after sale of Carnegie Steel)',
         giving_pledge: true,
         qualifying_donations_count: 2,
-        total_personal_giving: 255000000000,
-        avg_personal_donation: 127500000000,
+        total_personal_giving: 135000000,
+        avg_personal_donation: 67500000,
         largest_personal_donation: {
-          amount: 135000000000,
-          donation_date: '1911-11-10',
+          amount: 125000000,
+          donation_date: '1911-06-09',
           recipient: 'Carnegie Corporation of New York',
-          historical_net_worth: 350000000000,
-          historical_percentage: 38.5714
+          historical_net_worth: null,
+          historical_percentage: null
         },
         peak_donation_percentage: {
-          percentage: 38.5714,
-          amount: 135000000000,
-          donation_date: '1911-11-10',
-          recipient: 'Carnegie Corporation of New York',
-          historical_net_worth: 350000000000
+          percentage: 2.8571,
+          amount: 10000000,
+          donation_date: '1901-11-15',
+          recipient: 'Carnegie Technical Schools (Carnegie Mellon)',
+          historical_net_worth: 350000000
         },
         coverage_years: '1901–1911',
         coverage_span: 11,
         active_years_count: 2,
         has_sufficient_data: true,
-        annualized_giving: 23181818181.82,
+        annualized_giving: 12272727.27,
         coverage_indicator: '1901–1911 (2 active yrs)'
       },
       {
@@ -1004,7 +1035,8 @@ export async function getRankings({
       largest_personal_donation: largest,
       peak_donation_percentage: peakPct,
       avg_historical_percentage: parseFloat(p.avg_historical_percentage || 0),
-      lifetime_personal_giving_ratio: parseFloat(p.lifetime_personal_giving_ratio || 0),
+      peak_historical_percentage: parseFloat(p.peak_historical_percentage || (peakPct?.percentage || 0)),
+      lifetime_personal_giving_ratio: null,
       coverage_years: coverageYears,
       coverage_span: coverageSpan,
       active_years_count: activeYearsCount,

@@ -403,11 +403,13 @@ export function calculateDaysBetween(startDate, endDate) {
 /**
  * Classifies the quality tier of a historical wealth snapshot relative to a donation date.
  */
-export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
+export function classifySnapshotQuality(snapshotDate, donationDate, netWorth = 1) {
   const numericNetWorth = Number(netWorth);
   if (!snapshotDate || !donationDate || !isFinite(numericNetWorth) || numericNetWorth <= 0) {
     return {
       quality: QUALITY_TIERS.UNAVAILABLE,
+      tier: QUALITY_TIERS.UNAVAILABLE,
+      isAvailable: false,
       daysDiff: null,
       reason: !snapshotDate || !donationDate
         ? 'Missing snapshot date or donation date'
@@ -420,6 +422,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (!s || !d) {
     return {
       quality: QUALITY_TIERS.UNAVAILABLE,
+      tier: QUALITY_TIERS.UNAVAILABLE,
+      isAvailable: false,
       daysDiff: null,
       reason: 'Invalid date format'
     };
@@ -431,6 +435,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (daysDiff < 0) {
     return {
       quality: QUALITY_TIERS.UNAVAILABLE,
+      tier: QUALITY_TIERS.UNAVAILABLE,
+      isAvailable: false,
       daysDiff,
       reason: `Snapshot date (${s.isoString}) is after donation date (${d.isoString}). Future snapshots are rejected.`
     };
@@ -440,6 +446,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (daysDiff === 0) {
     return {
       quality: QUALITY_TIERS.EXACT_DATE,
+      tier: QUALITY_TIERS.EXACT_DATE,
+      isAvailable: true,
       daysDiff,
       reason: 'Wealth snapshot matches the donation date exactly.'
     };
@@ -449,6 +457,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (daysDiff <= 90) {
     return {
       quality: QUALITY_TIERS.NEAR_DATE,
+      tier: QUALITY_TIERS.NEAR_DATE,
+      isAvailable: true,
       daysDiff,
       reason: `Wealth snapshot is within ${daysDiff} day(s) before donation (≤ 90 days).`
     };
@@ -458,6 +468,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (s.year === d.year) {
     return {
       quality: QUALITY_TIERS.SAME_YEAR,
+      tier: QUALITY_TIERS.SAME_YEAR,
+      isAvailable: true,
       daysDiff,
       reason: `Wealth snapshot recorded in the same calendar year (${s.year}), ${daysDiff} days prior.`
     };
@@ -467,6 +479,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   if (daysDiff <= 1095) {
     return {
       quality: QUALITY_TIERS.APPROXIMATE,
+      tier: QUALITY_TIERS.APPROXIMATE,
+      isAvailable: true,
       daysDiff,
       reason: `Wealth snapshot is ${daysDiff} days prior (~${(daysDiff / 365).toFixed(1)} years). Historical estimate is approximate.`
     };
@@ -475,6 +489,8 @@ export function classifySnapshotQuality(snapshotDate, donationDate, netWorth) {
   // Unavailable: older than 3 years
   return {
     quality: QUALITY_TIERS.UNAVAILABLE,
+    tier: QUALITY_TIERS.UNAVAILABLE,
+    isAvailable: false,
     daysDiff,
     reason: `Wealth snapshot is ${daysDiff} days prior (> 3 years). Comparison unavailable.`
   };

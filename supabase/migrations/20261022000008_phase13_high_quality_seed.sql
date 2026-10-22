@@ -49,7 +49,7 @@ INSERT INTO organizations (id, legal_name, display_name, organization_type, ein,
 ('c0000000-0000-0000-0000-000000000002', 'Bill & Melinda Gates Foundation', 'Bill & Melinda Gates Foundation', 'FOUNDATION', '56-2618866', NULL, 'https://www.gatesfoundation.org', '🇺🇸 United States'),
 ('c0000000-0000-0000-0000-000000000031', 'Microsoft Corporation', 'Microsoft Corporation', 'COMPANY', NULL, '0000789019', 'https://www.microsoft.com', '🇺🇸 United States'),
 ('c0000000-0000-0000-0000-000000000007', 'Yield Giving Public Registry', 'Yield Giving Public Registry', 'CHARITY', NULL, NULL, 'https://yieldgiving.com', '🇺🇸 United States'),
-('c0000000-0000-0000-0000-000000000004', 'Tesla, Inc.', 'Tesla, Inc.', 'COMPANY', NULL, '0001318605', 'https://www.tesla.com', '🇺🇸 United States'),
+('c0000000-0000-0000-0000-000000000004', 'Tesla, Inc.', 'Tesla', 'COMPANY', NULL, '0001318605', 'https://www.tesla.com', '🇺🇸 United States'),
 ('c0000000-0000-0000-0000-000000000005', 'The Musk Foundation', 'The Musk Foundation', 'FOUNDATION', '75-2964348', NULL, 'https://muskfoundation.org', '🇺🇸 United States'),
 ('c0000000-0000-0000-0000-000000000006', 'Fidelity Investments Charitable Gift Fund', 'Fidelity Investments Charitable Gift Fund', 'DAF', '04-3132322', NULL, 'https://www.fidelitycharitable.org', '🇺🇸 United States'),
 ('c0000000-0000-0000-0000-000000000008', 'Wipro Limited', 'Wipro Limited', 'COMPANY', NULL, NULL, 'https://www.wipro.com', '🇮🇳 India'),
@@ -508,4 +508,17 @@ INSERT INTO donation_sources (donation_id, source_id) VALUES
 ('f0000000-0000-0000-0000-000000000071', 'e0000000-0000-0000-0000-000000000001'),
 ('f0000000-0000-0000-0000-000000000072', 'e0000000-0000-0000-0000-000000000001'),
 ('f0000000-0000-0000-0000-000000000073', 'e0000000-0000-0000-0000-000000000005')
+ON CONFLICT (donation_id, source_id) DO NOTHING;
+
+-- 8. EXPLICITLY MARKED TEST FIXTURE (FOR PARITY/REGRESSION EDGE-CASE TESTING)
+INSERT INTO sources (id, url, publisher, title, source_type, published_at) VALUES
+('e0000000-0000-0000-0000-000000000099', 'https://example.com/test-fixture-disputed-claim', '[TEST/DEMO] NoCharity Test Suite', '[TEST/DEMO FIXTURE] Disputed Gift Claim Source', 'SECONDARY', '2023-05-01')
+ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title;
+
+INSERT INTO donations (id, donor_person_id, donor_organization_id, recipient_organization_id, amount, currency, donation_date, donation_type, funding_source_type, status, description, cause_category, source_id) VALUES
+('f0000000-0000-0000-0000-000000000099', 'b0000000-0000-0000-0000-000000000004', NULL, NULL, 100000000, 'USD', '2023-05-01', 'GIFT', 'PERSONAL_DIRECT', 'DISPUTED', '[TEST/DEMO FIXTURE - DISPUTED RECORD] Unverified claimed donation under dispute used to test regression exclusion in default rankings.', '[TEST/DEMO] Disputed Claim Edge Case', 'e0000000-0000-0000-0000-000000000099')
+ON CONFLICT (id) DO UPDATE SET description = EXCLUDED.description, status = EXCLUDED.status;
+
+INSERT INTO donation_sources (donation_id, source_id) VALUES
+('f0000000-0000-0000-0000-000000000099', 'e0000000-0000-0000-0000-000000000099')
 ON CONFLICT (donation_id, source_id) DO NOTHING;

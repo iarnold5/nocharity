@@ -12,6 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Invariant: Basic mode route (/) must strictly ensure user remains in Basic mode
+    try { localStorage.setItem('nocharity_advanced_mode', 'false'); } catch (e) {}
+  </script>
 </head>
 <body>
   <div class="app-wrapper">
@@ -78,14 +82,14 @@
 
         <!-- Matching Showcase Box (Colors match the right side!) -->
         <div class="match-card">
-          <div class="match-subheading">✨ The Matching Challenge</div>
+          <div class="match-subheading">✨ Equivalent by percentage of wealth</div>
           <p class="match-target-quote" id="matchTargetQuote">
-            To match <strong>Bill Gates</strong>'s generosity of <span class="highlight-percentage" id="highlightMatchPercentage">30.74%</span> of their net worth:
+            To match <strong>Bill Gates</strong>'s documented giving of <span class="highlight-percentage" id="highlightMatchPercentage">30.74%</span> of their estimated wealth:
           </p>
           
           <!-- Green font color matching "Donated in Period" -->
-          <div class="match-hero-number" id="matchHeroAmount">₹10,759.26</div>
-          <div class="match-per-month" id="matchSubText">from your monthly budget</div>
+          <div class="match-hero-number" id="matchHeroAmount">₹10,759</div>
+          <div class="match-per-month" id="matchSubText">Equivalent by percentage of wealth (out of your monthly income)</div>
 
           <div class="tangible-banner" id="tangibleBanner">
             <span id="tangibleIcon" style="font-size: 20px;">☕</span>
@@ -93,7 +97,10 @@
           </div>
 
           <p class="cheering-tip" id="cheeringTip">
-            🎉 That's it! You have matched an ultra-wealthy billionaire's sacrifice ratio.
+            That's your proportional equivalent.
+          </p>
+          <p class="calculator-methodology-note" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 12px; line-height: 1.4; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
+            This comparison applies the donation's percentage of the billionaire's wealth to your income. It does not estimate the billionaire's income or the source of the donated funds.
           </p>
         </div>
       </section>
@@ -178,20 +185,20 @@
       </div>
 
       <div class="settings-group">
-        <label class="settings-label">Calculation Mode</label>
+        <label class="settings-label">User Income Frequency</label>
         <div class="mode-radio-box">
           <label class="mode-option">
-            <input type="radio" name="calcMode" value="networth" checked>
+            <input type="radio" name="calcMode" value="monthly" checked>
             <div>
-              <strong>Based on Net Worth (Default)</strong>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Matches their donation as a percentage of their total net worth against your budget (Gianmarco Soresi's premise).</p>
+              <strong>Monthly Take-Home Pay (Default)</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Compares the donation's percentage of wealth against your monthly paycheck.</p>
             </div>
           </label>
           <label class="mode-option">
-            <input type="radio" name="calcMode" value="income">
+            <input type="radio" name="calcMode" value="annual">
             <div>
-              <strong>Based on Monthly Income / Annual Cash Flow</strong>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Matches their donation as a percentage of their estimated monthly earnings/gains against your monthly income.</p>
+              <strong>Annual Income</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Compares the donation's percentage of wealth against your annual take-home salary.</p>
             </div>
           </label>
         </div>

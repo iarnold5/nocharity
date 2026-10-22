@@ -120,8 +120,9 @@ describe('NoCharity Advanced Mode — Phase 7: Individual Billionaire Profile Te
       assert.ok(foundationDonations.length >= 1, 'Has foundation donation');
       assert.strictEqual(foundationDonations[0].amount, 7000000000);
 
-      // But personal qualifying count reflects individual transfers only
-      assert.ok(profile.personal_giving_metrics.lifetime_personal_giving < 7000000000);
+      // But personal qualifying count reflects individual transfers only and strictly excludes the 7B foundation grant
+      assert.ok(!profile.personal_donations.some(d => d.funding_source_type === 'FOUNDATION' || d.amount === 7000000000));
+      assert.strictEqual(profile.personal_giving_metrics.lifetime_personal_giving, 21000000000);
     });
   });
 

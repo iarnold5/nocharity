@@ -646,6 +646,7 @@ export function computeDataQualityScore(donation, options = {}) {
     badge_color: qualityGrade.badgeColor,
     description: qualityGrade.description,
     answers_all_8_questions: eightQuestions.is_complete,
+    is_complete: eightQuestions.is_complete,
     eight_questions: eightQuestions,
     answered_questions_count: eightQuestions.answered_count,
     is_valid: validation.isValid,

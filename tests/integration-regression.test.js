@@ -38,7 +38,8 @@ import {
 import {
   evaluateEightQuestions,
   validateDonationQuality,
-  checkTemporalWealthConsistency
+  checkTemporalWealthConsistency,
+  computeDataQualityScore
 } from '../server/data-quality.js';
 import { PHASE13_BILLIONAIRES } from '../server/phase13-dataset.js';
 import { searchGoogleNews } from '../mcp-server.js';
@@ -436,6 +437,337 @@ describe('NoCharity Complete Integration & Regression Pass (20 Invariants)', () 
     assert.equal(testCalc.historicalGenerosityRatio, 5.0);
     assert.equal(testCalc.formattedRatio, '5.00%');
     assert.equal(testCalc.userEquivalentMonthly, 200.0);
+  });
+
+});
+
+describe('Audit Remediation Pass — Verification of 21 Explicit Mandates', () => {
+
+  // 1. Future wealth snapshots are rejected
+  test('Requirement 1: Future wealth snapshots are strictly rejected (snapshot_date <= donation_date)', () => {
+    // Exact parity engine function
+    const futureCheck = classifySnapshotQuality('2025-01-01', '2024-06-01');
+    assert.equal(futureCheck.tier, QUALITY_TIERS.UNAVAILABLE);
+    assert.equal(futureCheck.isAvailable, false);
+    assert.ok(futureCheck.daysDiff < 0, 'daysDiff must be negative for future snapshot');
+
+    // Temporal consistency checker
+    const temporalCheck = checkTemporalWealthConsistency('2024-06-01', '2025-01-01');
+    assert.equal(temporalCheck.isConsistent, false);
+    assert.equal(temporalCheck.isUnavailable, true);
+    assert.equal(temporalCheck.classification, 'FUTURE_SNAPSHOT_MISMATCH');
+
+    // Closest wealth search does not look forward in time
+    const snapshots = [
+      { snapshot_date: '2024-01-01', net_worth: 50000000000 },
+      { snapshot_date: '2025-01-01', net_worth: 100000000000 }
+    ];
+    const closest = findClosestHistoricalWealthSnapshot(snapshots, '2024-06-01');
+    assert.equal(closest.snapshotDate, '2024-01-01', 'Must choose prior snapshot, never forward');
+  });
+
+  // 2. No prior wealth snapshot results in UNAVAILABLE
+  test('Requirement 2: No prior wealth snapshot results in UNAVAILABLE', () => {
+    const noPrior = classifySnapshotQuality(null, '2024-01-01');
+    assert.equal(noPrior.tier, QUALITY_TIERS.UNAVAILABLE);
+    assert.equal(noPrior.isAvailable, false);
+
+    const emptySnapshots = calculateHistoricalDonationParity({
+      donationAmount: 1000000,
+      donationDate: '2024-01-01',
+      snapshots: []
+    });
+    assert.equal(emptySnapshots.isAvailable, false);
+    assert.equal(emptySnapshots.quality, 'UNAVAILABLE');
+  });
+
+  // 3. Wealth older than 3 years results in UNAVAILABLE
+  test('Requirement 3: Wealth older than 3 years (1095 days) results in UNAVAILABLE', () => {
+    // 4 years prior
+    const oldSnap = classifySnapshotQuality('2020-01-01', '2024-01-02');
+    assert.equal(oldSnap.tier, QUALITY_TIERS.UNAVAILABLE);
+    assert.equal(oldSnap.isAvailable, false);
+    assert.ok(oldSnap.daysDiff > 1095);
+
+    const parityResult = calculateHistoricalDonationParity({
+      donationAmount: 50000000,
+      donationDate: '2024-01-02',
+      snapshots: [{ snapshot_date: '2020-01-01', net_worth: 20000000000 }]
+    });
+    assert.equal(parityResult.isAvailable, false);
+    assert.equal(parityResult.quality, 'UNAVAILABLE');
+  });
+
+  // 4. Exact-date snapshots result in EXACT_DATE
+  test('Requirement 4: Exact-date snapshots (0 days diff) result in EXACT_DATE', () => {
+    const exact = classifySnapshotQuality('2023-05-15', '2023-05-15');
+    assert.equal(exact.tier, QUALITY_TIERS.EXACT_DATE);
+    assert.equal(exact.isAvailable, true);
+    assert.equal(exact.daysDiff, 0);
+  });
+
+  // 5. 90-day prior snapshots result in NEAR_DATE
+  test('Requirement 5: Snapshots 1 to 90 days prior result in NEAR_DATE', () => {
+    // 45 days prior
+    const near = classifySnapshotQuality('2023-04-01', '2023-05-15');
+    assert.equal(near.tier, QUALITY_TIERS.NEAR_DATE);
+    assert.equal(near.isAvailable, true);
+    assert.ok(near.daysDiff >= 1 && near.daysDiff <= 90);
+
+    // 90 days prior
+    const edge90 = classifySnapshotQuality('2023-01-01', '2023-04-01');
+    assert.equal(edge90.tier, QUALITY_TIERS.NEAR_DATE);
+  });
+
+  // 6. Same-year >90-day snapshots result in SAME_YEAR
+  test('Requirement 6: Same calendar year snapshots >90 days prior result in SAME_YEAR', () => {
+    // Jan 1 to Dec 1 of same year (334 days)
+    const sameYear = classifySnapshotQuality('2023-01-01', '2023-12-01');
+    assert.equal(sameYear.tier, QUALITY_TIERS.SAME_YEAR);
+    assert.equal(sameYear.isAvailable, true);
+    assert.ok(sameYear.daysDiff > 90);
+  });
+
+  // 7. Personal direct donations count
+  test('Requirement 7: PERSONAL_DIRECT donations qualify for personal parity', () => {
+    const pd = isPersonalParityEligible(FUNDING_SOURCE_TYPES.PERSONAL_DIRECT);
+    assert.equal(pd.isEligible, true);
+    assert.equal(pd.countsAsPersonal, true);
+  });
+
+  // 8. Personal funds-confirmed donations count
+  test('Requirement 8: PERSONAL_FUNDS_CONFIRMED donations qualify for personal parity', () => {
+    const pfc = isPersonalParityEligible(FUNDING_SOURCE_TYPES.PERSONAL_FUNDS_CONFIRMED);
+    assert.equal(pfc.isEligible, true);
+    assert.equal(pfc.countsAsPersonal, true);
+  });
+
+  // 9. Foundation donations do not count as personal giving
+  test('Requirement 9: FOUNDATION donations are strictly excluded from personal giving', () => {
+    const f = isPersonalParityEligible(FUNDING_SOURCE_TYPES.FOUNDATION);
+    assert.equal(f.isEligible, false);
+    assert.equal(f.countsAsPersonal, false);
+  });
+
+  // 10. Corporate donations do not count as personal giving
+  test('Requirement 10: CORPORATE donations are strictly excluded from personal giving', () => {
+    const c = isPersonalParityEligible(FUNDING_SOURCE_TYPES.CORPORATE);
+    assert.equal(c.isEligible, false);
+    assert.equal(c.countsAsPersonal, false);
+  });
+
+  // 11. DAF donations do not count as personal giving by default
+  test('Requirement 11: DAF donations are excluded from personal giving by default', () => {
+    const daf = isPersonalParityEligible(FUNDING_SOURCE_TYPES.DAF);
+    assert.equal(daf.isEligible, false);
+    assert.equal(daf.countsAsPersonal, false);
+  });
+
+  // 12. Pledges do not count as completed personal giving
+  test('Requirement 12: PLEDGE commitments must never count as completed personal giving', () => {
+    const pledge = isPersonalParityEligible(FUNDING_SOURCE_TYPES.PLEDGE);
+    assert.equal(pledge.isEligible, false);
+    assert.equal(pledge.countsAsPersonal, false);
+
+    // Schema validation invariant
+    const invalidPledge = validateDonationQuality({
+      amount: 1000000000,
+      donation_date: '2024-01-01',
+      funding_source_type: 'PLEDGE',
+      is_completed_giving: true
+    });
+    assert.equal(invalidPledge.isValid, false);
+    assert.ok(invalidPledge.errors.some(e => e.includes('Pledge commitments')));
+  });
+
+  // 13. Disputed donations do not count in default rankings
+  test('Requirement 13: DISPUTED donations do not count in default rankings or parity', () => {
+    const disp = isPersonalParityEligible('PERSONAL_DIRECT', 'DISPUTED');
+    assert.equal(disp.isEligible, false);
+    assert.match(disp.reason, /Disputed/i);
+
+    const invalidDisputed = validateDonationQuality({
+      amount: 50000000,
+      donation_date: '2024-01-01',
+      status: 'DISPUTED',
+      is_default_ranking_eligible: true
+    });
+    assert.equal(invalidDisputed.isValid, false);
+    assert.ok(invalidDisputed.errors.some(e => e.includes('Disputed records')));
+  });
+
+  // 14. Current net worth is never used as denominator for historical cumulative giving ratio
+  test('Requirement 14: Invalid lifetime cumulative giving ratio is eliminated', async () => {
+    const rankings = await getRankings('peak_percentage');
+    assert.ok(Array.isArray(rankings.rankings));
+
+    for (const r of rankings.rankings) {
+      // lifetime_personal_giving_ratio must NOT exist as a valid ratio in public response
+      assert.strictEqual(r.lifetime_personal_giving_ratio, null);
+      // Valid historical peak metric must be used instead
+      if (r.peak_historical_percentage !== null) {
+        assert.equal(typeof r.peak_historical_percentage, 'number');
+      }
+    }
+  });
+
+  // 15. User monthly income produces the correct proportional comparison
+  test('Requirement 15: User monthly income produces mathematically exact proportional comparison', () => {
+    // $1B gift on $50B wealth = 2.0%
+    // $5,000 monthly take-home * 2.0% = $100.00
+    const calc = calculateHistoricalDonationParity({
+      donationAmount: 1000000000,
+      donationDate: '2020-01-01',
+      fundingSourceType: 'PERSONAL_DIRECT',
+      historicalNetWorth: 50000000000,
+      userIncome: 5000,
+      incomeFrequency: 'monthly'
+    });
+    assert.equal(calc.historicalGenerosityRatio, 2.0);
+    assert.equal(calc.formattedRatio, '2.00%');
+    assert.equal(calc.userEquivalentMonthly, 100.0);
+  });
+
+  // 16. User annual income produces the correct proportional comparison
+  test('Requirement 16: User annual income produces mathematically exact proportional comparison', () => {
+    // $1B gift on $50B wealth = 2.0%
+    // $60,000 annual income * 2.0% = $1,200.00
+    const calc = calculateHistoricalDonationParity({
+      donationAmount: 1000000000,
+      donationDate: '2020-01-01',
+      fundingSourceType: 'PERSONAL_DIRECT',
+      historicalNetWorth: 50000000000,
+      userIncome: 60000,
+      incomeFrequency: 'annual'
+    });
+    assert.equal(calc.historicalGenerosityRatio, 2.0);
+    assert.equal(calc.formattedRatio, '2.00%');
+    assert.equal(calc.userEquivalentAnnual, 1200.0);
+  });
+
+  // 17. Quality score is calculated consistently
+  test('Requirement 17: Data Quality Score is calculated consistently with transparent heuristic', () => {
+    const fullRecord = {
+      donor_person_name: 'Warren Buffett',
+      description: 'Annual Berkshire Hathaway Class B share donation',
+      donation_date: '2024-06-28',
+      amount: 4000000000,
+      currency: 'USD',
+      funding_source_type: 'PERSONAL_DIRECT',
+      recipient_name: 'Gates Foundation',
+      source_url: 'https://www.sec.gov/edgar/buffett-2024',
+      status: 'VERIFIED',
+      historical_net_worth: 135000000000,
+      snapshot_date: '2024-06-28'
+    };
+
+    const qs = computeDataQualityScore(fullRecord, {
+      snapshotDate: '2024-06-28',
+      sources: [{ url: 'https://www.sec.gov/edgar/buffett-2024', publisher: 'SEC' }]
+    });
+
+    assert.ok(qs.score >= 85, `Score should be Grade A (>=85), got ${qs.score}`);
+    assert.equal(qs.grade, 'A');
+    assert.equal(qs.answered_questions_count, 8);
+    assert.equal(qs.is_complete, true);
+    assert.equal(qs.flags.length, 0);
+  });
+
+  // 18. Carnegie fallback and Supabase values are consistent
+  test('Requirement 18: Andrew Carnegie records use strictly nominal historical USD ($350M net worth)', async () => {
+    // Fallback dataset check
+    const people = await getPeople({ search: 'Carnegie' });
+    assert.ok(people.people.length > 0, 'Carnegie must exist');
+    const carnegie = people.people[0];
+
+    // Total personal giving is nominal historical USD: $135M ($125M + $10M gifts), not $135B
+    assert.equal(carnegie.total_personal_giving, 135000000, 'Carnegie total personal giving must be nominal $135M');
+
+    // Wealth snapshots must use historical nominal USD (1901: $350M, 1913: $150M, 1919: $25M)
+    const wh = await getWealthHistory(carnegie.person_id);
+    assert.ok(wh && wh.snapshots.length > 0);
+    const snap1901 = wh.snapshots.find(s => s.snapshot_date.startsWith('1901'));
+    assert.ok(snap1901, 'Must have 1901 snapshot');
+    assert.equal(snap1901.net_worth, 350000000, '1901 wealth must be nominal $350M, not modern $350B');
+
+    // Must never contain modern $350 Billion snapshot or future 2024/2026 snapshots
+    assert.ok(!wh.snapshots.some(s => s.net_worth > 1000000000));
+    assert.ok(!wh.snapshots.some(s => s.snapshot_date.startsWith('20')));
+
+    // Supabase / seed dataset check
+    const phase13Carnegie = PHASE13_BILLIONAIRES.find(b => b.name.includes('Carnegie'));
+    assert.ok(phase13Carnegie);
+    assert.equal(phase13Carnegie.wealthSnapshots[0].netWorth, 350000000);
+    assert.equal(phase13Carnegie.wealthSnapshots[0].date, '1901-03-02');
+  });
+
+  // 19. Basic/Advanced navigation does not trap users
+  test('Requirement 19: Navigation does not trap users in Advanced Mode', () => {
+    // Inspect index.html: Must clear or set nocharity_advanced_mode to false
+    const indexHtml = fs.readFileSync(path.join(rootDir, 'public', 'index.html'), 'utf8');
+    assert.match(indexHtml, /localStorage\.setItem\('nocharity_advanced_mode',\s*'false'\)/);
+
+    // Inspect app.js: Settings modal does not default to advanced mode
+    const appJs = fs.readFileSync(path.join(rootDir, 'public', 'js', 'app.js'), 'utf8');
+    assert.match(appJs, /settingsAdvancedModeToggle\.checked\s*=\s*false/);
+    assert.match(appJs, /updateModeDisplay\(false\)/);
+  });
+
+  // 20. USD and INR tangible comparisons do not incorrectly share the same raw threshold
+  test('Requirement 20: getTangibleMatch handles USD and INR respectfully without sharing raw USD thresholds', async () => {
+    // Setup mock browser globals for importing public/js/app.js
+    if (typeof globalThis.localStorage === 'undefined') {
+      const store = {};
+      globalThis.localStorage = {
+        getItem: k => store[k] ?? null,
+        setItem: (k, v) => { store[k] = String(v); },
+        removeItem: k => { delete store[k]; },
+        clear: () => {}
+      };
+    }
+    if (typeof globalThis.document === 'undefined') {
+      globalThis.document = {
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        getElementById: () => ({
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          setAttribute: () => {},
+          classList: { add: () => {}, remove: () => {} },
+          style: {}
+        }),
+        querySelectorAll: () => []
+      };
+    }
+    if (typeof globalThis.window === 'undefined') {
+      globalThis.window = globalThis;
+    }
+
+    const { getTangibleMatch } = await import('../public/js/app.js');
+
+    // USD: $3.50 gets a calibrated coffee item
+    const usdMatch = getTangibleMatch(3.50, '$', 4000);
+    assert.equal(usdMatch.icon, '☕');
+    assert.match(usdMatch.text, /coffee/i);
+    assert.match(usdMatch.tip, /proportional equivalent/i);
+
+    // INR: ₹3.50 must NOT get a US coffee item; gets proportional income equivalent
+    const inrMatch = getTangibleMatch(3.50, '₹', 40000);
+    assert.notEqual(inrMatch.icon, '☕');
+    assert.match(inrMatch.text, /Proportional income equivalent/i);
+    assert.match(inrMatch.tip, /proportional equivalent/i);
+
+    // High sacrifice case
+    const highMatch = getTangibleMatch(1500, '$', 4000);
+    assert.match(highMatch.tip, /consume a large share of your income/i);
+  });
+
+  // 21. Maintainer verification route protection
+  test('Requirement 21: POST /api/advanced/discover/verify is protected by MAINTAINER_TOKEN', () => {
+    const serverJs = fs.readFileSync(path.join(rootDir, 'server.js'), 'utf8');
+    assert.match(serverJs, /MAINTAINER_TOKEN/, 'server.js must require MAINTAINER_TOKEN');
+    assert.match(serverJs, /401/, 'server.js must return 401 when unauthorized');
+    assert.match(serverJs, /review-discovery\.js/, 'server.js must point unauthorized requests to local CLI tool');
   });
 
 });

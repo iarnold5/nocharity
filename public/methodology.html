@@ -424,12 +424,15 @@
       <div class="toc-title">Methodology Roadmap</div>
       <div class="toc-grid">
         <a href="#historical-wealth" class="toc-link"><span>⏳</span> 1. Historical Wealth & Denominators</a>
-        <a href="#personal-vs-org" class="toc-link"><span>🏛️</span> 2. Personal vs. Organization Giving</a>
-        <a href="#verification-tiers" class="toc-link"><span>✅</span> 3. Verification & Evidence Ladder</a>
-        <a href="#source-limitations" class="toc-link"><span>📑</span> 4. Source Limitations & Filing Lags</a>
-        <a href="#incomplete-records" class="toc-link"><span>🔍</span> 5. Incomplete Public Records</a>
-        <a href="#documented-vs-real" class="toc-link"><span>⚖️</span> 6. Documented vs. Real-World Giving</a>
-        <a href="#eight-questions" class="toc-link"><span>🎯</span> 7. The 8 Questions & Quality Layer</a>
+        <a href="#peak-vs-lifetime" class="toc-link"><span>📊</span> 2. Peak Donation vs. Invalid Lifetime Ratio</a>
+        <a href="#proportional-user-income" class="toc-link"><span>🧮</span> 3. User Income Comparison Methodology</a>
+        <a href="#personal-vs-org" class="toc-link"><span>🏛️</span> 4. Personal vs. Organization Giving</a>
+        <a href="#verification-tiers" class="toc-link"><span>✅</span> 5. Source Hierarchy & Evidence Ladder</a>
+        <a href="#historical-figures-carnegie" class="toc-link"><span>📜</span> 6. Historical Figures & Nominal Currency</a>
+        <a href="#source-limitations" class="toc-link"><span>📑</span> 7. Source Limitations & Filing Lags</a>
+        <a href="#incomplete-records" class="toc-link"><span>🔍</span> 8. Incomplete Public Records & Floor Metrics</a>
+        <a href="#documented-vs-real" class="toc-link"><span>⚖️</span> 9. Documented vs. Real-World Giving</a>
+        <a href="#eight-questions" class="toc-link"><span>🎯</span> 10. Data Quality Heuristic Formula</a>
       </div>
     </nav>
 
@@ -507,10 +510,89 @@
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 2. PERSONAL VS ORGANIZATION GIVING                                    -->
+    <!-- 2. PEAK DONATION VS. INVALID LIFETIME RATIO                           -->
+    <!-- ===================================================================== -->
+    <article id="peak-vs-lifetime" class="meth-section">
+      <h3><span>📊</span> 2. Peak Donation vs. The Invalid Lifetime Giving Ratio</h3>
+      <p>
+        A frequent request in billionaire philanthropy trackers is a single "lifetime giving percentage." In early prototypes or unvetted tools, this is often calculated as:
+      </p>
+
+      <div class="meth-callout warning">
+        <strong>The Invalid Lifetime Ratio Fallacy:</strong><br>
+        <code>Total Cumulative Lifetime Giving &divide; Current (Latest) Net Worth</code><br><br>
+        <strong>This calculation is conceptually and mathematically invalid.</strong> A donation made in 1998 had a real historical denominator: the donor's wealth in 1998. Adding gifts from 1998, 2010, and 2024 together in the numerator while dividing by a 2026 wealth snapshot produces a fictitious number. If the donor's fortune has multiplied tenfold, the ratio severely underestimates their historical generosity. If their fortune has shrunk, the ratio artificially inflates.
+      </div>
+
+      <p>
+        NoCharity has <strong>completely eliminated the invalid lifetime giving ratio</strong> from all public rankings, sorting, headline metrics, and API responses. We do not replace it with another misleading cumulative ratio.
+      </p>
+
+      <p>
+        Instead, when NoCharity presents a headline percentage metric, we display:
+      </p>
+      <ul>
+        <li>
+          <strong>Peak Donation / Wealth (%):</strong> The highest percentage of wealth given in any single documented personal donation event, calculated against the verified wealth snapshot at that donation date.
+        </li>
+        <li>
+          <strong>Total Documented Personal Giving:</strong> The absolute nominal sum of all qualifying, confirmed personal gifts.
+        </li>
+        <li>
+          <strong>Largest Single Personal Donation:</strong> The largest individual gift in nominal terms.
+        </li>
+        <li>
+          <strong>Documented Qualifying Donation Count:</strong> The number of discrete personal transactions meeting audit criteria.
+        </li>
+      </ul>
+      <p>
+        All figures are explicitly labeled as <em>documented qualifying donations</em>, not an exhaustive record of all lifetime charity.
+      </p>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 3. USER INCOME COMPARISON METHODOLOGY                                 -->
+    <!-- ===================================================================== -->
+    <article id="proportional-user-income" class="meth-section">
+      <h3><span>🧮</span> 3. User Income Comparison Methodology</h3>
+      <p>
+        NoCharity allows visitors to input their monthly take-home pay or annual household income to see a proportional comparison against billionaire gifts.
+      </p>
+
+      <div class="meth-callout gold">
+        <strong>Methodological Declaration:</strong><br>
+        <strong>"Equivalent by percentage of wealth."</strong><br>
+        This comparison calculates the donation as a percentage of the billionaire's wealth at the time of the donation, then applies that exact percentage to the user's income. 
+        <br><br>
+        <strong>What this comparison IS NOT:</strong>
+        <ul style="margin: 8px 0 0 16px; padding: 0;">
+          <li>It is <strong>not</strong> an estimate of the billionaire's annual salary or income.</li>
+          <li>It is <strong>not</strong> an estimate of disposable cash flow.</li>
+          <li>It does <strong>not</strong> infer where the billionaire obtained the donation funds.</li>
+        </ul>
+      </div>
+
+      <p>
+        <strong>Context-Aware Sacrifice & Currency Handling:</strong>
+      </p>
+      <ul>
+        <li>
+          <strong>USD Tangible Comparisons:</strong> For USD inputs, the application references everyday items (e.g., a cup of coffee, a grocery run) to make microscopic percentages intuitive.
+        </li>
+        <li>
+          <strong>International Currencies (e.g. INR):</strong> NoCharity never blindly converts USD dollar thresholds into foreign currencies without appropriate local calibration. For non-USD currencies, the application delivers respectful proportional statements (e.g., "Proportional income equivalent: ₹450") rather than inappropriate named items.
+        </li>
+        <li>
+          <strong>Neutral, Non-Moralizing Phrasing:</strong> Context-sensitive descriptors adapt based on the relative burden ("That's your proportional equivalent", "That's a substantial personal sacrifice at your income level", "That would consume a large share of your income") without lecturing or providing financial advice.
+        </li>
+      </ul>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 4. PERSONAL VS ORGANIZATION GIVING                                    -->
     <!-- ===================================================================== -->
     <article id="personal-vs-org" class="meth-section">
-      <h3><span>🏛️</span> 2. Personal vs. Organization Giving</h3>
+      <h3><span>🏛️</span> 4. Personal vs. Organization Giving</h3>
       <p>
         Public relations releases routinely conflate three entirely distinct categories of philanthropic capital:
       </p>
@@ -567,65 +649,87 @@
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 3. VERIFICATION & EVIDENCE LADDER                                     -->
+    <!-- 5. SOURCE HIERARCHY & EVIDENCE LADDER                                 -->
     <!-- ===================================================================== -->
     <article id="verification-tiers" class="meth-section">
-      <h3><span>✅</span> 3. Verification & The Evidence Ladder</h3>
+      <h3><span>✅</span> 5. Source Hierarchy & The Evidence Ladder</h3>
       <p>
-        No transaction enters NoCharity's confirmed database without passing an evidentiary audit:
+        No transaction enters NoCharity's confirmed database without passing an evidentiary audit. We structure evidence into a clear three-tier hierarchy:
       </p>
 
       <div class="dense-table-wrapper">
         <table class="dense-table">
           <thead>
             <tr>
-              <th>Status Tier</th>
+              <th>Hierarchy Tier</th>
+              <th>Source Type</th>
               <th>Required Primary Evidence</th>
-              <th>Default Parity Eligibility</th>
-              <th>Ranking Eligibility</th>
+              <th>Verification Handling</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="badge badge-green">VERIFIED</span></td>
-              <td>SEC Form 4 beneficial ownership statement, IRS Form 990-PF schedule, or audited grant agreement.</td>
-              <td>Eligible</td>
-              <td>Eligible</td>
+              <td><span class="badge badge-green">Tier 1: PRIMARY</span></td>
+              <td>Regulatory Filings</td>
+              <td>SEC Form 4 (insider equity disposition), IRS Form 990-PF (foundation schedule of contributors), or audited grant contracts.</td>
+              <td>Highest quality score (+20 pts). Automatically eligible for all calculations.</td>
             </tr>
             <tr>
-              <td><span class="badge badge-blue">PARTIALLY_VERIFIED</span></td>
-              <td>Institutional recipient official disclosure or dual independent investigative reports.</td>
-              <td>Eligible</td>
-              <td>Eligible</td>
+              <td><span class="badge badge-blue">Tier 2: REPUTABLE</span></td>
+              <td>Investigative Journalism</td>
+              <td>Institutional recipient disclosures (e.g. university endowment announcements) or dual-sourced investigative reporting (AP, Reuters, ProPublica).</td>
+              <td>High confidence (+12 pts). Eligible for personal parity if funding vehicle is confirmed.</td>
             </tr>
             <tr>
-              <td><span class="badge badge-amber">UNVERIFIED</span></td>
-              <td>Press release or single news article without regulatory corroboration.</td>
-              <td>Eligible (Badged)</td>
-              <td>Excluded from High-Confidence Filters</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-amber">DISCOVERED</span></td>
-              <td>Candidate headline detected by Google News RSS. "Potential donation — verification required".</td>
-              <td>Ineligible</td>
-              <td>Excluded</td>
-            </tr>
-            <tr>
-              <td><span class="badge badge-red">DISPUTED</span></td>
-              <td>Contested attribution, unfulfilled commitment, or repudiated grant figure.</td>
-              <td>Ineligible</td>
-              <td>Excluded</td>
+              <td><span class="badge badge-amber">Tier 3: DISCOVERY</span></td>
+              <td>Automated Ingestion</td>
+              <td>Google News RSS feeds, wire blurbs, or preliminary press releases. Marked unverified.</td>
+              <td>Preliminary score (+5 pts). Ineligible for personal giving calculations until verified by maintainer.</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <div class="meth-callout gold">
+        <strong>Maintainer Verification Security:</strong><br>
+        Candidate discovery records cannot be mutated or verified publicly. The discovery review endpoint (<code>POST /api/advanced/discover/verify</code>) requires an authenticated maintainer token via environment variable (<code>MAINTAINER_TOKEN</code>). The authoritative method for vetting and committing discovered records is the offline CLI review tool (<code>node scripts/review-discovery.js</code>).
+      </div>
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 4. SOURCE LIMITATIONS                                                 -->
+    <!-- 6. HISTORICAL FIGURES & NOMINAL CURRENCY STANDARD                    -->
+    <!-- ===================================================================== -->
+    <article id="historical-figures-carnegie" class="meth-section">
+      <h3><span>📜</span> 6. Historical Figures & The Nominal Currency Standard</h3>
+      <p>
+        Historical figures like Andrew Carnegie and John D. Rockefeller present unique analytical challenges. In 1901, Andrew Carnegie sold Carnegie Steel to J.P. Morgan for $480 million, retaining approximately $350 million in personal net worth.
+      </p>
+
+      <div class="meth-callout gold">
+        <strong>The Nominal Currency Invariant:</strong><br>
+        NoCharity records historical figures strictly in <strong>historical nominal USD</strong>. 
+        <br><br>
+        We <strong>never silently multiply historical nominal values by arbitrary inflation factors</strong> or substitute modern trillion-dollar valuations into historical databases. Andrew Carnegie's baseline wealth is recorded as $350,000,000 nominal USD (1901), and his gifts (e.g., $10,000,000 to the Carnegie Institute in 1901, $125,000,000 to the Carnegie Corporation in 1911) are evaluated in historical nominal USD.
+      </div>
+
+      <p>
+        <strong>Temporal Parity for Historical Donors:</strong>
+      </p>
+      <ul>
+        <li>
+          <strong>1901 Gift ($10,000,000):</strong> Evaluated against Carnegie's March 1901 wealth snapshot ($350,000,000). The gap is 258 days within the same calendar year (<span class="badge badge-amber">SAME_YEAR</span>), producing an authentic historical giving ratio of <strong>2.86%</strong>.
+        </li>
+        <li>
+          <strong>1911 Gift ($125,000,000):</strong> Carnegie's closest documented prior wealth snapshot is 1901 (10 years prior). Because NoCharity enforces a strict 3-year credibility ceiling and never searches into the future, this 1911 gift is classified as <span class="badge badge-red">UNAVAILABLE</span> for percentage parity. It remains fully documented in absolute dollars.
+        </li>
+      </ul>
+    </article>
+
+    <!-- ===================================================================== -->
+    <!-- 7. SOURCE LIMITATIONS                                                 -->
     <!-- ===================================================================== -->
     <article id="source-limitations" class="meth-section">
-      <h3><span>📑</span> 4. Source Limitations & Filing Lags</h3>
+      <h3><span>📑</span> 7. Source Limitations & Filing Lags</h3>
       <p>
         Transparency requires acknowledging the structural constraints of open public data:
       </p>
@@ -643,10 +747,10 @@
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 5. INCOMPLETE PUBLIC RECORDS                                          -->
+    <!-- 8. INCOMPLETE PUBLIC RECORDS                                          -->
     <!-- ===================================================================== -->
     <article id="incomplete-records" class="meth-section">
-      <h3><span>🔍</span> 5. Incomplete Public Records</h3>
+      <h3><span>🔍</span> 8. Incomplete Public Records & Floor Metrics</h3>
       <p>
         The public record is inherently incomplete. Billionaires who value privacy, support contentious causes, or donate to religious institutions, local relief efforts, or medical funds without issuing press releases leave minimal regulatory paper trails.
       </p>
@@ -657,10 +761,10 @@
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 6. DOCUMENTED VS REAL-WORLD GIVING                                    -->
+    <!-- 9. DOCUMENTED VS REAL-WORLD GIVING                                    -->
     <!-- ===================================================================== -->
     <article id="documented-vs-real" class="meth-section">
-      <h3><span>⚖️</span> 6. Why "Documented Giving" is NOT Equivalent to Total Real-World Giving</h3>
+      <h3><span>⚖️</span> 9. Why "Documented Giving" is NOT Equivalent to Total Real-World Giving</h3>
       <p>
         Every figure in NoCharity Advanced Mode represents a <strong>documented minimum (floor)</strong>, not a definitive ceiling.
       </p>
@@ -670,7 +774,7 @@
         <br>
         <em>"Public regulatory filings and audited disclosures confirm at least $15.0B in qualifying personal transactions."</em>
         <br><br>
-        It does <strong>not</strong> mean the billionaire has given only $15.0B. Nor does a blank record prove that an unranked billionaire has given zero dollars.
+        It does <strong>not</strong> mean the billionaire has given only $15.0B. Nor does a blank record prove that an unranked billionaire has given zero dollars. A lower documented total does not prove lesser real-world charity.
       </div>
       <p>
         When NoCharity calculates parity ratios, it explicitly qualifies:
@@ -680,13 +784,20 @@
     </article>
 
     <!-- ===================================================================== -->
-    <!-- 7. THE 8 QUESTIONS & DATA QUALITY LAYER                               -->
+    <!-- 10. THE 8 QUESTIONS & DATA QUALITY HEURISTIC FORMULA                  -->
     <!-- ===================================================================== -->
     <article id="eight-questions" class="meth-section">
-      <h3><span>🎯</span> 7. The 8 Essential Questions & Quality Scoring</h3>
+      <h3><span>🎯</span> 10. The 8 Essential Questions & Data Quality Heuristic Formula</h3>
       <p>
-        To prevent NoCharity from confidently displaying nonsense, every donation in Advanced Mode is evaluated against the <strong>8 Essential Questions</strong>:
+        To keep data evaluation honest and transparent, NoCharity calculates an automated <strong>Data Quality Score (0 to 100)</strong> for every donation record.
       </p>
+
+      <div class="meth-callout gold">
+        <strong>Definition:</strong><br>
+        <em>"A NoCharity data-quality heuristic based on source, verification, attribution, and historical-data confidence."</em>
+        <br><br>
+        The Data Quality Score is <strong>not an audited financial rating</strong>, not an official regulatory score, and not absolute proof of underlying accounting validity. It is a programmatic heuristic measuring the completeness, verification depth, and temporal precision of the record.
+      </div>
 
       <div class="eight-questions-grid">
         <div class="question-tile">
@@ -724,7 +835,68 @@
       </div>
 
       <p>
-        <strong>Automated Quality Grades (0 to 100):</strong>
+        <strong>Detailed Scoring Breakdown (100 Point Scale):</strong>
+      </p>
+
+      <div class="dense-table-wrapper">
+        <table class="dense-table">
+          <thead>
+            <tr>
+              <th>Evaluation Pillar</th>
+              <th>Maximum Points</th>
+              <th>Scoring Criteria & Deductions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Completeness of 8 Questions</strong></td>
+              <td>40 Points</td>
+              <td>5 points awarded per answered question (WHO, WHAT, WHEN, HOW MUCH, FROM WHOM, TO WHOM, SOURCE, HOW CERTAIN).</td>
+            </tr>
+            <tr>
+              <td><strong>2. Verification Status Quality</strong></td>
+              <td>30 Points</td>
+              <td>
+                <span class="badge badge-green">VERIFIED</span>: 30 pts |
+                <span class="badge badge-blue">PARTIALLY_VERIFIED</span>: 20 pts |
+                <span class="badge badge-amber">UNVERIFIED</span>: 10 pts |
+                <span class="badge badge-amber">DISCOVERED</span>: 5 pts |
+                <span class="badge badge-red">DISPUTED</span>: 0 pts
+              </td>
+            </tr>
+            <tr>
+              <td><strong>3. Source Provenance</strong></td>
+              <td>20 Points</td>
+              <td>
+                Tier 1 Regulatory Filing / Verified Primary: 20 pts |
+                Tier 2 Secondary Reporting / URL: 12 pts |
+                Named Publisher Only: 6 pts |
+                Missing Citation: 0 pts
+              </td>
+            </tr>
+            <tr>
+              <td><strong>4. Temporal Wealth Consistency</strong></td>
+              <td>10 Points</td>
+              <td>
+                Snapshot &le; 90 days or same calendar year (<span class="badge badge-green">EXACT</span> / <span class="badge badge-blue">NEAR</span> / <span class="badge badge-amber">SAME_YEAR</span>): +10 pts |
+                Snapshot 1–3 years prior (<span class="badge badge-amber">APPROXIMATE</span>): +5 pts |
+                Temporal gap &gt; 3 years or future snapshot (<span class="badge badge-red">UNAVAILABLE</span>): -10 pts
+              </td>
+            </tr>
+            <tr>
+              <td><strong>5. Invariant Deductions</strong></td>
+              <td>-35 Points</td>
+              <td>
+                Discrepant source amounts detected: -15 pts |
+                Core schema validation failure: -20 pts
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        <strong>Automated Quality Grades:</strong>
       </p>
       <div class="dense-table-wrapper">
         <table class="dense-table">

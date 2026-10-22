@@ -529,9 +529,21 @@ app.get('/api/advanced/discover', async (req, res) => {
   }
 });
 
-// POST /api/advanced/discover/verify - Phase 11: Lightweight Maintainer Verification
+// POST /api/advanced/discover/verify - Protected Maintainer Verification Route
+// Authoritative workflow: node scripts/review-discovery.js (CLI)
 app.post('/api/advanced/discover/verify', async (req, res) => {
   try {
+    const maintainerToken = process.env.MAINTAINER_TOKEN;
+    const authHeader = req.headers['authorization'];
+    const bearerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
+    const providedToken = req.headers['x-maintainer-token'] || bearerToken;
+
+    if (!maintainerToken || !providedToken || providedToken !== maintainerToken) {
+      return res.status(401).json({
+        error: 'Unauthorized: Public dataset mutations are disabled. Maintainers must supply a valid MAINTAINER_TOKEN via X-Maintainer-Token header, or use the authoritative local CLI review workflow: node scripts/review-discovery.js'
+      });
+    }
+
     const {
       candidate,
       fundingSourceType,

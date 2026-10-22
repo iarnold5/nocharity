@@ -32,15 +32,21 @@ NoCharity operates with a strict dual-mode model to preserve simplicity and prev
 
 ---
 
-## 🔬 Core Principles of Advanced Mode
+## 🔬 Core Principles & Methodological Boundaries
 
-1. **Attribution Taxonomy:** Only `PERSONAL_DIRECT` and `PERSONAL_FUNDS_CONFIRMED` count toward personal generosity calculations. Foundation grants (`FOUNDATION`), corporate philanthropy (`CORPORATE`), and donor-advised fund transfers (`DAF`) are categorized as separate contextual data.
-2. **Historical Wealth Parity:** Donation percentages must compare against the billionaire's estimated net worth **at the date of the donation**, never their present-day wealth:
-   $$\text{Historical Generosity Ratio} = \left(\frac{\text{Donation Amount at Date } T}{\text{Billionaire Net Worth at Date } T}\right) \times 100$$
-3. **Pledges Excluded:** Non-binding commitments (`PLEDGE`) do not count as completed giving.
-4. **Disputes Quarantined:** Contested or disputed records (`DISPUTED`) are excluded from default rankings and parity calculations.
-5. **Universal Provenance:** Every claim is linked to primary sources (SEC Form 4, IRS Form 990-PF, annual filings) or established investigative journalism.
-6. **Graceful Degradation:** If Supabase is offline or unconfigured, Advanced Mode falls back to a verified offline snapshot with clear notices.
+1. **Documented Giving vs. Real-World Giving:** NoCharity indexes **publicly documented qualifying donations**, not all philanthropy. Figures represent documented minimums from public records, not total real-world giving. Rankings must never be interpreted as proof that an individual with fewer public records gave less in reality.
+2. **Attribution Taxonomy:** Only `PERSONAL_DIRECT` and `PERSONAL_FUNDS_CONFIRMED` count toward individual generosity calculations. Foundation disbursements (`FOUNDATION`), corporate treasury giving (`CORPORATE`), and donor-advised fund transfers (`DAF`) are categorized as separate organizational context.
+3. **Historical Wealth Parity (No Future Snapshots):** A donation is compared against the billionaire's estimated wealth **at the time of the donation** (`snapshot_date <= donation_date`). Future snapshots are strictly rejected. Denominators older than 3 years are marked `UNAVAILABLE`.
+   $$\text{Historical Percentage} = \left(\frac{\text{Donation Amount at Date } T}{\text{Historical Wealth at or before Date } T}\right) \times 100$$
+4. **No Cumulative "Lifetime Giving Ratio":** Cumulative historical donations cannot validly share one current or latest wealth denominator. NoCharity uses **Peak Donation / Wealth** or dated historical percentages rather than invalid lifetime ratios.
+5. **Pledges & Disputes Excluded:** Non-binding commitments (`PLEDGE`) and contested claims (`DISPUTED`) are strictly quarantined and never count toward completed personal giving or default rankings.
+6. **Source Hierarchy:** Records follow a strict 3-tier hierarchy:
+   - **Tier 1: Primary Regulatory** (SEC Form 4, IRS Form 990-PF, foundation charters, deeds)
+   - **Tier 2: Reputable Secondary Reporting** (Reuters, Bloomberg, AP, ProPublica investigative reporting)
+   - **Tier 3: Discovery / Unverified** (Google News RSS candidates requiring maintainer review)
+7. **Historical Figures (Nominal Historical USD):** For historical titans like Andrew Carnegie ($350M net worth in 1901) and John D. Rockefeller ($900M in 1913), values are recorded strictly in **nominal historical USD**. Arbitrary inflation multipliers are forbidden.
+8. **Maintainer Authorization:** Dataset mutations (`POST /api/advanced/discover/verify`) require maintainer token authorization (`MAINTAINER_TOKEN`). The authoritative mutation workflow is the local CLI: `node scripts/review-discovery.js`. Public web visits are 100% read-only.
+9. **Graceful Degradation:** If Supabase is offline or unconfigured, Advanced Mode falls back to a verified offline snapshot with clear notices.
 
 ---
 
