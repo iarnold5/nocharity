@@ -68,7 +68,7 @@ export const PHASE13_BILLIONAIRES = [
       { date: "2023-01-01", netWorth: 106000000000, source: "Forbes Billionaires 2023", confidence: "HIGH", quality: DATA_QUALITY_STATUS.VERIFIED },
       { date: "2024-01-01", netWorth: 120000000000, source: "Forbes Billionaires 2024", confidence: "HIGH", quality: DATA_QUALITY_STATUS.VERIFIED },
       { date: "2025-06-28", netWorth: 135000000000, source: "Bloomberg Billionaires Index", confidence: "HIGH", quality: DATA_QUALITY_STATUS.VERIFIED },
-      { date: "2026-01-01", netWorth: 145000000000, source: "Bloomberg Billionaires Index", confidence: "HIGH", quality: DATA_QUALITY_STATUS.VERIFIED }
+      { date: "2026-01-01", netWorth: 154000000000, source: "Bloomberg Billionaires Index", confidence: "HIGH", quality: DATA_QUALITY_STATUS.VERIFIED }
     ],
     donations: [
       {

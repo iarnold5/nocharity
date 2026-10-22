@@ -49,7 +49,7 @@ describe('Canonical Dataset Unification — Unit & Integration Tests', () => {
     const buffett = res.billionaires.find(b => b.id === 'warren-buffett');
     assert.ok(buffett, 'Warren Buffett must exist');
     assert.equal(buffett.person_id, 'b0000000-0000-0000-0000-000000000001');
-    assert.equal(buffett.netWorth, 153619569000);
+    assert.equal(buffett.netWorth, 154000000000);
     assert.equal(buffett.historicalDonations.length, 4);
     assert.equal(buffett.totalDonatedInPeriod, 17170000000);
 
@@ -82,7 +82,7 @@ describe('Canonical Dataset Unification — Unit & Integration Tests', () => {
 
     // Verify snapshot facts match Supabase facts
     const buffett = CANONICAL_OFFLINE_SNAPSHOT.find(b => b.id === 'warren-buffett');
-    assert.equal(buffett.netWorth, 153619569000);
+    assert.equal(buffett.netWorth, 154000000000);
     assert.equal(buffett.historicalDonations.length, 4);
 
     const gates = CANONICAL_OFFLINE_SNAPSHOT.find(b => b.id === 'bill-gates');
@@ -108,7 +108,7 @@ describe('Canonical Dataset Unification — Unit & Integration Tests', () => {
 
     const buffettProfile = await getPersonById('b0000000-0000-0000-0000-000000000001');
     assert.equal(buffettProfile.canonical_name, 'Warren Buffett');
-    assert.equal(buffettProfile.latest_net_worth, 153619569000);
+    assert.equal(buffettProfile.latest_net_worth, 154000000000);
   });
 
   // =========================================================================

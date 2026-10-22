@@ -2,7 +2,7 @@
  * NoCharity — Bundled Verified Offline Snapshot (Canonical Dataset)
  * 
  * GENERATED AUTOMATICALLY FROM SUPABASE VIA scripts/generate-offline-snapshot.js
- * Generated at: 2026-10-22T10:20:02.778Z
+ * Generated at: 2026-10-22T13:53:30.327Z
  * 
  * Principles:
  * 1. Supabase is the canonical dataset for both Basic Mode and Advanced Mode.
@@ -15,7 +15,7 @@
 
 export const SNAPSHOT_METADATA = Object.freeze({
   source: 'canonical_supabase_export',
-  generatedAt: '2026-10-22T10:20:02.779Z',
+  generatedAt: '2026-10-22T13:53:30.328Z',
   billionairesCount: 17,
   totalDonationsCount: 29,
   isOfflineFallback: true,
@@ -30,7 +30,7 @@ export const CANONICAL_OFFLINE_SNAPSHOT = [
     "company": "Berkshire Hathaway Inc.",
     "country": "🇺🇸 United States",
     "industry": "Finance & Investing",
-    "netWorth": 153619569000,
+    "netWorth": 154000000000,
     "netWorthSourceUrl": "https://www.bloomberg.com/billionaires/",
     "netWorthSourceName": "Bloomberg Billionaires Index / Forbes",
     "image": "assets/billionaires/warren-buffett.jpg",

@@ -749,13 +749,13 @@ describe('Audit Remediation Pass — Verification of 21 Explicit Mandates', () =
     const usdMatch = getTangibleMatch(3.50, '$', 4000);
     assert.equal(usdMatch.icon, '☕');
     assert.match(usdMatch.text, /coffee/i);
-    assert.match(usdMatch.tip, /proportional equivalent/i);
+    assert.match(usdMatch.tip, /matching financial share|proportional/i);
 
-    // INR: ₹3.50 must NOT get a US coffee item; gets proportional income equivalent
+    // INR: ₹3.50 must NOT get a US coffee item; gets proportional income statement
     const inrMatch = getTangibleMatch(3.50, '₹', 40000);
     assert.notEqual(inrMatch.icon, '☕');
-    assert.match(inrMatch.text, /Proportional income equivalent/i);
-    assert.match(inrMatch.tip, /proportional equivalent/i);
+    assert.match(inrMatch.text, /Proportional paycheck share|Proportional income/i);
+    assert.match(inrMatch.tip, /matching financial share|proportional/i);
 
     // High sacrifice case
     const highMatch = getTangibleMatch(1500, '$', 4000);

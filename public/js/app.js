@@ -77,18 +77,22 @@ const closeMcpModal = document.getElementById('closeMcpModal');
 /**
  * Format currency amounts in human-readable millions/billions
  */
-function formatDollars(amount, currency = '₹') {
+function formatDollars(amount, currency = '$') {
   if (amount >= 1_000_000_000_000) {
-    return `${currency}${(amount / 1_000_000_000_000).toFixed(2)} Trillion`;
+    const val = amount / 1_000_000_000_000;
+    return `${currency}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(2)} Trillion`;
   }
   if (amount >= 1_000_000_000) {
-    return `${currency}${(amount / 1_000_000_000).toFixed(2)} Billion`;
+    const val = amount / 1_000_000_000;
+    return `${currency}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(2)} Billion`;
   }
   if (amount >= 1_000_000) {
-    return `${currency}${(amount / 1_000_000).toFixed(1)} Million`;
+    const val = amount / 1_000_000;
+    return `${currency}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)} Million`;
   }
   if (amount >= 1_000) {
-    return `${currency}${(amount / 1_000).toFixed(0)}k`;
+    const val = amount / 1_000;
+    return `${currency}${val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)}k`;
   }
   return `${currency}${amount.toLocaleString()}`;
 }
@@ -100,9 +104,9 @@ function formatDollars(amount, currency = '₹') {
  * - Do not apply USD thresholds directly to INR or other currencies.
  * - For USD ('$'), provide calibrated everyday purchase comparisons.
  * - For INR ('₹') and other currencies without a verified regional basket,
- *   prefer a generic proportional statement ("Proportional income equivalent").
+ *   prefer a generic proportional statement ("Proportional paycheck share").
  * - Tone: Context-aware without moralizing:
- *   - Lower equivalent: "That's your proportional equivalent."
+ *   - Lower equivalent: "Your matching financial share."
  *   - Higher equivalent: "That's a substantial personal sacrifice at your income level."
  *   - Very high equivalent: "That would consume a large share of your income."
  */
@@ -111,7 +115,7 @@ export function getTangibleMatch(userAmount, currency = '₹', userIncome = null
   const numericIncome = Number(userIncome);
   const ratio = (numericIncome && numericIncome > 0) ? (numericAmount / numericIncome) : (numericAmount / 4000);
 
-  let tip = "That's your proportional equivalent.";
+  let tip = "Your matching financial share.";
   if (ratio >= 0.25) {
     tip = "That would consume a large share of your income.";
   } else if (ratio >= 0.05) {
@@ -185,7 +189,7 @@ export function getTangibleMatch(userAmount, currency = '₹', userIncome = null
 
   return {
     icon,
-    text: `Proportional income equivalent (${amountStr})`,
+    text: `Proportional paycheck share (${amountStr})`,
     tip
   };
 }
@@ -261,14 +265,14 @@ function renderActiveBillionaire() {
   }
 
   // Update Left "ME" Panel
-  matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s documented giving of <span class="highlight-percentage" id="highlightMatchPercentage">${formattedPct}</span> of their estimated wealth (${getTimeframeLabel(state.activeTimeframe)}):`;
+  matchTargetQuote.innerHTML = `To match <strong>${b.name}'s</strong> documented giving of <span class="highlight-percentage" id="highlightMatchPercentage">${formattedPct}</span> of their estimated wealth (${getTimeframeLabel(state.activeTimeframe)}):`;
   
   // Hero number (clean whole units unless small fraction)
   const heroStr = (userEquivalent < 1 && userEquivalent > 0)
     ? `${state.currency}${userEquivalent.toFixed(2)}`
     : `${state.currency}${Math.round(userEquivalent).toLocaleString()}`;
   matchHeroAmount.textContent = heroStr;
-  matchSubText.textContent = `Equivalent by percentage of wealth (out of your ${state.currency}${state.monthlyIncome.toLocaleString()} ${periodLabel} income)`;
+  matchSubText.textContent = `(out of your ${state.currency}${state.monthlyIncome.toLocaleString()} ${periodLabel} income)*`;
   
   tangibleIcon.textContent = tangible.icon;
   tangibleText.textContent = tangible.text;
@@ -280,16 +284,16 @@ function renderActiveBillionaire() {
   // Update header settings button text
   headerSettingsLabel.textContent = `Settings (${state.currency}${state.monthlyIncome.toLocaleString()}/${isAnnual ? 'yr' : 'mo'})`;
 
-  // Flag and Country formatting
+  // Flag and Country formatting (supports 2-letter regional indicator pairs e.g. 🇺🇸)
   const countryStr = b.country || '';
-  const flagMatch = countryStr.match(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
+  const flagMatch = countryStr.match(/(\p{Regional_Indicator}{2}|\p{Emoji_Presentation}|\p{Extended_Pictographic})/u);
   const flag = flagMatch ? flagMatch[0] : '🌐';
-  const countryName = countryStr.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u, '').trim();
+  const countryName = countryStr.replace(/(\p{Regional_Indicator}{2}|\p{Emoji_Presentation}|\p{Extended_Pictographic})/u, '').trim();
 
-  // Financial badge: ALWAYS net worth (never infer billionaire income from net worth)
+  // Financial badge: ALWAYS billionaire native net worth in USD
   const financialBadge = `
     <a href="${b.netWorthSourceUrl}" target="_blank" rel="noopener noreferrer" class="tag-badge tag-networth" title="Source: ${b.netWorthSourceName || 'Bloomberg / Forbes'}">
-      💰 Net Worth: ${formatDollars(b.netWorth, state.currency)} ↗
+      💰 Net Worth: ${formatDollars(b.netWorth, '$')} ↗
     </a>
   `;
 
@@ -300,7 +304,7 @@ function renderActiveBillionaire() {
 
   const starRating = '★'.repeat(b.forbesPhilanthropyScore) + '☆'.repeat(5 - b.forbesPhilanthropyScore);
 
-  // Generate donations with verified direct links
+  // Generate donations with verified direct links (billionaire donations denominated in USD)
   const donationsHtml = activeDonations.length > 0
     ? activeDonations.map(d => `
         <div class="donation-news-card">
@@ -309,7 +313,7 @@ function renderActiveBillionaire() {
             <span style="color: #ea580c; font-size: 14px;">↗</span>
           </a>
           <div class="donation-news-meta">
-            <span class="donation-amount-badge">${formatDollars(d.amount, state.currency)}</span>
+            <span class="donation-amount-badge">${formatDollars(d.amount, '$')}</span>
             <span>•</span>
             <span class="news-source-tag">${d.source}</span>
             <span>•</span>
@@ -346,7 +350,7 @@ function renderActiveBillionaire() {
     <div class="b-stats-grid">
       <div class="b-stat-box">
         <div class="lbl">Donated in Period</div>
-        <div class="val val-green">${formatDollars(totalDonatedInPeriod, state.currency)}</div>
+        <div class="val val-green">${formatDollars(totalDonatedInPeriod, '$')}</div>
       </div>
       <div class="b-stat-box">
         <div class="lbl">${state.calcMode === 'income' ? 'Income % Donated' : 'Wealth % Donated'}</div>

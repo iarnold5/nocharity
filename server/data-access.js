@@ -857,7 +857,7 @@ export async function getRankings({
         country: '🇺🇸 United States',
         industry: 'Finance & Investing',
         occupation: 'Chairman & CEO, Berkshire Hathaway',
-        latest_net_worth: 145000000000,
+        latest_net_worth: 154000000000,
         giving_pledge: true,
         qualifying_donations_count: 4,
         total_personal_giving: 19240000000,
