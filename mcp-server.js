@@ -638,7 +638,9 @@ export function createMcpServer() {
               snapshotDate: { type: "string", description: "Optional date of explicit historical wealth snapshot in YYYY-MM-DD format" },
               fundingSourceType: { type: "string", enum: ["PERSONAL", "PERSONAL_DIRECT", "PERSONAL_FUNDS_CONFIRMED", "FOUNDATION", "CORPORATE", "DAF", "PLEDGE", "UNKNOWN_SOURCE"], description: "Attribution type. Defaults to PERSONAL_DIRECT." },
               status: { type: "string", enum: ["VERIFIED", "PARTIALLY_VERIFIED", "UNVERIFIED", "DISPUTED"], description: "Verification tier. Defaults to VERIFIED." },
-              userIncome: { type: "number", description: "User's personal income (default 60000)" },
+              userNetWorth: { type: "number", description: "User's estimated net worth (rough estimate: what you own minus what you owe)" },
+              monthlyIncome: { type: "number", description: "User's monthly take-home income (translates wealth sacrifice to paycheck interpretation)" },
+              userIncome: { type: "number", description: "Legacy personal income (default 60000)" },
               incomeFrequency: { type: "string", enum: ["monthly", "annual"], description: "Whether userIncome is 'monthly' or 'annual' (default 'monthly')" },
               userCurrency: { type: "string", description: "Display currency symbol (default '₹')" },
               displayExchangeRate: { type: "number", description: "Optional display exchange multiplier" }
@@ -1154,7 +1156,9 @@ export function createMcpServer() {
           snapshotDate: args.snapshotDate,
           fundingSourceType: fundingSource,
           status: defaultStatus,
-          userIncome: args.userIncome !== undefined ? parseFloat(args.userIncome) : 60000,
+          userNetWorth: args.userNetWorth !== undefined ? args.userNetWorth : args.user_net_worth,
+          monthlyIncome: args.monthlyIncome !== undefined ? args.monthlyIncome : args.userMonthlyIncome,
+          userIncome: args.userIncome !== undefined ? parseFloat(args.userIncome) : undefined,
           incomeFrequency: args.incomeFrequency || 'monthly',
           userCurrency: args.userCurrency || args.currency || '₹',
           displayExchangeRate: args.displayExchangeRate ? parseFloat(args.displayExchangeRate) : null

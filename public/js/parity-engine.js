@@ -599,6 +599,10 @@ export function formatRatio(ratio) {
     return `${num.toFixed(2)}%`;
   }
   if (num >= 0.01) {
+    const twoDec = num.toFixed(2);
+    if (Math.abs(Number(twoDec) - num) < 1e-6) {
+      return `${twoDec}%`;
+    }
     return `${num.toFixed(4)}%`;
   }
   if (num >= 0.0001) {
@@ -623,14 +627,32 @@ export function calculateHistoricalDonationParity({
   funding_source_type = null,
   status = null,
   verificationStatus = null,
-  userIncome = 60000,
+  userNetWorth = undefined,
+  user_net_worth = undefined,
+  monthlyIncome = undefined,
+  userMonthlyIncome = undefined,
+  userIncome = undefined,
   incomeFrequency = 'monthly', // 'monthly' | 'annual'
   sourceCurrency = 'USD',
   userCurrency = '₹',
   displayExchangeRate = null // Optional explicit multiplier for display only
 } = {}) {
   const numericDonation = Number(donationAmount);
-  const numericUserIncome = Number(userIncome);
+
+  // 1. Resolve User Financial Context
+  const rawNetWorth = userNetWorth !== undefined ? userNetWorth : user_net_worth;
+  const hasExplicitNetWorth = rawNetWorth !== undefined && rawNetWorth !== null;
+  const parsedNetWorth = hasExplicitNetWorth ? parseFloat(rawNetWorth) : null;
+  const numericUserNetWorth = (hasExplicitNetWorth && !isNaN(parsedNetWorth)) ? parsedNetWorth : null;
+
+  const rawMonthlyIncome = monthlyIncome !== undefined ? monthlyIncome : (userMonthlyIncome !== undefined ? userMonthlyIncome : undefined);
+  const hasExplicitMonthlyIncome = rawMonthlyIncome !== undefined && rawMonthlyIncome !== null;
+  const parsedMonthlyIncome = hasExplicitMonthlyIncome ? parseFloat(rawMonthlyIncome) : (userIncome !== undefined ? parseFloat(userIncome) : null);
+  const numericMonthlyIncome = (parsedMonthlyIncome !== null && !isNaN(parsedMonthlyIncome)) ? parsedMonthlyIncome : null;
+
+  // Legacy fallback flag for older Phase 3 / Phase 9 tests that provided userIncome without userNetWorth
+  const isLegacyMode = !hasExplicitNetWorth && userIncome !== undefined && rawMonthlyIncome === undefined;
+  const numericLegacyIncome = userIncome !== undefined ? Number(userIncome) : 60000;
   const normalizedFrequency = String(incomeFrequency || 'monthly').toLowerCase() === 'annual' ? 'annual' : 'monthly';
 
   // Resolve Phase 5 funding source type and status
@@ -640,7 +662,7 @@ export function calculateHistoricalDonationParity({
   const fundingSourceMeta = fundingSource ? (FUNDING_SOURCE_METADATA[fundingSource] || FUNDING_SOURCE_METADATA.UNKNOWN_SOURCE) : null;
   const statusMeta = donationStatus ? (STATUS_METADATA[donationStatus] || STATUS_METADATA.UNVERIFIED) : null;
 
-  // 1. Resolve wealth snapshot and quality tier
+  // 2. Resolve wealth snapshot and quality tier
   let resolvedNetWorth = null;
   let resolvedSnapshotDate = null;
   let resolvedSnapshot = null;
@@ -671,7 +693,7 @@ export function calculateHistoricalDonationParity({
     reason = 'No wealth data provided.';
   }
 
-  // 2. Validate eligibility and availability
+  // 3. Validate eligibility and availability
   if (fundingSource && !eligibility.isEligible) {
     const qualityMetadata = QUALITY_METADATA[quality] || QUALITY_METADATA.UNAVAILABLE;
     return {
@@ -694,13 +716,26 @@ export function calculateHistoricalDonationParity({
       sourceCurrency,
       historicalGenerosityRatio: null,
       formattedRatio: 'N/A',
-      userIncome: numericUserIncome,
+      userNetWorth: numericUserNetWorth,
+      hasNetWorth: hasExplicitNetWorth && numericUserNetWorth !== null,
+      monthlyIncome: numericMonthlyIncome,
+      hasMonthlyIncome: numericMonthlyIncome !== null && numericMonthlyIncome > 0,
+      userIncome: numericMonthlyIncome || numericLegacyIncome,
       incomeFrequency: normalizedFrequency,
       userCurrency,
       userEquivalent: null,
       userEquivalentMonthly: null,
       userEquivalentAnnual: null,
       formattedUserEquivalent: 'N/A',
+      incomeSharePercentage: null,
+      formattedIncomeShare: null,
+      incomeDaysEquivalent: null,
+      incomeInterpretation: null,
+      statementRatio: 'Historical wealth comparison unavailable.',
+      statementEquivalent: 'Direct comparison requires verified personal giving eligibility.',
+      statement_ratio: 'Historical wealth comparison unavailable.',
+      statement_equivalent: 'Direct comparison requires verified personal giving eligibility.',
+      humorCopy: 'Give yourself a rough net worth estimate — what you own minus what you owe.',
       explanation: eligibility.reason,
       sourceName
     };
@@ -735,39 +770,155 @@ export function calculateHistoricalDonationParity({
       sourceCurrency,
       historicalGenerosityRatio: null,
       formattedRatio: 'N/A',
-      userIncome: numericUserIncome,
+      userNetWorth: numericUserNetWorth,
+      hasNetWorth: hasExplicitNetWorth && numericUserNetWorth !== null,
+      monthlyIncome: numericMonthlyIncome,
+      hasMonthlyIncome: numericMonthlyIncome !== null && numericMonthlyIncome > 0,
+      userIncome: numericMonthlyIncome || numericLegacyIncome,
       incomeFrequency: normalizedFrequency,
       userCurrency,
       userEquivalent: null,
       userEquivalentMonthly: null,
       userEquivalentAnnual: null,
       formattedUserEquivalent: 'N/A',
+      incomeSharePercentage: null,
+      formattedIncomeShare: null,
+      incomeDaysEquivalent: null,
+      incomeInterpretation: null,
+      statementRatio: 'Historical wealth comparison unavailable.',
+      statementEquivalent: 'Direct comparison requires verified historical net worth and estimated user net worth.',
+      statement_ratio: 'Historical wealth comparison unavailable.',
+      statement_equivalent: 'Direct comparison requires verified historical net worth and estimated user net worth.',
+      humorCopy: 'Give yourself a rough net worth estimate — what you own minus what you owe.',
       explanation: reason || 'Historical wealth comparison is unavailable for this donation.',
       sourceName
     };
   }
 
-  // 3. Calculate historical generosity ratio (unrounded)
-  // Formula: historical_generosity_ratio = donation_amount / historical_net_worth * 100
+  // 4. Calculate historical generosity ratio (unrounded float)
+  // Formula: historical_generosity_ratio = (donation_amount / historical_net_worth) * 100
   const historicalGenerosityRatio = (numericDonation / resolvedNetWorth) * 100;
+  const formattedRatio = formatRatio(historicalGenerosityRatio);
 
-  // 4. Calculate user's equivalent sacrifice (unrounded)
-  // Formula: user_equivalent = user_income * historical_generosity_ratio / 100
-  const userEquivalent = numericUserIncome * (historicalGenerosityRatio / 100);
+  // 5. Primary Calculation (Wealth-to-Wealth Comparison)
+  // Formula: user_equivalent = user's estimated net worth * (historical_generosity_ratio / 100)
+  let userEquivalent = null;
+  let formattedUserEquivalent = 'N/A';
+  let isZeroOrNegativeNetWorth = false;
+  let netWorthStatus = 'MISSING'; // 'POSITIVE' | 'ZERO' | 'NEGATIVE' | 'MISSING' | 'LEGACY_INCOME_FALLBACK'
 
-  // Derive explicit monthly vs annual equivalents
+  if (numericUserNetWorth !== null) {
+    if (numericUserNetWorth < 0) {
+      userEquivalent = 0;
+      formattedUserEquivalent = formatCurrencyAmount(0, userCurrency);
+      isZeroOrNegativeNetWorth = true;
+      netWorthStatus = 'NEGATIVE';
+    } else if (numericUserNetWorth === 0) {
+      userEquivalent = 0;
+      formattedUserEquivalent = formatCurrencyAmount(0, userCurrency);
+      isZeroOrNegativeNetWorth = true;
+      netWorthStatus = 'ZERO';
+    } else {
+      userEquivalent = numericUserNetWorth * (historicalGenerosityRatio / 100);
+      formattedUserEquivalent = formatCurrencyAmount(userEquivalent, userCurrency);
+      isZeroOrNegativeNetWorth = false;
+      netWorthStatus = 'POSITIVE';
+    }
+  } else if (isLegacyMode) {
+    userEquivalent = numericLegacyIncome * (historicalGenerosityRatio / 100);
+    formattedUserEquivalent = formatCurrencyAmount(userEquivalent, userCurrency);
+    netWorthStatus = 'LEGACY_INCOME_FALLBACK';
+  } else {
+    userEquivalent = null;
+    formattedUserEquivalent = 'N/A';
+    netWorthStatus = 'MISSING';
+  }
+
+  // 6. Contextual Monthly Income Interpretation
+  // Monthly income translates the wealth-equivalent amount into an income-based interpretation
+  let incomeSharePercentage = null;
+  let formattedIncomeShare = null;
+  let incomeDaysEquivalent = null;
+  let incomeInterpretation = null;
+
+  if (numericMonthlyIncome && numericMonthlyIncome > 0) {
+    if (userEquivalent !== null && userEquivalent >= 0) {
+      if (userEquivalent === 0) {
+        incomeSharePercentage = 0;
+        formattedIncomeShare = '0%';
+        incomeDaysEquivalent = 0;
+        if (netWorthStatus === 'NEGATIVE') {
+          incomeInterpretation = `With debts exceeding assets, your estimated net worth is negative. Relinquishing ${formattedRatio} yields ${userCurrency}0 in deployable sacrifice.`;
+        } else {
+          incomeInterpretation = `At zero estimated net worth, your wealth equivalent is ${userCurrency}0. You have matched the billionaire's sacrifice without touching your monthly paycheck.`;
+        }
+      } else {
+        incomeSharePercentage = (userEquivalent / numericMonthlyIncome) * 100;
+        formattedIncomeShare = incomeSharePercentage >= 1
+          ? `${Math.round(incomeSharePercentage)}%`
+          : `${incomeSharePercentage.toFixed(1)}%`;
+
+        incomeDaysEquivalent = userEquivalent / (numericMonthlyIncome / 30);
+        const roundedDays = Math.round(incomeDaysEquivalent);
+        const daysPhrase = roundedDays >= 1
+          ? ` (roughly ${roundedDays} days of earnings)`
+          : '';
+
+        incomeInterpretation = `That's about ${formattedIncomeShare} of one month's take-home pay${daysPhrase}.`;
+      }
+    } else {
+      // User only provided monthly income, no net worth
+      const hypotheticalPaycheckEquivalent = numericMonthlyIncome * (historicalGenerosityRatio / 100);
+      incomeSharePercentage = historicalGenerosityRatio;
+      formattedIncomeShare = formattedRatio;
+      incomeDaysEquivalent = hypotheticalPaycheckEquivalent / (numericMonthlyIncome / 30);
+      incomeInterpretation = `Direct wealth comparison requires an estimated net worth. If compared directly against your monthly paycheck (for illustration only), ${formattedRatio} would be ${formatCurrencyAmount(hypotheticalPaycheckEquivalent, userCurrency)}. (Note: comparing wealth to income is conceptually mismatched.)`;
+    }
+  }
+
+  // Exact Canonical & Natural Language Statements
+  const statementRatio = `They gave approximately ${formattedRatio} of their documented wealth at the time.`;
+  let statementEquivalent;
+  if (userEquivalent !== null) {
+    if (isLegacyMode) {
+      const freqLabel = normalizedFrequency === 'annual' ? 'year' : 'month';
+      statementEquivalent = `For an income of ${userCurrency}${Math.round(numericLegacyIncome).toLocaleString()}/${freqLabel}, that is equivalent to ${formattedUserEquivalent}.`;
+    } else {
+      statementEquivalent = `That would be ${formattedUserEquivalent} for you.`;
+    }
+  } else {
+    statementEquivalent = 'Direct comparison requires an estimated net worth.';
+  }
+
+  let humorCopy;
+  if (netWorthStatus === 'NEGATIVE') {
+    humorCopy = 'Your debts have officially granted you immunity from philanthropic guilt.';
+  } else if (netWorthStatus === 'ZERO') {
+    humorCopy = "At zero net worth, you've matched the billionaire's sacrifice for free.";
+  } else if (userEquivalent !== null) {
+    humorCopy = 'Congratulations. You too can experience the billionaire donation lifestyle.';
+  } else {
+    humorCopy = 'Give yourself a rough net worth estimate — what you own minus what you owe.';
+  }
+
+  // Derive explicit monthly vs annual equivalents for backwards-compatibility
   let userEquivalentMonthly;
   let userEquivalentAnnual;
 
-  if (normalizedFrequency === 'monthly') {
-    userEquivalentMonthly = userEquivalent;
-    userEquivalentAnnual = (numericUserIncome * 12) * (historicalGenerosityRatio / 100);
+  if (isLegacyMode) {
+    if (normalizedFrequency === 'monthly') {
+      userEquivalentMonthly = userEquivalent;
+      userEquivalentAnnual = (numericLegacyIncome * 12) * (historicalGenerosityRatio / 100);
+    } else {
+      userEquivalentAnnual = userEquivalent;
+      userEquivalentMonthly = (numericLegacyIncome / 12) * (historicalGenerosityRatio / 100);
+    }
   } else {
-    userEquivalentAnnual = userEquivalent;
-    userEquivalentMonthly = (numericUserIncome / 12) * (historicalGenerosityRatio / 100);
+    userEquivalentMonthly = userEquivalent;
+    userEquivalentAnnual = userEquivalent !== null ? userEquivalent : null;
   }
 
-  // 5. Build display conversion object (never altering source calculations)
+  // 7. Build display conversion object (never altering source calculations)
   let displayConversion = {
     applied: false,
     sourceCurrency,
@@ -812,16 +963,32 @@ export function calculateHistoricalDonationParity({
     sourceCurrency,
     sourceName,
     historicalGenerosityRatio, // Raw, unrounded numeric calculation
-    formattedRatio: formatRatio(historicalGenerosityRatio),
-    userIncome: numericUserIncome,
-    incomeFrequency: normalizedFrequency, // Explicitly 'monthly' or 'annual'
+    formattedRatio,
+    userNetWorth: numericUserNetWorth,
+    hasNetWorth: hasExplicitNetWorth && numericUserNetWorth !== null,
+    netWorthStatus,
+    isZeroOrNegativeNetWorth,
+    monthlyIncome: numericMonthlyIncome,
+    hasMonthlyIncome: numericMonthlyIncome !== null && numericMonthlyIncome > 0,
     userCurrency,
-    userEquivalent, // Raw unrounded in chosen frequency
-    userEquivalentMonthly, // Raw unrounded monthly
-    userEquivalentAnnual, // Raw unrounded annual
-    formattedUserEquivalent: formatCurrencyAmount(userEquivalent, userCurrency),
-    formattedUserEquivalentMonthly: formatCurrencyAmount(userEquivalentMonthly, userCurrency),
-    formattedUserEquivalentAnnual: formatCurrencyAmount(userEquivalentAnnual, userCurrency),
+    userEquivalent, // Raw unrounded wealth-to-wealth equivalent
+    formattedUserEquivalent,
+    incomeSharePercentage,
+    formattedIncomeShare,
+    incomeDaysEquivalent,
+    incomeInterpretation,
+    statementRatio,
+    statementEquivalent,
+    statement_ratio: statementRatio,
+    statement_equivalent: statementEquivalent,
+    humorCopy,
+    // Legacy fields preserved for complete backwards-compatibility
+    userIncome: numericMonthlyIncome || numericLegacyIncome,
+    incomeFrequency: normalizedFrequency,
+    userEquivalentMonthly,
+    userEquivalentAnnual,
+    formattedUserEquivalentMonthly: formattedUserEquivalent,
+    formattedUserEquivalentAnnual: formattedUserEquivalent,
     displayConversion,
     explanation: `${qualityMetadata.label}: ${reason}`
   };
@@ -851,6 +1018,8 @@ export function enrichDonationsWithHistoricalParity(donations, wealthSnapshotsBy
       snapshotDate: donation.snapshot_date || donation.snapshotDate,
       fundingSourceType,
       status,
+      userNetWorth: options.userNetWorth !== undefined ? options.userNetWorth : options.user_net_worth,
+      monthlyIncome: options.monthlyIncome !== undefined ? options.monthlyIncome : options.userMonthlyIncome,
       userIncome: options.userIncome !== undefined ? options.userIncome : 60000,
       incomeFrequency: options.incomeFrequency || 'monthly',
       sourceCurrency: donation.currency || 'USD',

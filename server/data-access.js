@@ -1190,7 +1190,11 @@ export async function calculateHistoricalParity({
   funding_source_type = null,
   status = null,
   verificationStatus = null,
-  userIncome = 60000,
+  userNetWorth = undefined,
+  user_net_worth = undefined,
+  monthlyIncome = undefined,
+  userMonthlyIncome = undefined,
+  userIncome = undefined,
   incomeFrequency = 'monthly',
   userCurrency = '₹',
   displayExchangeRate = null
@@ -1238,6 +1242,10 @@ export async function calculateHistoricalParity({
     snapshotDate,
     fundingSourceType: targetFundingSourceType,
     status: targetStatus,
+    userNetWorth,
+    user_net_worth,
+    monthlyIncome,
+    userMonthlyIncome,
     userIncome,
     incomeFrequency,
     userCurrency,
@@ -1269,11 +1277,22 @@ export async function calculateHistoricalParity({
  */
 export async function compareBillionairesParity({
   personIds = null,
+  userNetWorth = undefined,
+  user_net_worth = undefined,
+  monthlyIncome = undefined,
+  userMonthlyIncome = undefined,
   userIncome = 60000,
   incomeFrequency = 'monthly',
   userCurrency = '₹',
   displayExchangeRate = null
 } = {}) {
+  const rawNetWorth = userNetWorth !== undefined ? userNetWorth : user_net_worth;
+  const hasNetWorth = rawNetWorth !== undefined && rawNetWorth !== null;
+  const numericNetWorth = hasNetWorth ? parseFloat(rawNetWorth) : null;
+
+  const rawMonthly = monthlyIncome !== undefined ? monthlyIncome : (userMonthlyIncome !== undefined ? userMonthlyIncome : undefined);
+  const numericMonthlyIncome = rawMonthly !== undefined && rawMonthly !== null ? parseFloat(rawMonthly) : null;
+
   const numericIncome = parseFloat(userIncome) || 60000;
   const normalizedFreq = String(incomeFrequency || 'monthly').toLowerCase() === 'annual' ? 'annual' : 'monthly';
   const currencySymbol = String(userCurrency || '₹').trim();
@@ -1290,11 +1309,38 @@ export async function compareBillionairesParity({
   const comparisons = people.map(p => {
     const peak = p.peak_donation_percentage;
     const ratio = peak?.percentage !== null && peak?.percentage !== undefined ? parseFloat(peak.percentage) : 0;
-    const equivalentSacrifice = (numericIncome * ratio) / 100;
-    const freqLabel = normalizedFreq === 'annual' ? 'year' : 'month';
+    
+    let equivalentSacrifice = null;
+    let statementEquivalent;
+    let formattedEquivalent;
+    let incomeInterpretation = null;
+
+    if (numericNetWorth !== null) {
+      if (numericNetWorth <= 0) {
+        equivalentSacrifice = 0;
+        formattedEquivalent = `${currencySymbol}0`;
+        statementEquivalent = `That would be ${currencySymbol}0 for you.`;
+      } else {
+        equivalentSacrifice = (numericNetWorth * ratio) / 100;
+        formattedEquivalent = `${currencySymbol}${Math.round(equivalentSacrifice).toLocaleString()}`;
+        statementEquivalent = `That would be ${formattedEquivalent} for you.`;
+      }
+
+      if (numericMonthlyIncome && numericMonthlyIncome > 0) {
+        const share = (equivalentSacrifice / numericMonthlyIncome) * 100;
+        const days = equivalentSacrifice / (numericMonthlyIncome / 30);
+        const daysPhrase = Math.round(days) >= 1 ? ` (roughly ${Math.round(days)} days of earnings)` : '';
+        incomeInterpretation = `That's about ${Math.round(share)}% of one month's take-home pay${daysPhrase}.`;
+      }
+    } else {
+      // Legacy income fallback
+      equivalentSacrifice = (numericIncome * ratio) / 100;
+      const freqLabel = normalizedFreq === 'annual' ? 'year' : 'month';
+      formattedEquivalent = `${currencySymbol}${Math.round(equivalentSacrifice).toLocaleString()}`;
+      statementEquivalent = `For an income of ${currencySymbol}${numericIncome.toLocaleString()}/${freqLabel}, that is equivalent to ${formattedEquivalent}.`;
+    }
 
     const statementRatio = `They gave approximately ${ratio.toFixed(2)}% of their documented wealth at the time.`;
-    const statementEquivalent = `For an income of ${currencySymbol}${numericIncome.toLocaleString()}/${freqLabel}, that is equivalent to ${currencySymbol}${Math.round(equivalentSacrifice).toLocaleString()}.`;
 
     return {
       person_id: p.person_id,
@@ -1319,11 +1365,14 @@ export async function compareBillionairesParity({
       } : null,
       ratio_percentage: ratio,
       formatted_ratio: `${ratio.toFixed(2)}%`,
+      user_net_worth: numericNetWorth,
+      user_monthly_income: numericMonthlyIncome,
       user_income: numericIncome,
       income_frequency: normalizedFreq,
       user_currency: currencySymbol,
       user_equivalent: equivalentSacrifice,
-      formatted_equivalent: `${currencySymbol}${Math.round(equivalentSacrifice).toLocaleString()}`,
+      formatted_equivalent: formattedEquivalent,
+      income_interpretation: incomeInterpretation,
       statement_ratio: statementRatio,
       statement_equivalent: statementEquivalent,
       methodology_type: 'Proportional wealth comparison',

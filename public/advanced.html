@@ -1157,6 +1157,36 @@
       margin-top: 14px;
     }
 
+    .income-interpretation-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #bae6fd;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-top: 12px;
+    }
+
+    .satirical-kicker-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-style: italic;
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+
     /* Satirical Nuance Callout */
     .satirical-nuance-callout {
       background: rgba(2, 6, 23, 0.7);
@@ -2018,13 +2048,13 @@
       <div class="calc-editorial-hero">
         <div class="calc-hero-topline">
           <span class="calc-topic-tag">Philanthropy Reality Check</span>
-          <button id="btnLoadCanonicalExample" class="btn-canonical-benchmark" title="Load the canonical $1B on $50B benchmark with ₹60,000 income">
-            <span>⚡ Canonical Benchmark ($1B / $50B)</span>
+          <button id="btnLoadCanonicalExample" class="btn-canonical-benchmark" title="Load the canonical $500M on $100B benchmark with ₹10L net worth and ₹35K income">
+            <span>⚡ Canonical Benchmark ($500M / $100B)</span>
           </button>
         </div>
         <h2 class="calc-hero-headline">"Okay, they gave that much. But how big was that sacrifice actually?"</h2>
         <p class="calc-hero-subheadline">
-          Billionaire philanthropic headlines calibrated against documented historical net worth at the time of donation, applied directly to an everyday paycheck.
+          Billionaire philanthropic headlines calibrated against documented historical net worth at the time of donation, applied directly to your own financial base.
         </p>
       </div>
 
@@ -2037,41 +2067,71 @@
           </select>
         </div>
 
-        <div class="calc-story-col" style="flex: 1.4;">
+        <div class="calc-story-col" style="flex: 1.2;">
           <label class="calc-bar-label" for="calcDonationSelect">2. Choose a Documented Gift</label>
           <select id="calcDonationSelect" class="calc-bar-select">
             <!-- Dynamically populated based on chosen billionaire -->
           </select>
         </div>
 
-        <div class="calc-story-col">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label class="calc-bar-label" for="calcUserIncomeInput" id="calcUserIncomeLabel" style="margin-bottom: 0;">3. Your Take-Home Pay</label>
-            <div class="calc-segmented-group" id="calcIncomeFreqToggle" style="width: auto; padding: 2px;">
-              <button type="button" class="calc-segmented-btn active" data-freq="monthly" style="padding: 3px 8px; font-size: 0.72rem;">Monthly</button>
-              <button type="button" class="calc-segmented-btn" data-freq="annual" style="padding: 3px 8px; font-size: 0.72rem;">Annual</button>
+        <div class="calc-story-col" style="flex: 1.6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+            <label class="calc-bar-label" style="margin-bottom: 0;">3. Your Financial Context</label>
+            <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 600;">Optional</span>
+          </div>
+          <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0 0 8px 0; line-height: 1.3;">
+            Wealth-to-wealth comparison uses estimated net worth. Monthly income translates it into your paycheck reality.
+          </p>
+
+          <!-- Input 1: Estimated Net Worth -->
+          <div style="margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+              <label class="calc-bar-label" for="calcUserNetWorthInput" style="font-size: 0.76rem; margin-bottom: 0;">
+                1. Estimated Net Worth
+              </label>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">What you own minus what you owe</span>
+            </div>
+            <div class="calc-input-wrapper">
+              <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency">
+                <option value="₹">₹ INR</option>
+                <option value="$">$ USD</option>
+                <option value="€">€ EUR</option>
+                <option value="£">£ GBP</option>
+                <option value="¥">¥ JPY</option>
+                <option value="C$">C$ CAD</option>
+                <option value="A$">A$ AUD</option>
+                <option value="CHF">CHF</option>
+              </select>
+              <input type="number" id="calcUserNetWorthInput" class="calc-amount-input" value="1000000" step="50000" placeholder="e.g. 1000000 (leave empty if unknown)">
+            </div>
+            <div class="calc-preset-row" style="margin-top: 5px;">
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="0">₹0 / Debts</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="500000">5L</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip active" data-amount="1000000">10L (Benchmark)</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="2500000">25L</button>
+              <button type="button" class="calc-preset-chip calc-nw-chip" data-amount="clear" style="opacity: 0.75;">Clear</button>
             </div>
           </div>
-          <div class="calc-input-wrapper">
-            <select id="calcCurrencySelect" class="calc-currency-prefix-select" title="Display Currency">
-              <option value="₹">₹ INR</option>
-              <option value="$">$ USD</option>
-              <option value="€">€ EUR</option>
-              <option value="£">£ GBP</option>
-              <option value="¥">¥ JPY</option>
-              <option value="C$">C$ CAD</option>
-              <option value="A$">A$ AUD</option>
-              <option value="CHF">CHF</option>
-            </select>
-            <span class="calc-currency-badge" id="calcInputCurrencySymbol" style="display: none;">₹</span>
-            <input type="number" id="calcUserIncomeInput" class="calc-amount-input" value="60000" min="1" step="1000" placeholder="60000">
-          </div>
-          <!-- Quick Preset Chips -->
-          <div class="calc-preset-row" style="margin-top: 6px;">
-            <button type="button" class="calc-preset-chip" data-amount="30000">30K</button>
-            <button type="button" class="calc-preset-chip active" data-amount="60000">60K (Benchmark)</button>
-            <button type="button" class="calc-preset-chip" data-amount="100000">100K</button>
-            <button type="button" class="calc-preset-chip" data-amount="250000">250K</button>
+
+          <!-- Input 2: Monthly Take-Home Income -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px;">
+              <label class="calc-bar-label" for="calcUserIncomeInput" id="calcUserIncomeLabel" style="font-size: 0.76rem; margin-bottom: 0;">
+                2. Monthly Take-Home Income
+              </label>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">For contextual paycheck interpretation</span>
+            </div>
+            <div class="calc-input-wrapper">
+              <span class="calc-currency-badge" id="calcIncomeCurrencySymbol">₹</span>
+              <input type="number" id="calcUserIncomeInput" class="calc-amount-input" value="35000" min="0" step="1000" placeholder="e.g. 35000 (optional)">
+            </div>
+            <div class="calc-preset-row" style="margin-top: 5px;">
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="20000">20K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip active" data-amount="35000">35K (Benchmark)</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="60000">60K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="100000">100K</button>
+              <button type="button" class="calc-preset-chip calc-income-chip" data-amount="clear" style="opacity: 0.75;">Clear</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2081,7 +2141,7 @@
         <div class="editorial-narrative-lead">
           <span class="editorial-lead-intro">Here's the headline:</span>
           <h3 class="editorial-lead-title">
-            <span id="displayBillionaireHero">Warren Buffett</span> donated <span id="calcHeroDonation" style="color: var(--accent-gold);">$1.0B</span>.
+            <span id="displayBillionaireHero">Warren Buffett</span> donated <span id="calcHeroDonation" style="color: var(--accent-gold);">$500M</span>.
           </h3>
           <p class="editorial-lead-irony">
             Sounds enormous. A staggering sum that commands front-page news.
@@ -2094,27 +2154,31 @@
           <div class="punchline-card primary">
             <div class="punchline-header-row">
               <span class="punchline-step-tag">Primary Reality Check</span>
-              <span class="punchline-subtag">% of wealth at the time</span>
+              <span class="punchline-subtag">% of wealth at donation date</span>
             </div>
-            <div class="punchline-hero-number" id="calcHeroRatio">2.00%</div>
+            <div class="punchline-hero-number" id="calcHeroRatio">0.50%</div>
             <p class="punchline-quote-statement" id="calcStatementRatio">
-              "They gave approximately 2.00% of their documented wealth at the time."
+              "They gave approximately 0.50% of their documented wealth at the time."
             </p>
           </div>
 
-          <!-- SECONDARY PUNCHLINE CARD -->
+          <!-- SECONDARY PUNCHLINE CARD (YOUR EQUIVALENT) -->
           <div class="punchline-card secondary">
             <div class="punchline-header-row">
-              <span class="punchline-step-tag secondary">Proportional Sacrifice</span>
-              <span class="punchline-subtag" id="calcHeroEquivalentSub">For ₹60,000 monthly income</span>
+              <span class="punchline-step-tag secondary">Your Equivalent</span>
+              <span class="punchline-subtag" id="calcHeroEquivalentSub">Wealth-to-wealth comparison</span>
             </div>
-            <div class="punchline-hero-number user" id="calcHeroEquivalent">₹1,200</div>
+            <div class="punchline-hero-number user" id="calcHeroEquivalent">₹5,000</div>
             <p class="punchline-quote-statement" id="calcStatementEquivalent">
-              "For an income of ₹60,000/month, that is equivalent to ₹1,200."
+              "That would be ₹5,000 for you."
             </p>
-            <div class="tangible-pill-badge" id="calcTangibleNote">
-              <span>☕</span>
-              <span>A modest cup of coffee or quick lunch!</span>
+            <div class="income-interpretation-pill" id="calcIncomeInterpretation">
+              <span>💡</span>
+              <span id="calcIncomeInterpretationText">That's about 14% of one month's take-home pay (roughly 4 days of earnings).</span>
+            </div>
+            <div class="satirical-kicker-badge" id="calcHumorKicker">
+              <span>🍸</span>
+              <span id="calcHumorKickerText">Congratulations. You too can experience the billionaire donation lifestyle.</span>
             </div>
           </div>
         </div>
@@ -2124,8 +2188,8 @@
           <span style="font-size: 1.2rem;">⚖️</span>
           <div>
             <strong>The Contrast:</strong>
-            Relinquishing <span id="calcCalloutRatioText">2.00%</span> of a <span id="calcHeroWealth">$50.0B</span> fortune still leaves tens of billions in surplus generational capital with <em>zero material impact on living standards</em>. Relinquishing <span id="calcCalloutRatioText2">2.00%</span> of an ordinary paycheck directly affects groceries, rent, or heating.
-            <span id="calcHeroWealthSub" style="display: none;">Canonical benchmark ($50,000,000,000)</span>
+            Relinquishing <span id="calcCalloutRatioText">0.50%</span> of a <span id="calcHeroWealth">$100.0B</span> fortune still leaves tens of billions in surplus generational capital with <em>zero material impact on living standards</em>. Relinquishing <span id="calcCalloutRatioText2">0.50%</span> of your own financial foundation is a conscious personal choice.
+            <span id="calcHeroWealthSub" style="display: none;">Canonical benchmark ($100,000,000,000)</span>
             <span id="calcHeroDonationSub" style="display: none;">Personal direct / verified funds</span>
           </div>
         </div>
@@ -2222,7 +2286,7 @@
           <div class="calc-scale-row">
             <div class="calc-scale-header">
               <span style="color: #38bdf8;">Their documented wealth at time of donation (100%)</span>
-              <span id="calcVisualWealthLabel" style="font-family: var(--font-mono); color: #38bdf8;">$50,000,000,000</span>
+              <span id="calcVisualWealthLabel" style="font-family: var(--font-mono); color: #38bdf8;">$100,000,000,000</span>
             </div>
             <div class="calc-scale-track">
               <div class="calc-scale-fill wealth"></div>
@@ -2232,21 +2296,21 @@
           <!-- Billionaire Donation Scale -->
           <div class="calc-scale-row">
             <div class="calc-scale-header">
-              <span style="color: var(--accent-gold);">Donation slice (<span id="calcVisualDonationPct">2.00%</span>)</span>
-              <span id="calcVisualDonationLabel" style="font-family: var(--font-mono); color: var(--accent-gold);">$1,000,000,000</span>
+              <span style="color: var(--accent-gold);">Donation slice (<span id="calcVisualDonationPct">0.50%</span>)</span>
+              <span id="calcVisualDonationLabel" style="font-family: var(--font-mono); color: var(--accent-gold);">$500,000,000</span>
             </div>
             <div class="calc-scale-track">
-              <div class="calc-scale-fill donation" id="calcVisualDonationFill" style="width: 2%;"></div>
+              <div class="calc-scale-fill donation" id="calcVisualDonationFill" style="width: 0.5%;"></div>
             </div>
           </div>
 
           <div style="height: 1px; background: rgba(51, 65, 85, 0.5); margin: 18px 0;"></div>
 
-          <!-- User Income Scale -->
+          <!-- User Net Worth Scale -->
           <div class="calc-scale-row">
             <div class="calc-scale-header">
-              <span style="color: #cbd5e1;">Your <span id="calcVisualIncomeFreqLabel">monthly</span> income (100%)</span>
-              <span id="calcVisualIncomeLabel" style="font-family: var(--font-mono); color: #cbd5e1;">₹60,000</span>
+              <span style="color: #cbd5e1;">Your estimated net worth base (100%)</span>
+              <span id="calcVisualIncomeLabel" style="font-family: var(--font-mono); color: #cbd5e1;">₹10,00,000</span>
             </div>
             <div class="calc-scale-track">
               <div class="calc-scale-fill income"></div>
@@ -2256,27 +2320,27 @@
           <!-- User Equivalent Sacrifice Scale -->
           <div class="calc-scale-row">
             <div class="calc-scale-header">
-              <span style="color: #34d399;">Equivalent sacrifice slice (<span id="calcVisualEquivPct">2.00%</span>)</span>
-              <span id="calcVisualEquivLabel" style="font-family: var(--font-mono); color: #34d399;">₹1,200</span>
+              <span style="color: #34d399;">Your equivalent sacrifice (<span id="calcVisualEquivPct">0.50%</span>)</span>
+              <span id="calcVisualEquivLabel" style="font-family: var(--font-mono); color: #34d399;">₹5,000</span>
             </div>
             <div class="calc-scale-track">
-              <div class="calc-scale-fill sacrifice" id="calcVisualEquivFill" style="width: 2%;"></div>
+              <div class="calc-scale-fill sacrifice" id="calcVisualEquivFill" style="width: 0.5%;"></div>
             </div>
           </div>
 
           <!-- Interactive ASCII Proportional Diagram -->
           <div class="calc-ascii-box" id="calcAsciiDiagram">
 <strong>Their wealth</strong>
-<span class="ascii-bar-wealth">████████████████████</span> $50,000,000,000 (100.0%)
+<span class="ascii-bar-wealth">████████████████████</span> $100,000,000,000 (100.0%)
 
 <strong>Donation</strong>
-<span class="ascii-bar-donation">▌</span> $1,000,000,000 (2.00%)
+<span class="ascii-bar-donation">▌</span> $500,000,000 (0.50%)
 
-<strong>Your income</strong>
-<span class="ascii-bar-income">████████████████████</span> ₹60,000/month (100.0%)
+<strong>Your net worth</strong>
+<span class="ascii-bar-income">████████████████████</span> ₹10,00,000 (100.0%)
 
-<strong>Equivalent</strong>
-<span class="ascii-bar-equiv">▌</span> ₹1,200 (2.00%)
+<strong>Your equivalent</strong>
+<span class="ascii-bar-equiv">▌</span> ₹5,000 (0.50%)
           </div>
         </div>
       </div>
@@ -3417,11 +3481,13 @@
       currency: localStorage.getItem('nocharity_currency') || '$',
       monthlyIncome: parseFloat(localStorage.getItem('nocharity_income')) || 4000,
       calculator: {
-        userIncome: parseFloat(localStorage.getItem('nocharity_income')) || 60000,
+        userNetWorth: 1000000,
+        monthlyIncome: 35000,
+        userIncome: 35000,
         incomeFrequency: 'monthly',
         currency: localStorage.getItem('nocharity_currency') || '₹',
         selectedBillionaireId: null,
-        selectedDonationId: null,
+        selectedDonationId: 'canonical',
         currentDonationsList: [],
         allBillionaires: [],
         compareFilter: 'all',
@@ -3552,26 +3618,17 @@
     async function loadRealityCheckCalculator() {
       const c = state.calculator;
       
+      const nwInput = document.getElementById('calcUserNetWorthInput');
+      if (nwInput) nwInput.value = (c.userNetWorth !== null && c.userNetWorth !== undefined) ? c.userNetWorth : '';
+
       const incomeInput = document.getElementById('calcUserIncomeInput');
-      if (incomeInput) incomeInput.value = c.userIncome;
+      if (incomeInput) incomeInput.value = (c.monthlyIncome !== null && c.monthlyIncome !== undefined) ? c.monthlyIncome : '';
       
       const currSelect = document.getElementById('calcCurrencySelect');
       if (currSelect) currSelect.value = c.currency;
 
-      const currSymbol = document.getElementById('calcInputCurrencySymbol');
-      if (currSymbol) currSymbol.textContent = c.currency;
-
-      const freqToggle = document.getElementById('calcIncomeFreqToggle');
-      if (freqToggle) {
-        freqToggle.querySelectorAll('.calc-segmented-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.freq === c.incomeFrequency);
-        });
-      }
-
-      const incomeLabel = document.getElementById('calcUserIncomeLabel');
-      if (incomeLabel) {
-        incomeLabel.textContent = c.incomeFrequency === 'annual' ? 'Your Annual Income' : 'Your Monthly Income';
-      }
+      const incomeSymbol = document.getElementById('calcIncomeCurrencySymbol');
+      if (incomeSymbol) incomeSymbol.textContent = c.currency;
 
       // Fetch billionaires list if not already loaded
       if (!c.allBillionaires || c.allBillionaires.length === 0) {
@@ -3588,7 +3645,7 @@
       const billSelect = document.getElementById('calcBillionaireSelect');
       if (billSelect && billSelect.options.length <= 1) {
         billSelect.innerHTML = `
-          <option value="canonical" ${c.isCanonicalExample ? 'selected' : ''}>⭐ Canonical Benchmark ($1B on $50B)</option>
+          <option value="canonical" ${c.isCanonicalExample ? 'selected' : ''}>⭐ Canonical Benchmark ($500M on $100B)</option>
           ${c.allBillionaires.map(b => `
             <option value="${b.id}" ${(!c.isCanonicalExample && c.selectedBillionaireId === b.id) ? 'selected' : ''}>
               ${b.canonical_name} (${formatCurrency(b.latest_net_worth)}) · ${b.country || ''}
@@ -3603,7 +3660,7 @@
       } else {
         const donSelect = document.getElementById('calcDonationSelect');
         if (donSelect) {
-          donSelect.innerHTML = `<option value="canonical" selected>$1,000,000,000 (2.00% of $50B Net Worth)</option>`;
+          donSelect.innerHTML = `<option value="canonical" selected>$500,000,000 (0.50% of $100B Net Worth)</option>`;
         }
       }
 
@@ -3649,54 +3706,119 @@
 
     async function calculateAndRenderParity() {
       const c = state.calculator;
-      const numericIncome = parseFloat(c.userIncome) || 60000;
-      const freq = c.incomeFrequency || 'monthly';
-      const freqLabel = freq === 'annual' ? 'year' : 'month';
       const curr = c.currency || '₹';
 
-      // 1. Check if canonical example is active
-      if (c.isCanonicalExample || !c.selectedDonationId || c.selectedDonationId === 'canonical') {
-        const billionaireWealth = 50000000000;
-        const donationAmount = 1000000000;
-        const ratio = 2.00;
-        const equivalentSacrifice = (numericIncome * ratio) / 100;
+      // 1. Resolve User Financial Inputs
+      const hasNetWorth = c.userNetWorth !== null && c.userNetWorth !== undefined && c.userNetWorth !== '' && !isNaN(parseFloat(c.userNetWorth));
+      const numericNetWorth = hasNetWorth ? parseFloat(c.userNetWorth) : null;
 
-        // Exact Canonical Sentences
-        const statementRatio = `They gave approximately ${ratio.toFixed(2)}% of their documented wealth at the time.`;
-        const statementEquivalent = `For an income of ${curr}${Math.round(numericIncome).toLocaleString()}/${freqLabel}, that is equivalent to ${curr}${Math.round(equivalentSacrifice).toLocaleString()}.`;
+      const hasMonthlyIncome = c.monthlyIncome !== null && c.monthlyIncome !== undefined && c.monthlyIncome !== '' && !isNaN(parseFloat(c.monthlyIncome)) && parseFloat(c.monthlyIncome) > 0;
+      const numericMonthlyIncome = hasMonthlyIncome ? parseFloat(c.monthlyIncome) : null;
+
+      // 1. Check if canonical example is active ($500M on $100B = 0.50%)
+      if (c.isCanonicalExample || !c.selectedDonationId || c.selectedDonationId === 'canonical') {
+        const billionaireWealth = 100000000000; // $100B
+        const donationAmount = 500000000; // $500M
+        const ratio = 0.50;
+
+        let userEquivalent = null;
+        let formattedEquivalent = 'N/A';
+        let netWorthStatus = 'MISSING';
+
+        if (numericNetWorth !== null) {
+          if (numericNetWorth < 0) {
+            userEquivalent = 0;
+            formattedEquivalent = `${curr}0`;
+            netWorthStatus = 'NEGATIVE';
+          } else if (numericNetWorth === 0) {
+            userEquivalent = 0;
+            formattedEquivalent = `${curr}0`;
+            netWorthStatus = 'ZERO';
+          } else {
+            userEquivalent = numericNetWorth * (ratio / 100);
+            formattedEquivalent = `${curr}${Math.round(userEquivalent).toLocaleString()}`;
+            netWorthStatus = 'POSITIVE';
+          }
+        }
+
+        // Contextual Monthly Income Interpretation
+        let incomeInterpretation = null;
+        if (numericMonthlyIncome && numericMonthlyIncome > 0) {
+          if (userEquivalent !== null && userEquivalent >= 0) {
+            if (userEquivalent === 0) {
+              if (netWorthStatus === 'NEGATIVE') {
+                incomeInterpretation = `With debts exceeding assets, your estimated net worth is negative. Relinquishing 0.50% yields ${curr}0 in deployable sacrifice.`;
+              } else {
+                incomeInterpretation = `At zero estimated net worth, your wealth equivalent is ${curr}0. You have matched the billionaire's sacrifice without touching your monthly paycheck.`;
+              }
+            } else {
+              const share = (userEquivalent / numericMonthlyIncome) * 100;
+              const formattedShare = share >= 1 ? `${Math.round(share)}%` : `${share.toFixed(1)}%`;
+              const days = Math.round(userEquivalent / (numericMonthlyIncome / 30));
+              const daysPhrase = days >= 1 ? ` (roughly ${days} days of earnings)` : '';
+              incomeInterpretation = `That's about ${formattedShare} of one month's take-home pay${daysPhrase}.`;
+            }
+          } else {
+            const hyp = numericMonthlyIncome * (ratio / 100);
+            incomeInterpretation = `Direct wealth comparison requires an estimated net worth. If compared directly against your monthly paycheck (for illustration only), 0.50% would be ${curr}${Math.round(hyp).toLocaleString()}. (Note: comparing wealth to income is conceptually mismatched.)`;
+          }
+        }
+
+        // Natural Language Canonical Statements
+        const statementRatio = `They gave approximately 0.50% of their documented wealth at the time.`;
+        let statementEquivalent;
+        if (userEquivalent !== null) {
+          statementEquivalent = `That would be ${formattedEquivalent} for you.`;
+        } else {
+          statementEquivalent = 'Direct comparison requires an estimated net worth.';
+        }
+
+        let humorCopy;
+        if (netWorthStatus === 'NEGATIVE') {
+          humorCopy = 'Your debts have officially granted you immunity from philanthropic guilt.';
+        } else if (netWorthStatus === 'ZERO') {
+          humorCopy = "At zero net worth, you've matched the billionaire's sacrifice for free.";
+        } else if (userEquivalent !== null) {
+          humorCopy = 'Congratulations. You too can experience the billionaire donation lifestyle.';
+        } else {
+          humorCopy = 'Give yourself a rough net worth estimate — what you own minus what you owe.';
+        }
 
         // Update Hero Title & Amounts
         const heroDonor = document.getElementById('displayBillionaireHero');
         if (heroDonor) heroDonor.textContent = 'Warren Buffett';
 
-        document.getElementById('calcHeroWealth').textContent = '$50.0B';
-        document.getElementById('calcHeroWealthSub').textContent = 'Canonical benchmark ($50,000,000,000)';
-        document.getElementById('calcHeroDonation').textContent = '$1.0B';
-        document.getElementById('calcHeroDonationSub').textContent = 'Canonical benchmark ($1,000,000,000)';
-        document.getElementById('calcHeroRatio').textContent = '2.00%';
-        document.getElementById('calcHeroEquivalent').textContent = `${curr}${Math.round(equivalentSacrifice).toLocaleString()}`;
-        document.getElementById('calcHeroEquivalentSub').textContent = `For ${curr}${numericIncome.toLocaleString()}/${freqLabel}`;
+        document.getElementById('calcHeroWealth').textContent = '$100.0B';
+        document.getElementById('calcHeroWealthSub').textContent = 'Canonical benchmark ($100,000,000,000)';
+        document.getElementById('calcHeroDonation').textContent = '$500M';
+        document.getElementById('calcHeroDonationSub').textContent = 'Canonical benchmark ($500,000,000)';
+        document.getElementById('calcHeroRatio').textContent = '0.50%';
+        document.getElementById('calcHeroEquivalent').textContent = userEquivalent !== null ? formattedEquivalent : 'Requires Net Worth';
+        document.getElementById('calcHeroEquivalentSub').textContent = userEquivalent !== null ? `For ${curr}${Math.round(numericNetWorth).toLocaleString()} net worth` : 'Estimated net worth needed';
 
         // Update Statements
         document.getElementById('calcStatementRatio').textContent = `"${statementRatio}"`;
         document.getElementById('calcStatementEquivalent').textContent = `"${statementEquivalent}"`;
 
+        // Update Income Interpretation & Humor Callouts
+        const interpEl = document.getElementById('calcIncomeInterpretationText');
+        if (interpEl) {
+          interpEl.textContent = incomeInterpretation || 'Provide monthly income to translate into paycheck days.';
+        }
+        const humorEl = document.getElementById('calcHumorKickerText');
+        if (humorEl) {
+          humorEl.textContent = humorCopy;
+        }
+
         // Update Satirical Nuance Callouts
         const callout1 = document.getElementById('calcCalloutRatioText');
-        if (callout1) callout1.textContent = '2.00%';
+        if (callout1) callout1.textContent = '0.50%';
         const callout2 = document.getElementById('calcCalloutRatioText2');
-        if (callout2) callout2.textContent = '2.00%';
-
-        // Update Tangible Comparison
-        const tangible = getTangibleComparison(equivalentSacrifice, curr, numericIncome);
-        const tangibleEl = document.getElementById('calcTangibleNote');
-        if (tangibleEl) {
-          tangibleEl.innerHTML = `<span>${tangible.icon}</span><span>${tangible.text}</span>`;
-        }
+        if (callout2) callout2.textContent = '0.50%';
 
         // Update Receipts Drawer
         const rvw = document.getElementById('receiptValWealth');
-        if (rvw) rvw.textContent = '$50,000,000,000';
+        if (rvw) rvw.textContent = '$100,000,000,000';
         const rsd = document.getElementById('calcReceiptSnapshotDate');
         if (rsd) rsd.textContent = '2018-05-01 (Canonical)';
         const rfs = document.getElementById('calcReceiptFundingSource');
@@ -3706,29 +3828,28 @@
         const rpr = document.getElementById('calcReceiptProvenance');
         if (rpr) rpr.textContent = 'SEC Form 4 / IRS Form 990-PF';
         const rrf = document.getElementById('calcReceiptRatioFormula');
-        if (rrf) rrf.textContent = '($1.0B ÷ $50.0B) = 2.00%';
+        if (rrf) rrf.textContent = '($500M ÷ $100B) = 0.50%';
         const ref = document.getElementById('calcReceiptEquivFormula');
-        if (ref) ref.textContent = `2.00% × ${curr}${Math.round(numericIncome).toLocaleString()} = ${curr}${Math.round(equivalentSacrifice).toLocaleString()}`;
+        if (ref) ref.textContent = userEquivalent !== null ? `0.50% × ${curr}${Math.round(numericNetWorth).toLocaleString()} = ${formattedEquivalent}` : 'Requires estimated net worth';
 
         // Update Visual Progress Bars
-        document.getElementById('calcVisualWealthLabel').textContent = '$50,000,000,000';
-        document.getElementById('calcVisualDonationLabel').textContent = '$1,000,000,000';
-        document.getElementById('calcVisualDonationPct').textContent = '2.00%';
-        document.getElementById('calcVisualDonationFill').style.width = '2%';
+        document.getElementById('calcVisualWealthLabel').textContent = '$100,000,000,000';
+        document.getElementById('calcVisualDonationLabel').textContent = '$500,000,000';
+        document.getElementById('calcVisualDonationPct').textContent = '0.50%';
+        document.getElementById('calcVisualDonationFill').style.width = '0.5%';
 
-        document.getElementById('calcVisualIncomeFreqLabel').textContent = freqLabel;
-        document.getElementById('calcVisualIncomeLabel').textContent = `${curr}${numericIncome.toLocaleString()}`;
-        document.getElementById('calcVisualEquivLabel').textContent = `${curr}${Math.round(equivalentSacrifice).toLocaleString()}`;
-        document.getElementById('calcVisualEquivPct').textContent = '2.00%';
-        document.getElementById('calcVisualEquivFill').style.width = '2%';
+        document.getElementById('calcVisualIncomeLabel').textContent = userEquivalent !== null ? `${curr}${Math.round(numericNetWorth).toLocaleString()}` : 'Not provided';
+        document.getElementById('calcVisualEquivLabel').textContent = userEquivalent !== null ? formattedEquivalent : 'Requires Net Worth';
+        document.getElementById('calcVisualEquivPct').textContent = '0.50%';
+        document.getElementById('calcVisualEquivFill').style.width = userEquivalent !== null ? '0.5%' : '0%';
 
         // Update ASCII diagram
         renderAsciiDiagram({
-          wealthStr: '$50,000,000,000',
-          donationStr: '$1,000,000,000',
-          ratio: 2.00,
-          incomeStr: `${curr}${numericIncome.toLocaleString()}/${freqLabel}`,
-          equivStr: `${curr}${Math.round(equivalentSacrifice).toLocaleString()}`
+          wealthStr: '$100,000,000,000',
+          donationStr: '$500,000,000',
+          ratio: 0.50,
+          incomeStr: userEquivalent !== null ? `${curr}${Math.round(numericNetWorth).toLocaleString()}` : 'Not provided',
+          equivStr: userEquivalent !== null ? formattedEquivalent : 'Requires Net Worth'
         });
 
         document.getElementById('calcSelectionQualityBadge').textContent = 'Canonical Benchmark';
@@ -3738,7 +3859,12 @@
 
       // 2. Real Documented Donation Calculation via API
       try {
-        const url = `/api/advanced/parity?donationId=${c.selectedDonationId}&userIncome=${numericIncome}&incomeFrequency=${freq}&userCurrency=${encodeURIComponent(curr)}`;
+        let url = `/api/advanced/parity?donationId=${c.selectedDonationId}&userCurrency=${encodeURIComponent(curr)}`;
+        if (hasNetWorth) url += `&userNetWorth=${numericNetWorth}`;
+        if (hasMonthlyIncome) url += `&monthlyIncome=${numericMonthlyIncome}`;
+        // Backwards compatibility legacy param
+        if (hasMonthlyIncome) url += `&userIncome=${numericMonthlyIncome}`;
+
         const res = await fetch(url);
         const data = await res.json();
 
@@ -3757,15 +3883,15 @@
           document.getElementById('calcStatementRatio').textContent = `"Historical wealth snapshot unavailable for this donation."`;
           document.getElementById('calcStatementEquivalent').textContent = `"${data.explanation || 'Cannot compute proportional wealth without verified historical net worth.'}"`;
 
+          const interpEl = document.getElementById('calcIncomeInterpretationText');
+          if (interpEl) interpEl.textContent = 'Parity calculation unavailable.';
+          const humorEl = document.getElementById('calcHumorKickerText');
+          if (humorEl) humorEl.textContent = data.humorCopy || 'Historical wealth comparison is unavailable.';
+
           const callout1 = document.getElementById('calcCalloutRatioText');
           if (callout1) callout1.textContent = 'N/A';
           const callout2 = document.getElementById('calcCalloutRatioText2');
           if (callout2) callout2.textContent = 'N/A';
-
-          const tangibleEl = document.getElementById('calcTangibleNote');
-          if (tangibleEl) {
-            tangibleEl.innerHTML = `<span>⏳</span><span>Historical snapshot pending regulatory verification</span>`;
-          }
 
           const rvw = document.getElementById('receiptValWealth'); if (rvw) rvw.textContent = 'Unavailable';
           const rsd = document.getElementById('calcReceiptSnapshotDate'); if (rsd) rsd.textContent = 'No snapshot';
@@ -3783,36 +3909,37 @@
         const wealth = data.historicalNetWorth;
         const donation = data.donationAmount;
         const ratio = data.historicalGenerosityRatio;
+        const formattedRatio = data.formattedRatio || `${ratio.toFixed(2)}%`;
         const equiv = data.userEquivalent;
-
-        const statementRatio = `They gave approximately ${ratio.toFixed(2)}% of their documented wealth at the time.`;
-        const statementEquivalent = `For an income of ${curr}${Math.round(numericIncome).toLocaleString()}/${freqLabel}, that is equivalent to ${curr}${Math.round(equiv).toLocaleString()}.`;
+        const formattedEquiv = data.formattedUserEquivalent || (equiv !== null ? `${curr}${Math.round(equiv).toLocaleString()}` : 'N/A');
 
         // Update KPIs
         document.getElementById('calcHeroWealth').textContent = formatCurrency(wealth);
         document.getElementById('calcHeroWealthSub').textContent = `Valuation at ${data.snapshotDate || 'donation date'}`;
         document.getElementById('calcHeroDonation').textContent = formatCurrency(donation);
         document.getElementById('calcHeroDonationSub').textContent = `${data.fundingSourceType || 'PERSONAL'} · ${data.status || 'VERIFIED'}`;
-        document.getElementById('calcHeroRatio').textContent = `${ratio.toFixed(2)}%`;
-        document.getElementById('calcHeroEquivalent').textContent = `${curr}${Math.round(equiv).toLocaleString()}`;
-        document.getElementById('calcHeroEquivalentSub').textContent = `For ${curr}${numericIncome.toLocaleString()}/${freqLabel}`;
+        document.getElementById('calcHeroRatio').textContent = formattedRatio;
+        document.getElementById('calcHeroEquivalent').textContent = equiv !== null ? formattedEquiv : 'Requires Net Worth';
+        document.getElementById('calcHeroEquivalentSub').textContent = equiv !== null && numericNetWorth !== null ? `For ${curr}${Math.round(numericNetWorth).toLocaleString()} net worth` : 'Estimated net worth needed';
 
-        // Update Exact Phrasing Statements
-        document.getElementById('calcStatementRatio').textContent = `"${statementRatio}"`;
-        document.getElementById('calcStatementEquivalent').textContent = `"${statementEquivalent}"`;
+        // Update Statements & Interpretation
+        document.getElementById('calcStatementRatio').textContent = `"${data.statementRatio}"`;
+        document.getElementById('calcStatementEquivalent').textContent = `"${data.statementEquivalent}"`;
+
+        const interpEl = document.getElementById('calcIncomeInterpretationText');
+        if (interpEl) {
+          interpEl.textContent = data.incomeInterpretation || (hasMonthlyIncome ? 'Paycheck interpretation calculated.' : 'Provide monthly income to see paycheck context.');
+        }
+        const humorEl = document.getElementById('calcHumorKickerText');
+        if (humorEl) {
+          humorEl.textContent = data.humorCopy || 'Congratulations. You too can experience the billionaire donation lifestyle.';
+        }
 
         // Update Satirical Nuance Callouts
         const callout1 = document.getElementById('calcCalloutRatioText');
-        if (callout1) callout1.textContent = `${ratio.toFixed(2)}%`;
+        if (callout1) callout1.textContent = formattedRatio;
         const callout2 = document.getElementById('calcCalloutRatioText2');
-        if (callout2) callout2.textContent = `${ratio.toFixed(2)}%`;
-
-        // Update Tangible Comparison
-        const tangible = getTangibleComparison(equiv, curr, numericIncome);
-        const tangibleEl = document.getElementById('calcTangibleNote');
-        if (tangibleEl) {
-          tangibleEl.innerHTML = `<span>${tangible.icon}</span><span>${tangible.text}</span>`;
-        }
+        if (callout2) callout2.textContent = formattedRatio;
 
         // Update Receipts Drawer
         const rvw = document.getElementById('receiptValWealth');
@@ -3826,30 +3953,29 @@
         const rpr = document.getElementById('calcReceiptProvenance');
         if (rpr) rpr.textContent = data.sourceType || 'SEC Form 4 / IRS Form 990-PF / Public Disclosures';
         const rrf = document.getElementById('calcReceiptRatioFormula');
-        if (rrf) rrf.textContent = `(${formatCurrency(donation)} ÷ ${formatCurrency(wealth)}) = ${ratio.toFixed(2)}%`;
+        if (rrf) rrf.textContent = `(${formatCurrency(donation)} ÷ ${formatCurrency(wealth)}) = ${formattedRatio}`;
         const ref = document.getElementById('calcReceiptEquivFormula');
-        if (ref) ref.textContent = `${ratio.toFixed(2)}% × ${curr}${Math.round(numericIncome).toLocaleString()} = ${curr}${Math.round(equiv).toLocaleString()}`;
+        if (ref) ref.textContent = equiv !== null && numericNetWorth !== null ? `${formattedRatio} × ${curr}${Math.round(numericNetWorth).toLocaleString()} = ${formattedEquiv}` : 'Requires estimated net worth';
 
         // Update Visual Progress Bars (ensure min visible sliver of 0.4%)
         const visualWidth = Math.min(100, Math.max(0.4, ratio)).toFixed(2);
         document.getElementById('calcVisualWealthLabel').textContent = `$${Number(wealth).toLocaleString()}`;
         document.getElementById('calcVisualDonationLabel').textContent = `$${Number(donation).toLocaleString()}`;
-        document.getElementById('calcVisualDonationPct').textContent = `${ratio.toFixed(2)}%`;
+        document.getElementById('calcVisualDonationPct').textContent = formattedRatio;
         document.getElementById('calcVisualDonationFill').style.width = `${visualWidth}%`;
 
-        document.getElementById('calcVisualIncomeFreqLabel').textContent = freqLabel;
-        document.getElementById('calcVisualIncomeLabel').textContent = `${curr}${numericIncome.toLocaleString()}`;
-        document.getElementById('calcVisualEquivLabel').textContent = `${curr}${Math.round(equiv).toLocaleString()}`;
-        document.getElementById('calcVisualEquivPct').textContent = `${ratio.toFixed(2)}%`;
-        document.getElementById('calcVisualEquivFill').style.width = `${visualWidth}%`;
+        document.getElementById('calcVisualIncomeLabel').textContent = hasNetWorth ? `${curr}${Math.round(numericNetWorth).toLocaleString()}` : 'Not provided';
+        document.getElementById('calcVisualEquivLabel').textContent = equiv !== null ? formattedEquiv : 'Requires Net Worth';
+        document.getElementById('calcVisualEquivPct').textContent = formattedRatio;
+        document.getElementById('calcVisualEquivFill').style.width = equiv !== null ? `${visualWidth}%` : '0%';
 
         // Update ASCII diagram
         renderAsciiDiagram({
           wealthStr: `$${Number(wealth).toLocaleString()}`,
           donationStr: `$${Number(donation).toLocaleString()}`,
           ratio: ratio,
-          incomeStr: `${curr}${numericIncome.toLocaleString()}/${freqLabel}`,
-          equivStr: `${curr}${Math.round(equiv).toLocaleString()}`
+          incomeStr: hasNetWorth ? `${curr}${Math.round(numericNetWorth).toLocaleString()}` : 'Not provided',
+          equivStr: equiv !== null ? formattedEquiv : 'Requires Net Worth'
         });
 
         // Update Quality Badge
@@ -3887,10 +4013,10 @@
 <strong>Donation</strong>
 <span class="ascii-bar-donation">${sliceBar}</span> ${donationStr} (${ratio.toFixed(2)}%)
 
-<strong>Your income</strong>
+<strong>Your net worth</strong>
 <span class="ascii-bar-income">████████████████████</span> ${incomeStr} (100.0%)
 
-<strong>Equivalent</strong>
+<strong>Your equivalent</strong>
 <span class="ascii-bar-equiv">${sliceBar}</span> ${equivStr} (${ratio.toFixed(2)}%)
       `.trim();
     }
@@ -3898,21 +4024,33 @@
     // Multi-Billionaire Side-by-Side Comparison
     async function loadRealityCheckComparison() {
       const c = state.calculator;
-      const numericIncome = parseFloat(c.userIncome) || 60000;
-      const freq = c.incomeFrequency || 'monthly';
-      const freqLabel = freq === 'annual' ? 'year' : 'month';
       const curr = c.currency || '₹';
+
+      const hasNetWorth = c.userNetWorth !== null && c.userNetWorth !== undefined && c.userNetWorth !== '' && !isNaN(parseFloat(c.userNetWorth));
+      const numericNetWorth = hasNetWorth ? parseFloat(c.userNetWorth) : null;
+
+      const hasMonthly = c.monthlyIncome !== null && c.monthlyIncome !== undefined && c.monthlyIncome !== '' && !isNaN(parseFloat(c.monthlyIncome));
+      const numericMonthlyIncome = hasMonthly ? parseFloat(c.monthlyIncome) : null;
 
       const subtitle = document.getElementById('calcCompareIncomeSubtitle');
       if (subtitle) {
-        subtitle.textContent = `${curr}${numericIncome.toLocaleString()}/${freqLabel}`;
+        if (numericNetWorth !== null) {
+          subtitle.textContent = `${curr}${Math.round(numericNetWorth).toLocaleString()} net worth`;
+        } else if (numericMonthlyIncome !== null) {
+          subtitle.textContent = `${curr}${Math.round(numericMonthlyIncome).toLocaleString()}/month`;
+        } else {
+          subtitle.textContent = 'Proportional giving';
+        }
       }
 
       const grid = document.getElementById('calcCompareCardsGrid');
       if (!grid) return;
 
       try {
-        const url = `/api/advanced/parity/compare?userIncome=${numericIncome}&incomeFrequency=${freq}&userCurrency=${encodeURIComponent(curr)}`;
+        let url = `/api/advanced/parity/compare?userCurrency=${encodeURIComponent(curr)}`;
+        if (numericNetWorth !== null) url += `&userNetWorth=${numericNetWorth}`;
+        if (numericMonthlyIncome !== null) url += `&monthlyIncome=${numericMonthlyIncome}&userIncome=${numericMonthlyIncome}`;
+
         const res = await fetch(url);
         const data = await res.json();
         const comparisons = data.comparisons || [];
@@ -3937,8 +4075,9 @@
 
         grid.innerHTML = filtered.map(b => {
           const ratio = b.ratio_percentage || 0;
-          const equiv = b.user_equivalent || 0;
+          const equiv = b.user_equivalent;
           const barWidth = Math.min(100, Math.max(0.5, ratio * 10)).toFixed(1);
+          const formattedEquiv = b.formatted_equivalent || (equiv !== null ? `${curr}${Math.round(equiv).toLocaleString()}` : 'Requires Net Worth');
 
           return `
             <div class="calc-compare-card" data-person-id="${b.person_id}">
@@ -3960,13 +4099,19 @@
                   </div>
                   <div>
                     <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; text-align: right;">Your Sacrifice</div>
-                    <div class="calc-compare-equiv">${curr}${Math.round(equiv).toLocaleString()}</div>
+                    <div class="calc-compare-equiv">${formattedEquiv}</div>
                   </div>
                 </div>
 
                 <div class="calc-compare-bar-track" title="Relative giving ratio: ${ratio.toFixed(2)}%">
                   <div class="calc-compare-bar-fill" style="width: ${barWidth}%;"></div>
                 </div>
+
+                ${b.income_interpretation ? `
+                  <div style="font-size: 0.72rem; color: #bae6fd; background: rgba(56, 189, 248, 0.1); padding: 4px 8px; border-radius: 4px; margin-bottom: 8px;">
+                    ${b.income_interpretation}
+                  </div>
+                ` : ''}
 
                 <div style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">
                   ${b.donation ? `Peak gift: <strong>${formatCurrency(b.donation.amount)}</strong> to ${b.donation.recipient ? b.donation.recipient.substring(0, 24) : 'Charity'} (${b.donation.donation_date ? b.donation.donation_date.split('T')[0] : ''})` : 'No qualifying personal gifts documented'}
@@ -5326,7 +5471,9 @@
       if (btnCanonical) {
         btnCanonical.addEventListener('click', () => {
           state.calculator.isCanonicalExample = true;
-          state.calculator.userIncome = 60000;
+          state.calculator.userNetWorth = 1000000;
+          state.calculator.monthlyIncome = 35000;
+          state.calculator.userIncome = 35000;
           state.calculator.incomeFrequency = 'monthly';
           state.calculator.currency = '₹';
           state.calculator.selectedBillionaireId = null;
@@ -5336,82 +5483,116 @@
           if (bSelect) bSelect.value = 'canonical';
 
           const dSelect = document.getElementById('calcDonationSelect');
-          if (dSelect) dSelect.innerHTML = `<option value="canonical" selected>$1,000,000,000 (2.00% of $50B Net Worth)</option>`;
+          if (dSelect) dSelect.innerHTML = `<option value="canonical" selected>$500,000,000 (0.50% of $100B Net Worth)</option>`;
+
+          const nwInput = document.getElementById('calcUserNetWorthInput');
+          if (nwInput) nwInput.value = 1000000;
 
           const incomeInput = document.getElementById('calcUserIncomeInput');
-          if (incomeInput) incomeInput.value = 60000;
+          if (incomeInput) incomeInput.value = 35000;
 
           const currSelect = document.getElementById('calcCurrencySelect');
           if (currSelect) currSelect.value = '₹';
 
-          const currSymbol = document.getElementById('calcInputCurrencySymbol');
-          if (currSymbol) currSymbol.textContent = '₹';
+          const incomeSymbol = document.getElementById('calcIncomeCurrencySymbol');
+          if (incomeSymbol) incomeSymbol.textContent = '₹';
 
-          document.querySelectorAll('#calcIncomeFreqToggle .calc-segmented-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.freq === 'monthly');
+          document.querySelectorAll('.calc-nw-chip').forEach(c => {
+            c.classList.toggle('active', c.dataset.amount === '1000000');
           });
 
-          const label = document.getElementById('calcUserIncomeLabel');
-          if (label) label.textContent = 'Your Monthly Income';
-
-          document.querySelectorAll('.calc-preset-chip').forEach(c => {
-            c.classList.toggle('active', c.dataset.amount === '60000');
+          document.querySelectorAll('.calc-income-chip').forEach(c => {
+            c.classList.toggle('active', c.dataset.amount === '35000');
           });
 
           calculateAndRenderParity();
           loadRealityCheckComparison();
         });
       }
-
-      // Income Frequency Segmented Control
-      document.querySelectorAll('#calcIncomeFreqToggle .calc-segmented-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#calcIncomeFreqToggle .calc-segmented-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.calculator.incomeFrequency = btn.dataset.freq;
-          const label = document.getElementById('calcUserIncomeLabel');
-          if (label) {
-            label.textContent = btn.dataset.freq === 'annual' ? 'Your Annual Income' : 'Your Monthly Income';
-          }
-          calculateAndRenderParity();
-          loadRealityCheckComparison();
-        });
-      });
 
       // Currency Select
       const calcCurr = document.getElementById('calcCurrencySelect');
       if (calcCurr) {
         calcCurr.addEventListener('change', (e) => {
           state.calculator.currency = e.target.value;
-          const symbol = document.getElementById('calcInputCurrencySymbol');
+          const symbol = document.getElementById('calcIncomeCurrencySymbol');
           if (symbol) symbol.textContent = e.target.value;
           calculateAndRenderParity();
           loadRealityCheckComparison();
         });
       }
 
-      // User Income Input
-      const calcIncInput = document.getElementById('calcUserIncomeInput');
-      if (calcIncInput) {
-        calcIncInput.addEventListener('input', (e) => {
-          const val = parseFloat(e.target.value);
-          if (!isNaN(val) && val > 0) {
-            state.calculator.userIncome = val;
-            calculateAndRenderParity();
-            loadRealityCheckComparison();
+      // User Net Worth Input
+      const calcNwInput = document.getElementById('calcUserNetWorthInput');
+      if (calcNwInput) {
+        calcNwInput.addEventListener('input', (e) => {
+          const raw = e.target.value.trim();
+          if (raw === '') {
+            state.calculator.userNetWorth = null;
+          } else {
+            const val = parseFloat(raw);
+            state.calculator.userNetWorth = !isNaN(val) ? val : null;
           }
+          calculateAndRenderParity();
+          loadRealityCheckComparison();
         });
       }
 
-      // Quick Preset Chips
-      document.querySelectorAll('.calc-preset-chip').forEach(chip => {
+      // Net Worth Preset Chips
+      document.querySelectorAll('.calc-nw-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-          document.querySelectorAll('.calc-preset-chip').forEach(c => c.classList.remove('active'));
+          document.querySelectorAll('.calc-nw-chip').forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
-          const val = parseFloat(chip.dataset.amount);
-          state.calculator.userIncome = val;
-          const input = document.getElementById('calcUserIncomeInput');
-          if (input) input.value = val;
+          if (chip.dataset.amount === 'clear') {
+            state.calculator.userNetWorth = null;
+            const input = document.getElementById('calcUserNetWorthInput');
+            if (input) input.value = '';
+          } else {
+            const val = parseFloat(chip.dataset.amount);
+            state.calculator.userNetWorth = val;
+            const input = document.getElementById('calcUserNetWorthInput');
+            if (input) input.value = val;
+          }
+          calculateAndRenderParity();
+          loadRealityCheckComparison();
+        });
+      });
+
+      // User Monthly Income Input
+      const calcIncInput = document.getElementById('calcUserIncomeInput');
+      if (calcIncInput) {
+        calcIncInput.addEventListener('input', (e) => {
+          const raw = e.target.value.trim();
+          if (raw === '') {
+            state.calculator.monthlyIncome = null;
+            state.calculator.userIncome = null;
+          } else {
+            const val = parseFloat(raw);
+            state.calculator.monthlyIncome = (!isNaN(val) && val >= 0) ? val : null;
+            state.calculator.userIncome = state.calculator.monthlyIncome;
+          }
+          calculateAndRenderParity();
+          loadRealityCheckComparison();
+        });
+      }
+
+      // Monthly Income Preset Chips
+      document.querySelectorAll('.calc-income-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.calc-income-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          if (chip.dataset.amount === 'clear') {
+            state.calculator.monthlyIncome = null;
+            state.calculator.userIncome = null;
+            const input = document.getElementById('calcUserIncomeInput');
+            if (input) input.value = '';
+          } else {
+            const val = parseFloat(chip.dataset.amount);
+            state.calculator.monthlyIncome = val;
+            state.calculator.userIncome = val;
+            const input = document.getElementById('calcUserIncomeInput');
+            if (input) input.value = val;
+          }
           calculateAndRenderParity();
           loadRealityCheckComparison();
         });
@@ -5427,7 +5608,7 @@
             state.calculator.selectedBillionaireId = null;
             state.calculator.selectedDonationId = 'canonical';
             const dSelect = document.getElementById('calcDonationSelect');
-            if (dSelect) dSelect.innerHTML = `<option value="canonical" selected>$1,000,000,000 (2.00% of $50B Net Worth)</option>`;
+            if (dSelect) dSelect.innerHTML = `<option value="canonical" selected>$500,000,000 (0.50% of $100B Net Worth)</option>`;
             await calculateAndRenderParity();
           } else {
             state.calculator.isCanonicalExample = false;

@@ -347,6 +347,12 @@ app.get(['/api/advanced/parity', '/api/advanced/parity/calculate'], async (req, 
       verificationStatus,
       userIncome,
       incomeFrequency,
+      userNetWorth,
+      user_net_worth,
+      monthlyIncome,
+      userMonthlyIncome,
+      userIncome,
+      incomeFrequency,
       currency,
       userCurrency,
       displayExchangeRate
@@ -361,7 +367,9 @@ app.get(['/api/advanced/parity', '/api/advanced/parity/calculate'], async (req, 
       snapshotDate,
       fundingSourceType: fundingSourceType || funding_source_type,
       status: status || verificationStatus,
-      userIncome: userIncome !== undefined ? parseFloat(userIncome) : 60000,
+      userNetWorth: userNetWorth !== undefined ? userNetWorth : user_net_worth,
+      monthlyIncome: monthlyIncome !== undefined ? monthlyIncome : userMonthlyIncome,
+      userIncome: userIncome !== undefined ? parseFloat(userIncome) : undefined,
       incomeFrequency: incomeFrequency || 'monthly',
       userCurrency: userCurrency || currency || '₹',
       displayExchangeRate: displayExchangeRate ? parseFloat(displayExchangeRate) : null
@@ -388,6 +396,10 @@ app.post('/api/advanced/parity/calculate', async (req, res) => {
       funding_source_type,
       status,
       verificationStatus,
+      userNetWorth,
+      user_net_worth,
+      monthlyIncome,
+      userMonthlyIncome,
       userIncome,
       incomeFrequency,
       currency,
@@ -404,7 +416,9 @@ app.post('/api/advanced/parity/calculate', async (req, res) => {
       snapshotDate,
       fundingSourceType: fundingSourceType || funding_source_type,
       status: status || verificationStatus,
-      userIncome: userIncome !== undefined ? parseFloat(userIncome) : 60000,
+      userNetWorth: userNetWorth !== undefined ? userNetWorth : user_net_worth,
+      monthlyIncome: monthlyIncome !== undefined ? monthlyIncome : userMonthlyIncome,
+      userIncome: userIncome !== undefined ? parseFloat(userIncome) : undefined,
       incomeFrequency: incomeFrequency || 'monthly',
       userCurrency: userCurrency || currency || '₹',
       displayExchangeRate: displayExchangeRate ? parseFloat(displayExchangeRate) : null
@@ -421,6 +435,10 @@ app.get('/api/advanced/parity/compare', async (req, res) => {
   try {
     const {
       personIds,
+      userNetWorth,
+      user_net_worth,
+      monthlyIncome,
+      userMonthlyIncome,
       userIncome,
       incomeFrequency,
       currency,
@@ -432,6 +450,8 @@ app.get('/api/advanced/parity/compare', async (req, res) => {
 
     const data = await compareBillionairesParity({
       personIds: ids,
+      userNetWorth: userNetWorth !== undefined ? userNetWorth : user_net_worth,
+      monthlyIncome: monthlyIncome !== undefined ? monthlyIncome : userMonthlyIncome,
       userIncome: userIncome !== undefined ? parseFloat(userIncome) : 60000,
       incomeFrequency: incomeFrequency || 'monthly',
       userCurrency: userCurrency || currency || '₹',
@@ -449,6 +469,10 @@ app.post('/api/advanced/parity/compare', async (req, res) => {
   try {
     const {
       personIds,
+      userNetWorth,
+      user_net_worth,
+      monthlyIncome,
+      userMonthlyIncome,
       userIncome,
       incomeFrequency,
       currency,
@@ -458,6 +482,8 @@ app.post('/api/advanced/parity/compare', async (req, res) => {
 
     const data = await compareBillionairesParity({
       personIds,
+      userNetWorth: userNetWorth !== undefined ? userNetWorth : user_net_worth,
+      monthlyIncome: monthlyIncome !== undefined ? monthlyIncome : userMonthlyIncome,
       userIncome: userIncome !== undefined ? parseFloat(userIncome) : 60000,
       incomeFrequency: incomeFrequency || 'monthly',
       userCurrency: userCurrency || currency || '₹',
