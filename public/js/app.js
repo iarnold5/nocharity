@@ -251,6 +251,13 @@ function renderActiveBillionaire() {
     ? percentage.toFixed(2) + '%'
     : (percentage > 0 ? '<0.01%' : '0.00%');
 
+  // Update satirical lead
+  const satiricalLead = document.getElementById('satiricalLeadText');
+  if (satiricalLead) {
+    const donatedStr = formatDollars(totalDonatedInPeriod, '$');
+    satiricalLead.innerHTML = `<strong>${b.name}</strong> gave ${donatedStr}. <em>Sounds enormous.</em> That was <strong>${formattedPct}</strong> of their wealth:`;
+  }
+
   // Update Left "ME" Panel
   matchTargetQuote.innerHTML = `To match <strong>${b.name}</strong>'s documented giving of <span class="highlight-percentage" id="highlightMatchPercentage">${formattedPct}</span> of their estimated wealth (${getTimeframeLabel(state.activeTimeframe)}):`;
   

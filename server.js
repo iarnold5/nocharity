@@ -330,8 +330,8 @@ app.get('/api/advanced/donations/:id/sources', async (req, res) => {
   }
 });
 
-// GET /api/advanced/parity/calculate - Calculate historical wealth-aware parity
-app.get('/api/advanced/parity/calculate', async (req, res) => {
+// GET /api/advanced/parity/calculate & /api/advanced/parity - Calculate historical wealth-aware parity
+app.get(['/api/advanced/parity', '/api/advanced/parity/calculate'], async (req, res) => {
   try {
     const {
       personId,
